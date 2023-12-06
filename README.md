@@ -1,4 +1,4 @@
-# Easy Learning Platform Server
+# Easy Learning Platform Server Site
 
 ## Web and Android Application
 
