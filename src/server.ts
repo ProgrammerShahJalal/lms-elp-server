@@ -1,8 +1,18 @@
 import { Server } from "http";
-import config from "./app/config";
 import app from "./app";
+import config from "./config";
+import mongoose from "mongoose";
+
+// const uri = `mongodb+srv://${config.mongodb.user}:${config.mongodb.pass}@cluster0.zojx33n.mongodb.net/${config.mongodb.db_name}`;
+const uri = `mongodb://localhost:27017/easy_learning_platform`;
 
 async function bootstrap() {
+  try {
+    await mongoose.connect(uri);
+    console.log("DB connected!");
+  } catch (error) {
+    console.log("Mongodb error!", error);
+  }
   const server: Server = app.listen(config.port, () => {
     console.log(`Server is running on port: ${config.port}`);
   });
