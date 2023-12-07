@@ -1,9 +1,9 @@
 import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 import { ZodError } from "zod";
-import { IGenericErrorMessage } from "../interfaces/error";
-import ApiError from "../errors/ApiError";
-import handleZodError from "../errors/handleZodError";
-import config from "../config";
+import ApiError from "../../errors/ApiError";
+import { IGenericErrorMessage } from "../../interfaces/error";
+import handleZodError from "../../errors/handleZodError";
+import config from "../../config";
 
 const globalErrorHandler: ErrorRequestHandler = (
   error,
@@ -16,9 +16,9 @@ const globalErrorHandler: ErrorRequestHandler = (
   let errorMessages: IGenericErrorMessage[] = [];
 
   if (error instanceof ApiError) {
-    statusCode: error?.statusCode;
-    message: error?.message;
-    errorMessages: error?.message
+    statusCode = error?.statusCode;
+    message = error.message;
+    errorMessages = error?.message
       ? [
           {
             path: "",
