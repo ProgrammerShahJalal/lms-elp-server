@@ -9,6 +9,6 @@ const shippingAddressSchema = new Schema<IShippingAddress>({
 });
 
 export const ShippingAddress = model<IShippingAddress>(
-  "QuizQuestion",
+  "ShippingAddress",
   shippingAddressSchema
 );

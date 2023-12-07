@@ -11,6 +11,11 @@ const router = Router();
 // create shipping address
 router.post(
   "/",
+  authUserOrRole(
+    ENUM_USER_ROLE.SUPER_ADMIN,
+    ENUM_USER_ROLE.ADMIN,
+    ENUM_USER_ROLE.STUDENT
+  ),
   validateRequest(ShippingAddressValidation.createShippingAddressZodSchema),
   ShippingAddressController.createShippingAddress
 );
