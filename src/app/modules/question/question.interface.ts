@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { ENUM_QUIZ_OPTIONS } from "../../enums/quiz_options";
 
 export interface IQuestion {
@@ -6,7 +7,7 @@ export interface IQuestion {
   b?: string;
   c?: string;
   d?: string;
-  correct_answer?: ENUM_QUIZ_OPTIONS | string;
-  exam_id: string;
+  correct_answer?: ENUM_QUIZ_OPTIONS | string | null;
+  exam_id: Types.ObjectId;
   question_type: "0" | "1";
 }

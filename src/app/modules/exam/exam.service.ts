@@ -1,8 +1,20 @@
+import httpStatus from "http-status";
+import ApiError from "../../../errors/ApiError";
+import { Course } from "../course/course.model";
 import { IExam } from "./exam.interface";
 import { Exam } from "./exam.model";
 
 // create exam
 const createExam = async (payload: IExam): Promise<IExam> => {
+  // if the provided course_id have the course or not in db
+  const { course_id } = payload;
+  if (course_id) {
+    const course = await Course.findById(course_id);
+    if (!course) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Course not found!");
+    }
+  }
+
   const result = await Exam.create(payload);
 
   return result;
@@ -17,6 +29,11 @@ const getAllExams = async (): Promise<IExam[]> => {
 // get single exam
 const getSingleExam = async (id: string): Promise<IExam | null> => {
   const result = await Exam.findById(id);
+
+  if (!result) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Exam not found!");
+  }
+
   return result;
 };
 
