@@ -1,3 +1,6 @@
+import httpStatus from "http-status";
+import ApiError from "../../../errors/ApiError";
+import { User } from "../user/user.model";
 import { IShippingAddress } from "./shipping-address.interface";
 import { ShippingAddress } from "./shipping-address.model";
 
@@ -5,6 +8,12 @@ import { ShippingAddress } from "./shipping-address.model";
 const createShippingAddress = async (
   payload: IShippingAddress
 ): Promise<IShippingAddress> => {
+  const { user_id } = payload;
+  const user = await User.findById(user_id);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
+  }
+
   const result = await ShippingAddress.create(payload);
 
   return result;
