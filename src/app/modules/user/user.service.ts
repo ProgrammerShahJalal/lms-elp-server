@@ -53,8 +53,6 @@ const login = async (loginInfo: ILoginInfo) => {
   });
   // const requestedUser = await User.findOne({ email: email });
 
-  console.log(requestedUser);
-
   if (!requestedUser) {
     throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
   }

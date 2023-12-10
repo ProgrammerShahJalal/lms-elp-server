@@ -3,8 +3,8 @@ import app from "./app";
 import config from "./config";
 import mongoose from "mongoose";
 
-// const uri = `mongodb+srv://${config.mongodb.user}:${config.mongodb.pass}@cluster0.zojx33n.mongodb.net/${config.mongodb.db_name}`;
-const uri = `mongodb://localhost:27017/easy_learning_platform`;
+// const uri = `mongodb://localhost:27017/easy_learning_platform`;
+const uri = `${config.mongodb.url}`;
 
 async function bootstrap() {
   try {
