@@ -18,20 +18,12 @@ const registerUserZodSchema = z
     return true;
   });
 
-const loginUserZodSchema = z
-  .object({
-    body: z.object({
-      contact_no: z.string({}).optional(),
-      email: z.string({}).optional(),
-      password: z.string({ required_error: "Password is required!" }),
-    }),
-  })
-  .refine((data) => {
-    if (!data.body.contact_no && !data.body.email) {
-      throw new Error("Either contact_no or email is required!");
-    }
-    return true;
-  });
+const loginUserZodSchema = z.object({
+  body: z.object({
+    email_or_contact: z.string({}).optional(),
+    password: z.string({ required_error: "Password is required!" }),
+  }),
+});
 
 const updateUserZodSchema = z.object({
   body: z.object({

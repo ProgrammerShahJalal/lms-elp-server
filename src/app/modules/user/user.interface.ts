@@ -9,7 +9,6 @@ export interface IUser {
 }
 
 export type ILoginInfo = {
-  contact_no?: string;
-  email?: string;
+  email_or_contact: string;
   password: string;
 };

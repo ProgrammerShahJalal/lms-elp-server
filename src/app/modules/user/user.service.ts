@@ -43,18 +43,18 @@ const createSuperAdmin = async (
 
 // login user
 const login = async (loginInfo: ILoginInfo) => {
-  const { contact_no, email, password } = loginInfo;
+  const { email_or_contact, password } = loginInfo;
 
   const requestedUser = await User.findOne({
     $or: [
-      { contact_no: { $exists: true, $ne: null, $eq: contact_no } },
-      { email: { $exists: true, $ne: null, $eq: email } },
+      { contact_no: { $exists: true, $ne: null, $eq: email_or_contact } },
+      { email: { $exists: true, $ne: null, $eq: email_or_contact } },
     ],
   });
   // const requestedUser = await User.findOne({ email: email });
 
   if (!requestedUser) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found here!");
   }
 
   // compare password
