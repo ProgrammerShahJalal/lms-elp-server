@@ -7,6 +7,6 @@ export interface IExam {
   duration_in_minutes: number;
   cost: number;
   is_active: boolean;
-  is_paid: boolean;
+  exam_type: "0" | "1";
   course_id: Types.ObjectId;
 }
