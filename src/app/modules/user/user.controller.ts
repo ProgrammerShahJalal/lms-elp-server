@@ -48,6 +48,18 @@ const login = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getAllUsers = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await UserService.getAllUsers();
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Users fetched in successfully!",
+    data: result,
+  });
+});
+
 const getSingleUser = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const result = await UserService.getSingleUser(id);
@@ -90,6 +102,7 @@ export const UserController = {
   createSuperAdmin,
   createAdmin,
   login,
+  getAllUsers,
   getSingleUser,
   updateUser,
   deleteUser,

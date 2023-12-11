@@ -91,6 +91,17 @@ const login = async (loginInfo: ILoginInfo) => {
   return { isPasswordMatched, accessToken, refreshToken };
 };
 
+// get all users
+const getAllUsers = async () => {
+  const result = await User.find({});
+
+  if (!result.length) {
+    throw new ApiError(httpStatus.NOT_FOUND, "No user found!");
+  }
+
+  return result;
+};
+
 // get single user
 const getSingleUser = async (id: string): Promise<Omit<IUser, "password">> => {
   const result = await User.findById(id);
@@ -134,6 +145,7 @@ export const UserService = {
   createSuperAdmin,
   createAdmin,
   login,
+  getAllUsers,
   getSingleUser,
   updateUser,
   deleteUser,

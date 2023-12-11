@@ -12,6 +12,8 @@ import { ExamSubmissionRoutes } from "../modules/exam-submission/exam-submission
 import { BookRoutes } from "../modules/book/book.route";
 import { QuizQuestionRoutes } from "../modules/quiz-question/quiz-question.route";
 import { QuizSubmissionRoutes } from "../modules/quiz-submission/quiz-submission.route";
+import { UserExamQuestionMarkRoutes } from "../modules/user-exam-question-mark/user-exam-question-mark.route";
+import { ExamResultRoutes } from "../modules/exam-result/exam-result.route";
 
 const router = Router();
 
@@ -28,6 +30,8 @@ const moduleRoutes = [
   { path: "/questions", route: QuestionRoutes },
   { path: "/quiz-submissions", route: QuizSubmissionRoutes },
   { path: "/exam-submissions", route: ExamSubmissionRoutes },
+  { path: "/user-exam-question-marks", route: UserExamQuestionMarkRoutes },
+  { path: "/exam-results", route: ExamResultRoutes },
   { path: "/books", route: BookRoutes },
 ];
 
