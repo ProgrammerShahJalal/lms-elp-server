@@ -1,6 +1,5 @@
 import httpStatus from "http-status";
 import ApiError from "../../../errors/ApiError";
-import { Course } from "../course/course.model";
 import { IExamResult } from "./exam-result.interface";
 import { ExamResult } from "./exam-result.model";
 import { User } from "../user/user.model";
