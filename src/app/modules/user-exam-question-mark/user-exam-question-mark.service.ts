@@ -5,8 +5,9 @@ import { IUserExamQuestionMark } from "./user-exam-question-mark.interface";
 import { UserExamQuestionMark } from "./user-exam-question-mark.model";
 import { User } from "../user/user.model";
 import { Question } from "../question/question.model";
+import { ExamResult } from "../exam-result/exam-result.model";
 
-// creating UserExamQuestionMark
+// creating User Exam Question Mark
 const createUserExamQuestionMark = async (
   payload: IUserExamQuestionMark
 ): Promise<IUserExamQuestionMark> => {
@@ -31,16 +32,38 @@ const createUserExamQuestionMark = async (
 
   const result = await UserExamQuestionMark.create(payload);
 
+  // calculate total_mark on Exam Result and update
+  const filter = { user_id, exam_id };
+  const userExamResult = await ExamResult.findOne(filter);
+  if (userExamResult) {
+    const previousMark = userExamResult.total_mark_obtained;
+    const updatedMark = previousMark
+      ? previousMark + result.mark_obtained
+      : result.mark_obtained;
+    await ExamResult.findOneAndUpdate(
+      filter,
+      { $set: { total_mark_obtained: updatedMark } },
+      { new: true }
+    );
+  } else {
+    await ExamResult.create({
+      user_id,
+      exam_id,
+      total_marks: exam.total_marks,
+      total_mark_obtained: result.mark_obtained,
+    });
+  }
+
   return result;
 };
 
-// get all UserExamQuestionMarks
+// get all User Exam Question Marks
 const getAllUserExamQuestionMarks = async (): Promise<
   IUserExamQuestionMark[]
 > => {
   const result = await UserExamQuestionMark.find({});
 
-  // if no UserExamQuestionMark found, throw error
+  // if no User Exam Question Mark found, throw error
   if (!result.length) {
     throw new ApiError(
       httpStatus.NOT_FOUND,
@@ -51,7 +74,7 @@ const getAllUserExamQuestionMarks = async (): Promise<
   return result;
 };
 
-// get single quiz UserExamQuestionMark
+// get single quiz User Exam Question Mark
 const getSingleUserExamQuestionMark = async (
   id: string
 ): Promise<IUserExamQuestionMark | null> => {
@@ -68,7 +91,7 @@ const getSingleUserExamQuestionMark = async (
   return result;
 };
 
-// update quiz UserExamQuestionMark
+// update quiz User Exam Question Mark
 const updateUserExamQuestionMark = async (
   id: string,
   payload: Partial<IUserExamQuestionMark>
@@ -86,7 +109,7 @@ const updateUserExamQuestionMark = async (
   return result;
 };
 
-// delete quiz UserExamQuestionMark
+// delete quiz User Exam Question Mark
 const deleteUserExamQuestionMark = async (id: string) => {
   const result = await UserExamQuestionMark.findByIdAndDelete(id);
 

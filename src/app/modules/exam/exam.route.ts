@@ -21,6 +21,9 @@ router.get("/", ExamController.getAllExams);
 // get single exam
 router.get("/:id", ExamController.getSingleExam);
 
+// get questions of an exam
+router.get("/:id/questions", ExamController.getQuestionsOfAnExam);
+
 // update single exam
 router.patch(
   "/:id",

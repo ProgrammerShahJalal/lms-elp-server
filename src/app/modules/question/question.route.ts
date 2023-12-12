@@ -18,7 +18,7 @@ router.post(
 // get all questions
 router.get(
   "/",
-  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  // authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
   QuestionController.getAllQuestions
 );
 

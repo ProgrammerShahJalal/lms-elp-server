@@ -21,6 +21,12 @@ router.get("/", ExamResultController.getAllExamResults);
 // get single ExamResult
 router.get("/:id", ExamResultController.getSingleExamResult);
 
+// get exam result of an user
+router.get(
+  "/user/:user_id/exam/:exam_id/",
+  ExamResultController.getExamResultOfAUser
+);
+
 // update single ExamResult
 router.patch(
   "/:id",

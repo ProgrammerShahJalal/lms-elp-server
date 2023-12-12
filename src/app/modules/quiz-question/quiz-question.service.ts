@@ -15,7 +15,20 @@ const createQuizQuestion = async (
     if (!exam) {
       throw new ApiError(httpStatus.NOT_FOUND, "Exam not found!");
     }
+
+    // check if all questions added, if added prevent more adding
+    const { total_marks } = exam;
+    const totalQuestionsOnExam = await QuizQuestion.countDocuments({
+      exam_id,
+    });
+    if (totalQuestionsOnExam >= total_marks) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        `Total ${total_marks} questions added to this exam already!`
+      );
+    }
   }
+
   const result = await QuizQuestion.create(payload);
 
   return result;

@@ -5,7 +5,7 @@ const examResultSchema = new Schema<IExamResult>(
   {
     user_id: { type: Schema.Types.ObjectId, required: true, ref: "User" },
     exam_id: { type: Schema.Types.ObjectId, required: true, ref: "Exam" },
-    total_mark: { type: Number, required: true },
+    total_marks: { type: Number, required: true },
     total_mark_obtained: { type: Number, required: true },
     isApproved: { type: Boolean },
   },

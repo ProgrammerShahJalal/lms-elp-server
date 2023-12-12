@@ -13,6 +13,22 @@ const createQuestion = async (payload: IQuestion): Promise<IQuestion> => {
     if (!exam) {
       throw new ApiError(httpStatus.NOT_FOUND, "Exam not found!");
     }
+
+    // if adding this question to the exam exceeds the total_marks limit for the exam
+    const { total_marks } = exam;
+    const questions = await Question.find({
+      exam_id,
+    });
+    const totalMarkQuestionAdded = questions.reduce(
+      (sum, question) => sum + (question.mark || 0),
+      0
+    );
+    if (totalMarkQuestionAdded + payload.mark > total_marks) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        `Adding this question exceeds ${total_marks} marks for this exam.`
+      );
+    }
   }
   const result = await Question.create(payload);
 

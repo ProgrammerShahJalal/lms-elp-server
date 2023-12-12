@@ -3,6 +3,10 @@ import ApiError from "../../../errors/ApiError";
 import { Course } from "../course/course.model";
 import { IExam } from "./exam.interface";
 import { Exam } from "./exam.model";
+import { IQuestion } from "../question/question.interface";
+import { IQuizQuestion } from "../quiz-question/quiz-question.interface";
+import { Question } from "../question/question.model";
+import { QuizQuestion } from "../quiz-question/quiz-question.model";
 
 // create exam
 const createExam = async (payload: IExam): Promise<IExam> => {
@@ -23,6 +27,25 @@ const createExam = async (payload: IExam): Promise<IExam> => {
 // get all exams
 const getAllExams = async (): Promise<IExam[]> => {
   const result = await Exam.find({});
+  return result;
+};
+
+// get questions of an exam
+const getQuestionsOfAnExam = async (
+  exam_id: string
+): Promise<IQuestion[] | IQuizQuestion[]> => {
+  let result;
+
+  result = await Question.find({ exam_id });
+
+  if (!result.length) {
+    result = await QuizQuestion.find({ exam_id });
+  }
+
+  if (!result.length) {
+    throw new ApiError(httpStatus.NOT_FOUND, "No question found for this exam");
+  }
+
   return result;
 };
 
@@ -58,6 +81,7 @@ const deleteExam = async (id: string) => {
 export const ExamService = {
   createExam,
   getAllExams,
+  getQuestionsOfAnExam,
   getSingleExam,
   updateExam,
   deleteExam,

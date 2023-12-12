@@ -31,6 +31,14 @@ const getAllExamResults = async (): Promise<IExamResult[]> => {
   return result;
 };
 
+const getExamResultOfAUser = async (user_id: string, exam_id: string) => {
+  const result = await ExamResult.findOne({
+    user_id,
+    exam_id,
+  });
+  return result;
+};
+
 // get single ExamResult
 const getSingleExamResult = async (id: string): Promise<IExamResult | null> => {
   const result = await ExamResult.findById(id);
@@ -64,6 +72,7 @@ export const ExamResultService = {
   createExamResult,
   getAllExamResults,
   getSingleExamResult,
+  getExamResultOfAUser,
   updateExamResult,
   deleteExamResult,
 };
