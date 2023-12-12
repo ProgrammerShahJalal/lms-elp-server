@@ -7,9 +7,7 @@ export default {
   env: process.env.NODE_ENV,
   port: process.env.PORT,
   mongodb: {
-    user: process.env.MONGODB_USER,
-    pass: process.env.MONGODB_PASS,
-    db_name: process.env.MONGODB_DB_NAME,
+    url: process.env.MONGODB_URL,
   },
   jwt: {
     secret: process.env.JWT_SECRET,

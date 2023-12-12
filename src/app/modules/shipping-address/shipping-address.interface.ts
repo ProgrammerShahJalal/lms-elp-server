@@ -1,5 +1,7 @@
+import { Types } from "mongoose";
+
 export interface IShippingAddress {
-  user_id: string;
+  user_id: Types.ObjectId;
   division: string;
   district: string;
   upazilla: string;

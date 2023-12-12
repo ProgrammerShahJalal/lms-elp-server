@@ -17,13 +17,15 @@ const createSubCategory = async (
     );
   }
 
-  const result = await SubCategory.create(payload);
+  const result = (await await SubCategory.create(payload)).populate(
+    "category_id"
+  );
   return result;
 };
 
 // get all sub-categories
 const getAllSubCategories = async (): Promise<ISubCategory[]> => {
-  const result = await SubCategory.find({});
+  const result = await SubCategory.find({}).populate("category_id");
 
   // if there is no SubCategory, throw error
   if (!result.length) {

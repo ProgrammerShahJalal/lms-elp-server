@@ -38,6 +38,9 @@ router.post(
   UserController.login
 );
 
+// get all users
+router.get("/", UserController.getAllUsers);
+
 // get single user
 router.get(
   "/:id",
