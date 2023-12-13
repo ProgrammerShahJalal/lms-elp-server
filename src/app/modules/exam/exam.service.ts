@@ -1,12 +1,17 @@
 import httpStatus from "http-status";
 import ApiError from "../../../errors/ApiError";
 import { Course } from "../course/course.model";
-import { IExam } from "./exam.interface";
+import { IExam, IExamFilters } from "./exam.interface";
 import { Exam } from "./exam.model";
 import { IQuestion } from "../question/question.interface";
 import { IQuizQuestion } from "../quiz-question/quiz-question.interface";
 import { Question } from "../question/question.model";
 import { QuizQuestion } from "../quiz-question/quiz-question.model";
+import { IPaginationOptions } from "../../../interfaces/pagination";
+import { examSearchableFields } from "./exam.constants";
+import { paginationHelpers } from "../../helpers/paginationHelpers";
+import { IGenericResponse } from "../../../interfaces/common";
+import { SortOrder } from "mongoose";
 
 // create exam
 const createExam = async (payload: IExam): Promise<IExam> => {
@@ -25,9 +30,59 @@ const createExam = async (payload: IExam): Promise<IExam> => {
 };
 
 // get all exams
-const getAllExams = async (): Promise<IExam[]> => {
-  const result = await Exam.find({});
-  return result;
+const getAllExams = async (
+  filters: IExamFilters,
+  paginationOptions: IPaginationOptions
+): Promise<IGenericResponse<IExam[]>> => {
+  const { searchTerm, ...filtersData } = filters;
+
+  const andConditions = [];
+
+  if (searchTerm) {
+    andConditions.push({
+      $or: examSearchableFields.map((field) => ({
+        [field]: {
+          $regex: searchTerm,
+          $options: "i",
+        },
+      })),
+    });
+  }
+
+  if (Object.keys(filtersData).length) {
+    andConditions.push({
+      $and: Object.entries(filtersData).map(([field, value]) => ({
+        [field]: value,
+      })),
+    });
+  }
+
+  const { page, limit, skip, sortBy, sortOrder } =
+    paginationHelpers.calculatePagination(paginationOptions);
+
+  const sortConditions: { [key: string]: SortOrder } = {};
+  if (sortBy && sortOrder) {
+    sortConditions[sortBy] = sortOrder;
+  }
+
+  const whereConditions =
+    andConditions.length > 0 ? { $and: andConditions } : {};
+
+  const result = await Exam.find(whereConditions)
+    .sort(sortConditions)
+    .skip(skip)
+    .limit(limit)
+    .populate("course_id");
+  const total = await Exam.countDocuments(whereConditions);
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
 };
 
 // get questions of an exam
@@ -51,7 +106,7 @@ const getQuestionsOfAnExam = async (
 
 // get single exam
 const getSingleExam = async (id: string): Promise<IExam | null> => {
-  const result = await Exam.findById(id);
+  const result = await Exam.findById(id).populate("course_id");
 
   if (!result) {
     throw new ApiError(httpStatus.NOT_FOUND, "Exam not found!");

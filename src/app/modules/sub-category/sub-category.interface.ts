@@ -7,3 +7,9 @@ export interface ISubCategory {
   createdAt: Date;
   updatedAt?: Date;
 }
+
+export interface ISubCategoryFilters {
+  searchTerm?: string;
+  name?: string;
+  category_id?: string;
+}

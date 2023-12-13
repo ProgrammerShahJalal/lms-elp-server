@@ -1,8 +1,13 @@
 import httpStatus from "http-status";
 import ApiError from "../../../errors/ApiError";
-import { ISubCategory } from "./sub-category.interface";
+import { ISubCategory, ISubCategoryFilters } from "./sub-category.interface";
 import { SubCategory } from "./sub-category.model";
 import { Category } from "../category/category.model";
+import { IPaginationOptions } from "../../../interfaces/pagination";
+import { subCategorySearchableFields } from "./sub-category.constants";
+import { paginationHelpers } from "../../helpers/paginationHelpers";
+import { SortOrder } from "mongoose";
+import { IGenericResponse } from "../../../interfaces/common";
 
 // create SubCategory
 const createSubCategory = async (
@@ -24,22 +29,75 @@ const createSubCategory = async (
 };
 
 // get all sub-categories
-const getAllSubCategories = async (): Promise<ISubCategory[]> => {
-  const result = await SubCategory.find({}).populate("category_id");
+const getAllSubCategories = async (
+  filters: ISubCategoryFilters,
+  paginationOptions: IPaginationOptions
+): Promise<IGenericResponse<ISubCategory[]>> => {
+  const { searchTerm, ...filtersData } = filters;
 
-  // if there is no SubCategory, throw error
-  if (!result.length) {
-    throw new ApiError(httpStatus.NOT_FOUND, "No SubCategory found!");
+  const andConditions = [];
+
+  if (searchTerm) {
+    andConditions.push({
+      $or: subCategorySearchableFields.map((field) => ({
+        [field]: {
+          $regex: searchTerm,
+          $options: "i",
+        },
+      })),
+    });
   }
 
-  return result;
+  if (Object.keys(filtersData).length) {
+    andConditions.push({
+      $and: Object.entries(filtersData).map(([field, value]) => ({
+        [field]: value,
+      })),
+    });
+  }
+
+  const { page, limit, skip, sortBy, sortOrder } =
+    paginationHelpers.calculatePagination(paginationOptions);
+
+  const sortConditions: { [key: string]: SortOrder } = {};
+  if (sortBy && sortOrder) {
+    sortConditions[sortBy] = sortOrder;
+  }
+
+  const whereConditions =
+    andConditions.length > 0 ? { $and: andConditions } : {};
+
+  const result = await SubCategory.find(whereConditions)
+    .sort(sortConditions)
+    .skip(skip)
+    .limit(limit)
+    .populate({
+      path: "category_id",
+      select: "-createdAt -updatedAt -__v",
+    })
+    .select("-createdAt -updatedAt -__v");
+  const total = await SubCategory.countDocuments(whereConditions);
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
 };
 
 // get SubCategory
 const getSingleSubCategory = async (
   id: string
 ): Promise<ISubCategory | null> => {
-  const result = await SubCategory.findById(id);
+  const result = await SubCategory.findById(id)
+    .populate({
+      path: "category_id",
+      select: "-createdAt -updatedAt -__v",
+    })
+    .select("-createdAt -updatedAt -__v");
 
   // if the SubCategory is not found, throw error
   if (!result) {

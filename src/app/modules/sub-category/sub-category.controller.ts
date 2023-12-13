@@ -3,6 +3,9 @@ import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
 import { SubCategoryService } from "./sub-category.service";
+import pick from "../../../shared/pick";
+import { subCategoryFilterableFields } from "./sub-category.constants";
+import { paginationFields } from "../../constants/pagination";
 
 const createSubCategory = catchAsync(async (req: Request, res: Response) => {
   const result = await SubCategoryService.createSubCategory(req.body);
@@ -16,7 +19,12 @@ const createSubCategory = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllSubCategories = catchAsync(async (req: Request, res: Response) => {
-  const result = await SubCategoryService.getAllSubCategories();
+  const filters = pick(req.query, subCategoryFilterableFields);
+  const paginationOptions = pick(req.query, paginationFields);
+  const result = await SubCategoryService.getAllSubCategories(
+    filters,
+    paginationOptions
+  );
 
   sendResponse(res, {
     success: true,

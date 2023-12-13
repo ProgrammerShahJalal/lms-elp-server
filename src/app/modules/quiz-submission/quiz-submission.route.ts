@@ -4,17 +4,13 @@ import { ENUM_USER_ROLE } from "../../enums/user";
 import authUserOrRole from "../../middlewares/authUserOrRole";
 import { QuizSubmissionValidation } from "./quiz-submission.validation";
 import { QuizSubmissionController } from "./quiz-submission.controller";
+import authRole from "../../middlewares/authRole";
 
 const router = Router();
 
 // create Quiz Submission
 router.post(
   "/",
-  authUserOrRole(
-    ENUM_USER_ROLE.SUPER_ADMIN,
-    ENUM_USER_ROLE.ADMIN,
-    ENUM_USER_ROLE.STUDENT
-  ),
   validateRequest(QuizSubmissionValidation.createQuizSubmissionZodSchema),
   QuizSubmissionController.createQuizSubmission
 );
@@ -36,7 +32,7 @@ router.get(
 // update single Exam Submission
 router.patch(
   "/:id",
-  authUserOrRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
   validateRequest(QuizSubmissionValidation.updateQuizSubmissionZodSchema),
   QuizSubmissionController.updateQuizSubmission
 );

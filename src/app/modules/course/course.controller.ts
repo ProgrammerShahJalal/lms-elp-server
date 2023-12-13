@@ -3,6 +3,9 @@ import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
 import { CourseService } from "./course.service";
+import { courseFilterableFields } from "./course.constants";
+import { paginationFields } from "../../constants/pagination";
+import pick from "../../../shared/pick";
 
 const createCourse = catchAsync(async (req: Request, res: Response) => {
   const result = await CourseService.createCourse(req.body);
@@ -16,7 +19,9 @@ const createCourse = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllCourses = catchAsync(async (req: Request, res: Response) => {
-  const result = await CourseService.getAllCourses();
+  const filters = pick(req.query, courseFilterableFields);
+  const paginationOptions = pick(req.query, paginationFields);
+  const result = await CourseService.getAllCourses(filters, paginationOptions);
 
   sendResponse(res, {
     success: true,
