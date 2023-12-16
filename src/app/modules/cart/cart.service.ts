@@ -8,13 +8,14 @@ import { IGenericResponse } from "../../../interfaces/common";
 import { SortOrder } from "mongoose";
 import { ICart, ICartFilters } from "./cart.interface";
 import { Book } from "../book/book.model";
+import { User } from "../user/user.model";
 
 // create Cart
-const createCart = async (payload: ICart): Promise<ICart> => {
-  // if the provided user_id have the user or not in db
+const createCart = async (payload: ICart): Promise<ICart | null> => {
   const { user_id, book_id } = payload;
 
-  const user = await Course.findById(user_id);
+  // if the provided user_id have the user or not in db
+  const user = await User.findById(user_id);
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
   }
@@ -24,9 +25,35 @@ const createCart = async (payload: ICart): Promise<ICart> => {
     throw new ApiError(httpStatus.NOT_FOUND, "Book not found!");
   }
 
-  console.log(book);
+  const cartExisting = await Cart.findOne({
+    user_id,
+    book_id,
+  });
 
-  const result = await Cart.create(payload);
+  let result;
+
+  if (!cartExisting) {
+    // Create the cart
+    const createdCart = await Cart.create(payload);
+
+    // Query the created cart to populate the user and book information
+    result = await Cart.findById(createdCart._id)
+      .populate("user_id", "name email contact_no")
+      .populate("book_id", "name writer price");
+  } else {
+    await Cart.updateOne(
+      {
+        user_id,
+        book_id,
+      },
+      { $inc: { quantity: payload.quantity || 1 } },
+      { new: true }
+    );
+
+    result = await Cart.findById(cartExisting._id)
+      .populate("user_id", "name email contact_no")
+      .populate("book_id", "name writer price");
+  }
 
   return result;
 };
