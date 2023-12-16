@@ -6,7 +6,7 @@ const categorySchema = new Schema<ICategory>(
     name: { type: String, required: true, unique: true },
     icon_link: { type: String },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true } }
 );
 
 export const Category = model<ICategory>("Category", categorySchema);

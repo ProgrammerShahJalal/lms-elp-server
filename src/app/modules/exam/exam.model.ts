@@ -12,7 +12,7 @@ const examSchema = new Schema<IExam>(
     exam_type: { type: String, required: true },
     course_id: { type: Schema.Types.ObjectId, required: true, ref: "Course" },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true } }
 );
 
 examSchema.index(

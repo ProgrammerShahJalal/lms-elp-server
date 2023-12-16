@@ -14,6 +14,7 @@ const userExamQuestionMarkSchema = new Schema<IUserExamQuestionMark>(
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
   }
 );
 

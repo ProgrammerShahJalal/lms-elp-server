@@ -13,6 +13,7 @@ const quizQuestionSchema = new Schema<IQuizQuestion>(
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
   }
 );
 

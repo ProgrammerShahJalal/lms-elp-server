@@ -39,7 +39,11 @@ router.post(
 );
 
 // get all users
-router.get("/", UserController.getAllUsers);
+router.get(
+  "/",
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  UserController.getAllUsers
+);
 
 // get single user
 router.get(
@@ -51,7 +55,7 @@ router.get(
 // update user
 router.patch(
   "/:id",
-  authUser,
+  authUserOrRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
   validateRequest(UserValidation.updateUserZodSchema),
   UserController.updateUser
 );

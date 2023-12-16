@@ -14,6 +14,7 @@ import { QuizQuestionRoutes } from "../modules/quiz-question/quiz-question.route
 import { QuizSubmissionRoutes } from "../modules/quiz-submission/quiz-submission.route";
 import { UserExamQuestionMarkRoutes } from "../modules/user-exam-question-mark/user-exam-question-mark.route";
 import { ExamResultRoutes } from "../modules/exam-result/exam-result.route";
+import { CartRoutes } from "../modules/cart/cart.route";
 
 const router = Router();
 
@@ -33,6 +34,7 @@ const moduleRoutes = [
   { path: "/user-exam-question-marks", route: UserExamQuestionMarkRoutes },
   { path: "/exam-results", route: ExamResultRoutes },
   { path: "/books", route: BookRoutes },
+  { path: "/carts", route: CartRoutes },
 ];
 
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

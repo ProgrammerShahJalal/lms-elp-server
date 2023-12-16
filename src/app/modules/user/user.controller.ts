@@ -3,9 +3,19 @@ import catchAsync from "../../../shared/catchAsync";
 import { UserService } from "./user.service";
 import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
+import config from "../../../config";
+import pick from "../../../shared/pick";
+import { bookFilterableFields } from "../book/book.constants";
+import { paginationFields } from "../../constants/pagination";
+import { userFilterableFields } from "./user.constants";
 
 const registerUser = catchAsync(async (req: Request, res: Response) => {
   const result = await UserService.registerUser(req.body);
+
+  res.cookie("refreshToken", result.refreshToken, {
+    httpOnly: true,
+    secure: config.env === "production",
+  });
 
   sendResponse(res, {
     success: true,
@@ -40,6 +50,13 @@ const createAdmin = catchAsync(async (req: Request, res: Response) => {
 const login = catchAsync(async (req: Request, res: Response) => {
   const result = await UserService.login(req.body);
 
+  const { refreshToken } = result;
+
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: config.env === "production",
+  });
+
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -49,8 +66,10 @@ const login = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const result = await UserService.getAllUsers();
+  const filters = pick(req.query, userFilterableFields);
+  const paginationOptions = pick(req.query, paginationFields);
+
+  const result = await UserService.getAllUsers(filters, paginationOptions);
 
   sendResponse(res, {
     success: true,

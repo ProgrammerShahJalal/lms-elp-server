@@ -10,6 +10,7 @@ const questionSchema = new Schema<IQuestion>(
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
   }
 );
 

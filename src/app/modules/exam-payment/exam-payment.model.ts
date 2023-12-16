@@ -9,7 +9,7 @@ const examPaymentSchema = new Schema<IExamPayment>(
     trx_id: { type: String, required: true },
     payment_date: { type: Date },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true } }
 );
 
 examPaymentSchema.index(

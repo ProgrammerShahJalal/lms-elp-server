@@ -7,7 +7,7 @@ const examSubmissionSchema = new Schema<IExamSubmission>(
     exam_id: { type: Schema.Types.ObjectId, required: true, ref: "Exam" },
     answer_link: { type: String, required: true },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true } }
 );
 
 examSubmissionSchema.index(

@@ -11,7 +11,7 @@ const coursePlaylistSchema = new Schema<ICoursePlaylist>(
     },
     playlist_link: { type: String, required: true },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true } }
 );
 
 coursePlaylistSchema.index(

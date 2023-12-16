@@ -12,7 +12,7 @@ const quizSubmissionSchema = new Schema<IQuizSubmission>(
     },
     answer: { type: String, required: true },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true } }
 );
 
 quizSubmissionSchema.index(
