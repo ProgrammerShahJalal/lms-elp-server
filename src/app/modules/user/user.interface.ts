@@ -10,6 +10,13 @@ export interface IUser {
   password: string;
 }
 
+export interface IUserFilters {
+  searchTerm?: string;
+  name?: string;
+  email?: string;
+  contact_no?: string;
+}
+
 export type ILoginInfo = {
   email_or_contact: string;
   password: string;
