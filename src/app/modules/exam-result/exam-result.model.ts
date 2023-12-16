@@ -9,7 +9,7 @@ const examResultSchema = new Schema<IExamResult>(
     total_mark_obtained: { type: Number, required: true },
     isApproved: { type: Boolean },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true } }
 );
 
 examResultSchema.index({ user_id: 1, exam_id: 1 }, { unique: true });

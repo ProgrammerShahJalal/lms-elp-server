@@ -12,7 +12,7 @@ const bookSchema = new Schema<IBook>(
     pdf_link: { type: String },
     course_id: { type: Schema.Types.ObjectId, ref: "Course" },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true } }
 );
 
 bookSchema.index(

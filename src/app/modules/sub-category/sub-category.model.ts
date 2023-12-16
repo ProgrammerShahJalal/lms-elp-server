@@ -11,7 +11,7 @@ const subCategorySchema = new Schema<ISubCategory>(
       ref: "Category",
     },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true } }
 );
 
 subCategorySchema.index({ name: 1, category_id: 1 }, { unique: true });

@@ -19,6 +19,7 @@ const shippingAddressSchema = new Schema<IShippingAddress>(
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
   }
 );
 

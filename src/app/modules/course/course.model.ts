@@ -15,7 +15,7 @@ const courseSchema = new Schema<ICourse>(
     syllabus: { type: String },
     study_materials: { type: String },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true } }
 );
 
 courseSchema.index(
