@@ -1,8 +1,13 @@
 import httpStatus from "http-status";
 import ApiError from "../../../errors/ApiError";
-import { ICourse } from "./course.interface";
+import { ICourse, ICourseFilters } from "./course.interface";
 import { Course } from "./course.model";
 import { SubCategory } from "../sub-category/sub-category.model";
+import { IPaginationOptions } from "../../../interfaces/pagination";
+import { IGenericResponse } from "../../../interfaces/common";
+import { courseFilterableFields } from "./course.constants";
+import { paginationHelpers } from "../../helpers/paginationHelpers";
+import { SortOrder } from "mongoose";
 
 // create Course
 const createCourse = async (payload: ICourse): Promise<ICourse> => {
@@ -18,20 +23,81 @@ const createCourse = async (payload: ICourse): Promise<ICourse> => {
 };
 
 // get all courses
-const getAllCourses = async (): Promise<ICourse[]> => {
-  const result = await Course.find({});
+const getAllCourses = async (
+  filters: ICourseFilters,
+  paginationOptions: IPaginationOptions
+): Promise<IGenericResponse<ICourse[]>> => {
+  const { searchTerm, ...filtersData } = filters;
 
-  // if there is no Course, throw error
-  if (!result.length) {
-    throw new ApiError(httpStatus.NOT_FOUND, "No Course found!");
+  const andConditions = [];
+
+  if (searchTerm) {
+    andConditions.push({
+      $or: courseFilterableFields.map((field) => ({
+        [field]: {
+          $regex: searchTerm,
+          $options: "i",
+        },
+      })),
+    });
   }
 
-  return result;
+  if (Object.keys(filtersData).length) {
+    andConditions.push({
+      $and: Object.entries(filtersData).map(([field, value]) => ({
+        [field]: value,
+      })),
+    });
+  }
+
+  const { page, limit, skip, sortBy, sortOrder } =
+    paginationHelpers.calculatePagination(paginationOptions);
+
+  const sortConditions: { [key: string]: SortOrder } = {};
+  if (sortBy && sortOrder) {
+    sortConditions[sortBy] = sortOrder;
+  }
+
+  const whereConditions =
+    andConditions.length > 0 ? { $and: andConditions } : {};
+
+  const result = await Course.find(whereConditions)
+    .sort(sortConditions)
+    .skip(skip)
+    .limit(limit)
+    .populate({
+      path: "sub_category_id",
+      select: "name _id",
+      populate: {
+        path: "category_id",
+        select: "name _id",
+      },
+    })
+    .select("-createdAt -updatedAt -__v");
+  const total = await Course.countDocuments(whereConditions);
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
 };
 
 // get Course
 const getSingleCourse = async (id: string): Promise<ICourse | null> => {
-  const result = await Course.findById(id);
+  const result = await Course.findById(id)
+    .populate({
+      path: "sub_category_id",
+      select: "name _id",
+      populate: {
+        path: "category_id",
+        select: "name _id",
+      },
+    })
+    .select("-createdAt -updatedAt -__v");
 
   // if the Course is not found, throw error
   if (!result) {

@@ -10,3 +10,14 @@ export interface IBook {
   pdf_link?: string;
   course_id?: Types.ObjectId;
 }
+
+export interface IBookFilters {
+  searchTerm?: string;
+  name?: string;
+  price?: number;
+  discount_price?: number;
+  description?: string;
+  format?: string;
+  pdf_link?: string;
+  course_id?: Types.ObjectId;
+}

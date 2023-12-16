@@ -3,6 +3,9 @@ import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
 import { ExamService } from "./exam.service";
+import { examFilterableFields } from "./exam.constants";
+import pick from "../../../shared/pick";
+import { paginationFields } from "../../constants/pagination";
 
 const createExam = catchAsync(async (req: Request, res: Response) => {
   const result = await ExamService.createExam(req.body);
@@ -16,7 +19,10 @@ const createExam = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllExams = catchAsync(async (req: Request, res: Response) => {
-  const result = await ExamService.getAllExams();
+  const filters = pick(req.query, examFilterableFields);
+  const paginationOptions = pick(req.query, paginationFields);
+
+  const result = await ExamService.getAllExams(filters, paginationOptions);
 
   sendResponse(res, {
     success: true,
