@@ -3,6 +3,9 @@ import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
 import { QuestionService } from "./question.service";
+import { questionFilterableFields } from "./question.constants";
+import { paginationFields } from "../../constants/pagination";
+import pick from "../../../shared/pick";
 
 const createQuestion = catchAsync(async (req: Request, res: Response) => {
   const result = await QuestionService.createQuestion(req.body);
@@ -16,7 +19,13 @@ const createQuestion = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllQuestions = catchAsync(async (req: Request, res: Response) => {
-  const result = await QuestionService.getAllQuestions();
+  const filters = pick(req.query, questionFilterableFields);
+  const paginationOptions = pick(req.query, paginationFields);
+
+  const result = await QuestionService.getAllQuestions(
+    filters,
+    paginationOptions
+  );
 
   sendResponse(res, {
     success: true,

@@ -1,8 +1,13 @@
 import httpStatus from "http-status";
 import ApiError from "../../../errors/ApiError";
 import { Exam } from "../exam/exam.model";
-import { IQuestion } from "./question.interface";
+import { IQuestion, IQuestionFilters } from "./question.interface";
 import { Question } from "./question.model";
+import { IPaginationOptions } from "../../../interfaces/pagination";
+import { questionSearchableFields } from "./question.constants";
+import { paginationHelpers } from "../../helpers/paginationHelpers";
+import { SortOrder } from "mongoose";
+import { IGenericResponse } from "../../../interfaces/common";
 
 // creating question
 const createQuestion = async (payload: IQuestion): Promise<IQuestion> => {
@@ -36,20 +41,64 @@ const createQuestion = async (payload: IQuestion): Promise<IQuestion> => {
 };
 
 // get all questions
-const getAllQuestions = async (): Promise<IQuestion[]> => {
-  const result = await Question.find({});
+const getAllQuestions = async (
+  filters: IQuestionFilters,
+  paginationOptions: IPaginationOptions
+): Promise<IGenericResponse<IQuestion[]>> => {
+  const { searchTerm, ...filtersData } = filters;
 
-  // if no question found, throw error
-  if (!result.length) {
-    throw new ApiError(httpStatus.NOT_FOUND, "No question found!");
+  const andConditions = [];
+
+  if (searchTerm) {
+    andConditions.push({
+      $or: questionSearchableFields.map((field) => ({
+        [field]: {
+          $regex: searchTerm,
+          $options: "i",
+        },
+      })),
+    });
   }
 
-  return result;
+  if (Object.keys(filtersData).length) {
+    andConditions.push({
+      $and: Object.entries(filtersData).map(([field, value]) => ({
+        [field]: value,
+      })),
+    });
+  }
+
+  const { page, limit, skip, sortBy, sortOrder } =
+    paginationHelpers.calculatePagination(paginationOptions);
+
+  const sortConditions: { [key: string]: SortOrder } = {};
+  if (sortBy && sortOrder) {
+    sortConditions[sortBy] = sortOrder;
+  }
+
+  const whereConditions =
+    andConditions.length > 0 ? { $and: andConditions } : {};
+
+  const result = await Question.find(whereConditions)
+    .sort(sortConditions)
+    .skip(skip)
+    .limit(limit)
+    .populate("exam_id");
+  const total = await Question.countDocuments(whereConditions);
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
 };
 
 // get single quiz question
 const getSingleQuestion = async (id: string): Promise<IQuestion | null> => {
-  const result = await Question.findById(id);
+  const result = await Question.findById(id).populate("exam_id");
 
   // if question not found, throw error
   if (!result) {

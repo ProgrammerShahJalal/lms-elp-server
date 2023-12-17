@@ -16,6 +16,7 @@ const createQuestionZodSchema = z.object({
     question_type: z.enum(["0", "1"] as const, {
       required_error: "Question type is required!",
     }),
+    mark: z.number({}).optional(),
   }),
 });
 
@@ -29,6 +30,7 @@ const updateQuestionZodSchema = z.object({
     correct_answer: z.string({}).optional(),
     exam_id: z.string({}).optional(),
     question_type: z.enum(["0", "1"] as const).optional(),
+    mark: z.number({}).optional(),
   }),
 });
 

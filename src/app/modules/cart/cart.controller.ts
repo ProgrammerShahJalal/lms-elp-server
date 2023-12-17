@@ -7,8 +7,8 @@ import { paginationFields } from "../../constants/pagination";
 import { CartService } from "./cart.service";
 import { cartFilterableFields } from "./cart.constants";
 
-const createCart = catchAsync(async (req: Request, res: Response) => {
-  const result = await CartService.createCart(req.body);
+const addCart = catchAsync(async (req: Request, res: Response) => {
+  const result = await CartService.addCart(req.body);
 
   sendResponse(res, {
     success: true,
@@ -69,7 +69,7 @@ const deleteCart = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const CartController = {
-  createCart,
+  addCart,
   getAllCarts,
   getSingleCart,
   updateCart,

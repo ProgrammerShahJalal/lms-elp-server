@@ -4,9 +4,14 @@ import { IQuestion } from "./question.interface";
 const questionSchema = new Schema<IQuestion>(
   {
     question: { type: String, required: true },
+    a: { type: String },
+    b: { type: String },
+    c: { type: String },
+    d: { type: String },
     correct_answer: { type: String },
-    mark: { type: Number, required: true },
+    mark: { type: Number, required: true, default: 1 },
     exam_id: { type: Schema.Types.ObjectId, ref: "Exam" },
+    exam_type: { type: String },
   },
   {
     timestamps: true,

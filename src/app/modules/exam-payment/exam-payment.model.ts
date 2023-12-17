@@ -5,7 +5,6 @@ const examPaymentSchema = new Schema<IExamPayment>(
   {
     user_id: { type: Schema.Types.ObjectId, required: true, ref: "User" },
     exam_id: { type: Schema.Types.ObjectId, required: true, ref: "Exam" },
-    invalid_date: { type: Date },
     trx_id: { type: String, required: true },
     payment_date: { type: Date },
   },
@@ -13,7 +12,7 @@ const examPaymentSchema = new Schema<IExamPayment>(
 );
 
 examPaymentSchema.index(
-  { user_id: 1, exam_id: 1, payment_id: 1 },
+  { user_id: 1, exam_id: 1, trx_id: 1 },
   { unique: true }
 );
 
