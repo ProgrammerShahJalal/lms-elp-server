@@ -21,10 +21,12 @@ router.get("/", ExamResultController.getAllExamResults);
 // get single ExamResult
 router.get("/:id", ExamResultController.getSingleExamResult);
 
-// get exam result of an user
-router.get(
-  "/user/:user_id/exam/:exam_id/",
-  ExamResultController.getExamResultOfAUser
+// give question mark
+router.patch(
+  "/give-mark",
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  validateRequest(ExamResultValidation.giveQuestionMarkZodSchema),
+  ExamResultController.giveQuestionMark
 );
 
 // update single ExamResult

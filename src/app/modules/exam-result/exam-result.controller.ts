@@ -3,6 +3,9 @@ import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
 import { ExamResultService } from "./exam-result.service";
+import { examResultFilterableFields } from "./exam-result.constants";
+import { paginationFields } from "../../constants/pagination";
+import pick from "../../../shared/pick";
 
 const createExamResult = catchAsync(async (req: Request, res: Response) => {
   const result = await ExamResultService.createExamResult(req.body);
@@ -15,8 +18,25 @@ const createExamResult = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const giveQuestionMark = catchAsync(async (req: Request, res: Response) => {
+  const result = await ExamResultService.giveQuestionMark(req.body);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Exam result updated successfully!",
+    data: result,
+  });
+});
+
 const getAllExamResults = catchAsync(async (req: Request, res: Response) => {
-  const result = await ExamResultService.getAllExamResults();
+  const filters = pick(req.query, examResultFilterableFields);
+  const paginationOptions = pick(req.query, paginationFields);
+
+  const result = await ExamResultService.getAllExamResults(
+    filters,
+    paginationOptions
+  );
 
   sendResponse(res, {
     success: true,
@@ -25,18 +45,6 @@ const getAllExamResults = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
-
-const getExamResultOfAUser = async (req: Request, res: Response) => {
-  const { exam_id, user_id } = req.params;
-  const result = await ExamResultService.getAllExamResults();
-
-  sendResponse(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: "Exam result of an exam of a user fetched successfully!",
-    data: result,
-  });
-};
 
 const getSingleExamResult = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -76,9 +84,9 @@ const deleteExamResult = catchAsync(async (req: Request, res: Response) => {
 
 export const ExamResultController = {
   createExamResult,
+  giveQuestionMark,
   getAllExamResults,
   getSingleExamResult,
-  getExamResultOfAUser,
   updateExamResult,
   deleteExamResult,
 };
