@@ -11,7 +11,7 @@ const router = Router();
 router.post(
   "/",
   validateRequest(CartValidation.createCartZodSchema),
-  CartController.createCart
+  CartController.addCart
 );
 
 // get all Carts

@@ -10,8 +10,8 @@ import { ICart, ICartFilters } from "./cart.interface";
 import { Book } from "../book/book.model";
 import { User } from "../user/user.model";
 
-// create Cart
-const createCart = async (payload: ICart): Promise<ICart | null> => {
+// add Cart
+const addCart = async (payload: ICart): Promise<ICart | null> => {
   const { user_id, book_id } = payload;
 
   // if the provided user_id have the user or not in db
@@ -41,6 +41,9 @@ const createCart = async (payload: ICart): Promise<ICart | null> => {
       .populate("user_id", "name email contact_no")
       .populate("book_id", "name writer price");
   } else {
+    if (Number(cartExisting?.quantity) + Number(payload?.quantity) < 0) {
+      return cartExisting;
+    }
     await Cart.updateOne(
       {
         user_id,
@@ -132,7 +135,7 @@ const deleteCart = async (id: string) => {
 };
 
 export const CartService = {
-  createCart,
+  addCart,
   getAllCarts,
   getSingleCart,
   updateCart,
