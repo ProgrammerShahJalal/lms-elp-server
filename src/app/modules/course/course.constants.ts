@@ -2,6 +2,7 @@ export const courseFilterableFields = [
   "searchTerm",
   "membership_type",
   "sub_category_id",
+  "category_id",
   "name",
 ];
 

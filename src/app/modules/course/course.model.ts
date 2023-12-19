@@ -10,6 +10,7 @@ const courseSchema = new Schema<ICourse>(
       required: true,
       ref: "SubCategory",
     },
+    category_id: { type: String },
     description: { type: String, required: true },
     banner: { type: String },
     syllabus: { type: String },

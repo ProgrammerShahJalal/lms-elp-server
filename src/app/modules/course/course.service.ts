@@ -13,16 +13,28 @@ import { SortOrder } from "mongoose";
 const createCourse = async (payload: ICourse): Promise<ICourse> => {
   // to check if the sub-category is present of the provided sub-category-id
   const { sub_category_id } = payload;
-  const subCategory = await SubCategory.findById(sub_category_id);
+  const subCategory = await SubCategory.findById(sub_category_id).populate(
+    "category_id"
+  );
   if (!subCategory) {
     throw new ApiError(httpStatus.NOT_FOUND, "Sub category not found!");
   }
+  // @ts-ignore
+  payload.category_id = subCategory.category_id._id.toString();
 
-  const result = await Course.create(payload);
+  const result = (await Course.create(payload)).populate({
+    path: "sub_category_id",
+    select: "name _id",
+    populate: {
+      path: "category_id",
+      select: "name _id",
+    },
+  });
   return result;
 };
 
 // get all courses
+
 const getAllCourses = async (
   filters: ICourseFilters,
   paginationOptions: IPaginationOptions
@@ -61,7 +73,7 @@ const getAllCourses = async (
   const whereConditions =
     andConditions.length > 0 ? { $and: andConditions } : {};
 
-  const result = await Course.find(whereConditions)
+  let result = await Course.find(whereConditions)
     .sort(sortConditions)
     .skip(skip)
     .limit(limit)

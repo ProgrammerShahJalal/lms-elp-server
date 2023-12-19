@@ -1,9 +1,10 @@
 import { Types } from "mongoose";
+import { ICategory } from "../category/category.interface";
 
 export interface ISubCategory {
   name: string;
   icon_link?: string;
-  category_id: Types.ObjectId;
+  category_id: Types.ObjectId | ICategory;
   createdAt: Date;
   updatedAt?: Date;
 }

@@ -1,9 +1,18 @@
 import httpStatus from "http-status";
 import ApiError from "../../../errors/ApiError";
-import { IExamResult } from "./exam-result.interface";
+import {
+  IExamQuestionMarkPayload,
+  IExamResult,
+  IExamResultFilters,
+} from "./exam-result.interface";
 import { ExamResult } from "./exam-result.model";
 import { User } from "../user/user.model";
 import { Exam } from "../exam/exam.model";
+import { IGenericResponse } from "../../../interfaces/common";
+import { IPaginationOptions } from "../../../interfaces/pagination";
+import { examResultFilterableFields } from "./exam-result.constants";
+import { paginationHelpers } from "../../helpers/paginationHelpers";
+import { SortOrder } from "mongoose";
 
 // create ExamResult
 const createExamResult = async (payload: IExamResult): Promise<IExamResult> => {
@@ -20,23 +29,113 @@ const createExamResult = async (payload: IExamResult): Promise<IExamResult> => {
     throw new ApiError(httpStatus.NOT_FOUND, "Exam not found!");
   }
 
-  const result = await ExamResult.create(payload);
+  let result;
+  payload.total_marks = exam.total_marks;
+  payload.exam_type = exam.exam_type;
+  if (exam.exam_type === "1") {
+    // if written exam is submitted by student
+    if (!payload.answer) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        "Please provide your answer link."
+      );
+    }
+    result = await ExamResult.create(payload);
+    return result;
+  } else if (exam.exam_type === "0") {
+    // if quiz exam is submitted by student
+    result = await ExamResult.create(payload);
+    return result;
+  } else {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Invalid exam type!");
+  }
+};
 
+// create/give exam question mark
+const giveQuestionMark = async (payload: IExamQuestionMarkPayload) => {
+  const examResult = await ExamResult.findOne({
+    user_id: payload.user_id,
+    exam_id: payload.exam_id,
+  });
+
+  if (!examResult) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Invalid user id or exam id!");
+  }
+
+  let totalCorrectAnswer = 0;
+  for (const mark of payload.marks) {
+    totalCorrectAnswer += mark.mark_obtained;
+  }
+  const result = await ExamResult.updateOne(
+    { _id: examResult._id },
+    {
+      $set: {
+        question_mark: payload.marks,
+        totalCorrectAnswer: totalCorrectAnswer,
+        total_wrong_answer: examResult.total_marks - totalCorrectAnswer,
+      },
+    },
+    {
+      new: true,
+    }
+  );
   return result;
 };
 
 // get all ExamResults
-const getAllExamResults = async (): Promise<IExamResult[]> => {
-  const result = await ExamResult.find({});
-  return result;
-};
+const getAllExamResults = async (
+  filters: IExamResultFilters,
+  paginationOptions: IPaginationOptions
+): Promise<IGenericResponse<IExamResult[]>> => {
+  const { searchTerm, ...filtersData } = filters;
 
-const getExamResultOfAUser = async (user_id: string, exam_id: string) => {
-  const result = await ExamResult.findOne({
-    user_id,
-    exam_id,
-  });
-  return result;
+  const andConditions = [];
+
+  if (searchTerm) {
+    andConditions.push({
+      $or: examResultFilterableFields.map((field) => ({
+        [field]: {
+          $regex: searchTerm,
+          $options: "i",
+        },
+      })),
+    });
+  }
+
+  if (Object.keys(filtersData).length) {
+    andConditions.push({
+      $and: Object.entries(filtersData).map(([field, value]) => ({
+        [field]: value,
+      })),
+    });
+  }
+
+  const { page, limit, skip, sortBy, sortOrder } =
+    paginationHelpers.calculatePagination(paginationOptions);
+
+  const sortConditions: { [key: string]: SortOrder } = {};
+  if (sortBy && sortOrder) {
+    sortConditions[sortBy] = sortOrder;
+  }
+
+  const whereConditions =
+    andConditions.length > 0 ? { $and: andConditions } : {};
+
+  const result = await ExamResult.find(whereConditions)
+    .sort(sortConditions)
+    .skip(skip)
+    .limit(limit)
+    .populate("course_id");
+  const total = await ExamResult.countDocuments(whereConditions);
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
 };
 
 // get single ExamResult
@@ -70,9 +169,9 @@ const deleteExamResult = async (id: string) => {
 
 export const ExamResultService = {
   createExamResult,
+  giveQuestionMark,
   getAllExamResults,
   getSingleExamResult,
-  getExamResultOfAUser,
   updateExamResult,
   deleteExamResult,
 };

@@ -14,6 +14,7 @@ import { CartRoutes } from "../modules/cart/cart.route";
 import { SubscriptionRoutes } from "../modules/subscription/subscription.route";
 import { OrderRoutes } from "../modules/order/order.route";
 import { OrderStatusRoutes } from "../modules/order-status/order-status.route";
+import { SubscriptionHistoryRoutes } from "../modules/subscription-history/subscription-history.route";
 
 const router = Router();
 
@@ -31,6 +32,7 @@ const moduleRoutes = [
   { path: "/books", route: BookRoutes },
   { path: "/carts", route: CartRoutes },
   { path: "/subscriptions", route: SubscriptionRoutes },
+  { path: "/subscription-histories", route: SubscriptionHistoryRoutes },
   { path: "/orders", route: OrderRoutes },
   { path: "/order-statuses", route: OrderStatusRoutes },
 ];
