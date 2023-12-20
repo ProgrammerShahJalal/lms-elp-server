@@ -5,7 +5,7 @@ export interface IExam {
   description: string;
   total_marks: number;
   duration_in_minutes: number;
-  cost: number;
+  fee: number;
   is_active: boolean;
   exam_type: "0" | "1";
   course_id: Types.ObjectId;
@@ -16,7 +16,7 @@ export type IExamFilters = {
   name?: string;
   total_marks?: number;
   duration_in_minutes?: number;
-  cost?: string;
+  fee?: string;
   is_active?: number;
   exam_type?: string;
   course_id?: string;

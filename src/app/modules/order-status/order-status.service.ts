@@ -1,37 +1,35 @@
 import httpStatus from "http-status";
 import ApiError from "../../../errors/ApiError";
-import { SubCategory } from "../sub-category/sub-category.model";
 import { IPaginationOptions } from "../../../interfaces/pagination";
 import { IGenericResponse } from "../../../interfaces/common";
 import { paginationHelpers } from "../../helpers/paginationHelpers";
-import { Course } from "../course/course.model";
-import { Book } from "../book/book.model";
 import { IOrderStatus, IOrderStatusFilters } from "./order-status.interface";
 import { Order } from "../order/order.model";
 import { OrderStatus } from "./order-status.model";
 import { ShippingAddress } from "../shipping-address/shipping-address.model";
 import { SortOrder } from "mongoose";
+import { User } from "../user/user.model";
 
 // create OrderStatus
 const createOrderStatus = async (
   payload: IOrderStatus
 ): Promise<IOrderStatus> => {
-  const { user_id, order_id, shipping_address_id } = payload;
+  const { user_id, order_details_id, shipping_address_id } = payload;
   // to check if the user is present of the provided user_id
-  const user = await Course.findById(user_id);
+  const user = await User.findById(user_id);
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
   }
 
-  // to check if the order is present of the provided order_id
-  const order = await Order.findById(order_id);
-  if (!order) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Book not found!");
+  // to check if the order details is present of the provided order_details_id
+  const order_details = await Order.findById(order_details_id);
+  if (!order_details) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Order details found!");
   }
 
   // to check if the shipping address is present of the provided shipping address id
   const shippingAddress = await ShippingAddress.findById(shipping_address_id);
-  if (!order) {
+  if (!shippingAddress) {
     throw new ApiError(httpStatus.NOT_FOUND, "Shipping address not found!");
   }
 
