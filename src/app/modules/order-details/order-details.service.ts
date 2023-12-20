@@ -9,7 +9,6 @@ import { ShippingAddress } from "../shipping-address/shipping-address.model";
 import { SortOrder } from "mongoose";
 import { IOrderDetails, IOrderDetailsFilters } from "./order-details.interface";
 import { User } from "../user/user.model";
-import { Order } from "../order/order.model";
 import { isJSON } from "../../helpers/common";
 import { IOrder } from "../order/order.interface";
 
@@ -79,7 +78,7 @@ const getAllOrderDetails = async (
     .sort(sortConditions)
     .skip(skip)
     .limit(limit)
-    .populate("course_id");
+    .populate("user_id ");
   const total = await OrderDetails.countDocuments(whereConditions);
 
   return {
