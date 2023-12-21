@@ -8,10 +8,10 @@ const orderStatusSchema = new Schema<IOrderStatus>(
       required: true,
       ref: "User",
     },
-    order_id: {
+    order_details_id: {
       type: Schema.Types.ObjectId,
       required: true,
-      ref: "Order",
+      ref: "OrderDetails",
     },
     shipping_address_id: {
       type: Schema.Types.ObjectId,

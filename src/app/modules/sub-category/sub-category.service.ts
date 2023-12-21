@@ -8,13 +8,14 @@ import { subCategorySearchableFields } from "./sub-category.constants";
 import { paginationHelpers } from "../../helpers/paginationHelpers";
 import { SortOrder } from "mongoose";
 import { IGenericResponse } from "../../../interfaces/common";
+import { Request } from "express";
+import { IUploadFile } from "../../../interfaces/file";
+import { FileUploadHelper } from "../../helpers/fileUploadHelper";
 
 // create SubCategory
-const createSubCategory = async (
-  payload: ISubCategory
-): Promise<ISubCategory> => {
+const createSubCategory = async (req: Request): Promise<ISubCategory> => {
   // check if the category found of payload category_id
-  const category = await Category.findById(payload.category_id);
+  const category = await Category.findById(req.body.category_id);
   if (!category) {
     throw new ApiError(
       httpStatus.NOT_FOUND,
@@ -22,9 +23,16 @@ const createSubCategory = async (
     );
   }
 
-  const result = (await await SubCategory.create(payload)).populate(
-    "category_id"
-  );
+  if (req.file) {
+    const file = req.file as IUploadFile;
+    const uploadedImage = await FileUploadHelper.uploadToCloudinary(file);
+
+    if (uploadedImage) {
+      req.body.icon = uploadedImage.secure_url;
+    }
+  }
+
+  const result = (await SubCategory.create(req.body)).populate("category_id");
   return result;
 };
 

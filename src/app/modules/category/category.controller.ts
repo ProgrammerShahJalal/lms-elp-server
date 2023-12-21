@@ -5,12 +5,12 @@ import httpStatus from "http-status";
 import { CategoryService } from "./category.service";
 
 const createCategory = catchAsync(async (req: Request, res: Response) => {
-  const result = await CategoryService.createCategory(req.body);
+  const result = await CategoryService.createCategory(req);
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: "Category added successfully!",
+    message: "Category created successfully!",
     data: result,
   });
 });

@@ -4,7 +4,7 @@ import { ICategory } from "./category.interface";
 const categorySchema = new Schema<ICategory>(
   {
     name: { type: String, required: true, unique: true },
-    icon_link: { type: String },
+    icon: { type: String },
   },
   { timestamps: true, toJSON: { virtuals: true } }
 );

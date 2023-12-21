@@ -13,7 +13,7 @@ const createExamZodSchema = z.object({
     duration_in_minutes: z.number({
       required_error: "Duration in minutes is required!",
     }),
-    cost: z.number({}),
+    fee: z.number({}),
     is_active: z.boolean({ required_error: "Is active is required!" }),
     exam_type: z.enum(["0", "1"] as const, {
       required_error: "Exam type is required!",
@@ -28,7 +28,7 @@ const updateExamZodSchema = z.object({
     description: z.string({}).optional(),
     total_marks: z.number({}).optional(),
     duration_in_minutes: z.number({}).optional(),
-    cost: z.number({}).optional(),
+    fee: z.number({}).optional(),
     is_active: z.boolean({}).optional(),
     exam_type: z.string({}).optional(),
     course_id: z.string({}).optional(),
