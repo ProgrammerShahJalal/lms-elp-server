@@ -69,19 +69,21 @@ const updateCategory = async (
   return result;
 };
 
-// delete user
+// delete category
 const deleteCategory = async (id: string) => {
-  // find and delete category in one operation
-  const result = await Category.findOneAndDelete({ _id: id });
+  const category = await Category.findById(id);
 
-  // if the category you want to delete was not present, i.e. not deleted, throw error
-  if (!result) {
-    throw new ApiError(
-      httpStatus.NOT_FOUND,
-      "Couldn't delete. Category not found!"
-    );
+  if (!category) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Category not found!");
+  } else {
+    if (category.icon) {
+      // delete that category icon from cloudinary
+      FileUploadHelper.deleteFromCloudinary(category?.icon as string);
+    }
   }
 
+  // find and delete category in one operation
+  const result = await Category.findByIdAndDelete(id);
   return result;
 };
 

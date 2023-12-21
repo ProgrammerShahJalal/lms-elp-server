@@ -117,6 +117,18 @@ const updateBook = async (
 
 // delete Book
 const deleteBook = async (id: string) => {
+  const book = await Book.findById(id);
+
+  if (!book) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Book not found!");
+  } else {
+    if (book.cover_page) {
+      // delete that book cover page from cloudinary
+      FileUploadHelper.deleteFromCloudinary(book?.cover_page as string);
+    }
+  }
+
+  // find and delete book in one operation
   const result = await Book.findByIdAndDelete(id);
   return result;
 };

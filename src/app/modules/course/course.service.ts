@@ -152,19 +152,21 @@ const updateCourse = async (
   return result;
 };
 
-// delete user
+// delete course
 const deleteCourse = async (id: string) => {
-  // find and delete Course in one operation
-  const result = await Course.findOneAndDelete({ _id: id });
+  const course = await Course.findById(id);
 
-  // if the Course you want to delete was not present, i.e. not deleted, throw error
-  if (!result) {
-    throw new ApiError(
-      httpStatus.NOT_FOUND,
-      "Couldn't delete. Course not found!"
-    );
+  if (!course) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Course not found!");
+  } else {
+    if (course.banner) {
+      // delete that course banner from cloudinary
+      FileUploadHelper.deleteFromCloudinary(course?.banner as string);
+    }
   }
 
+  // find and delete course in one operation
+  const result = await Course.findByIdAndDelete(id);
   return result;
 };
 

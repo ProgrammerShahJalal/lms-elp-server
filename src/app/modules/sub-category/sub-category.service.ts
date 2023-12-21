@@ -136,19 +136,21 @@ const updateSubCategory = async (
   return result;
 };
 
-// delete user
+// delete sub category
 const deleteSubCategory = async (id: string) => {
-  // find and delete SubCategory in one operation
-  const result = await SubCategory.findOneAndDelete({ _id: id });
+  const subCategory = await SubCategory.findById(id);
 
-  // if the SubCategory you want to delete was not present, i.e. not deleted, throw error
-  if (!result) {
-    throw new ApiError(
-      httpStatus.NOT_FOUND,
-      "Couldn't delete. SubCategory not found!"
-    );
+  if (!subCategory) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Sub-category not found!");
+  } else {
+    if (subCategory.icon) {
+      // delete that sub-category icon from cloudinary
+      FileUploadHelper.deleteFromCloudinary(subCategory?.icon as string);
+    }
   }
 
+  // find and delete sub-category in one operation
+  const result = await SubCategory.findByIdAndDelete(id);
   return result;
 };
 
