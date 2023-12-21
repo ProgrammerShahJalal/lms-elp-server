@@ -8,11 +8,14 @@ import { IGenericResponse } from "../../../interfaces/common";
 import { courseFilterableFields } from "./course.constants";
 import { paginationHelpers } from "../../helpers/paginationHelpers";
 import { SortOrder } from "mongoose";
+import { Request } from "express";
+import { IUploadFile } from "../../../interfaces/file";
+import { FileUploadHelper } from "../../helpers/fileUploadHelper";
 
 // create Course
-const createCourse = async (payload: ICourse): Promise<ICourse> => {
+const createCourse = async (req: Request): Promise<ICourse> => {
   // to check if the sub-category is present of the provided sub-category-id
-  const { sub_category_id } = payload;
+  const { sub_category_id } = req.body;
   const subCategory = await SubCategory.findById(sub_category_id).populate(
     "category_id"
   );
@@ -20,9 +23,18 @@ const createCourse = async (payload: ICourse): Promise<ICourse> => {
     throw new ApiError(httpStatus.NOT_FOUND, "Sub category not found!");
   }
   // @ts-ignore
-  payload.category_id = subCategory.category_id._id.toString();
+  req.body.category_id = subCategory.category_id._id.toString();
 
-  const result = (await Course.create(payload)).populate({
+  if (req.file) {
+    const file = req.file as IUploadFile;
+    const uploadedImage = await FileUploadHelper.uploadToCloudinary(file);
+
+    if (uploadedImage) {
+      req.body.banner = uploadedImage.secure_url;
+    }
+  }
+
+  const result = (await Course.create(req.body)).populate({
     path: "sub_category_id",
     select: "name _id",
     populate: {

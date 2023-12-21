@@ -4,7 +4,7 @@ import { ISubCategory } from "./sub-category.interface";
 const subCategorySchema = new Schema<ISubCategory>(
   {
     name: { type: String, required: true },
-    icon_link: { type: String },
+    icon: { type: String },
     category_id: {
       type: Schema.Types.ObjectId,
       required: true,

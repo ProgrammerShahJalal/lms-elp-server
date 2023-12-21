@@ -8,7 +8,7 @@ import { paginationFields } from "../../constants/pagination";
 import pick from "../../../shared/pick";
 
 const createCourse = catchAsync(async (req: Request, res: Response) => {
-  const result = await CourseService.createCourse(req.body);
+  const result = await CourseService.createCourse(req);
 
   sendResponse(res, {
     success: true,

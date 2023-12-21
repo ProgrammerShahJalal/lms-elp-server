@@ -8,11 +8,14 @@ import { bookSearchableFields } from "./book.constants";
 import { paginationHelpers } from "../../helpers/paginationHelpers";
 import { SortOrder } from "mongoose";
 import { IGenericResponse } from "../../../interfaces/common";
+import { IUploadFile } from "../../../interfaces/file";
+import { Request } from "express";
+import { FileUploadHelper } from "../../helpers/fileUploadHelper";
 
 // create Book
-const createBook = async (payload: IBook): Promise<IBook> => {
+const addBook = async (req: Request): Promise<IBook> => {
   // if the provided course_id have the course or not in db
-  const { course_id } = payload;
+  const { course_id } = req.body;
   if (course_id) {
     const course = await Course.findById(course_id);
     if (!course) {
@@ -20,8 +23,16 @@ const createBook = async (payload: IBook): Promise<IBook> => {
     }
   }
 
-  const result = await Book.create(payload);
+  if (req.file) {
+    const file = req.file as IUploadFile;
+    const uploadedImage = await FileUploadHelper.uploadToCloudinary(file);
 
+    if (uploadedImage) {
+      req.body.cover_page = uploadedImage.secure_url;
+    }
+  }
+
+  const result = await Book.create(req.body);
   return result;
 };
 
@@ -111,7 +122,7 @@ const deleteBook = async (id: string) => {
 };
 
 export const BookService = {
-  createBook,
+  addBook,
   getAllBooks,
   getSingleBook,
   updateBook,

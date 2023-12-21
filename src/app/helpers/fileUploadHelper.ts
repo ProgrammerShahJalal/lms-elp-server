@@ -25,7 +25,6 @@ const uploadToCloudinary = async (
   file: IUploadFile
 ): Promise<ICloudinaryResponse | undefined> => {
   return new Promise((resolve, reject) => {
-    console.log(file.path);
     cloudinary.uploader.upload(
       file.path,
       (error: Error, result: ICloudinaryResponse) => {
@@ -40,7 +39,35 @@ const uploadToCloudinary = async (
   });
 };
 
+const deleteFromCloudinary = async (
+  secureUrl: string
+): Promise<ICloudinaryResponse | undefined> => {
+  return new Promise((resolve, reject) => {
+    const parts = secureUrl.split("/");
+    if (parts.length > 0) {
+      const publicId = parts.pop()?.replace(/\.[^/.]+$/, "");
+      if (publicId) {
+        cloudinary.uploader.destroy(
+          publicId,
+          (error: Error, result: ICloudinaryResponse) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(result);
+            }
+          }
+        );
+      } else {
+        reject(new Error("Failed to extract publicId"));
+      }
+    } else {
+      reject(new Error("Invalid secureUrl format"));
+    }
+  });
+};
+
 export const FileUploadHelper = {
   uploadToCloudinary,
+  deleteFromCloudinary,
   upload,
 };

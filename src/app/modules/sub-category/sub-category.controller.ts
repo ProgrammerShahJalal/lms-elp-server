@@ -8,7 +8,7 @@ import { subCategoryFilterableFields } from "./sub-category.constants";
 import { paginationFields } from "../../constants/pagination";
 
 const createSubCategory = catchAsync(async (req: Request, res: Response) => {
-  const result = await SubCategoryService.createSubCategory(req.body);
+  const result = await SubCategoryService.createSubCategory(req);
 
   sendResponse(res, {
     success: true,

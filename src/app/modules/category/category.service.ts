@@ -11,11 +11,13 @@ import { FileUploadHelper } from "../../helpers/fileUploadHelper";
 
 // create category
 const createCategory = async (req: Request) => {
-  const file = req.file as IUploadFile;
-  const uploadedImage = await FileUploadHelper.uploadToCloudinary(file);
+  if (req.file) {
+    const file = req.file as IUploadFile;
+    const uploadedImage = await FileUploadHelper.uploadToCloudinary(file);
 
-  if (uploadedImage) {
-    req.body.icon = uploadedImage.secure_url;
+    if (uploadedImage) {
+      req.body.icon = uploadedImage.secure_url;
+    }
   }
 
   const result = await Category.create(req.body);

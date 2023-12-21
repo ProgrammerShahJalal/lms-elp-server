@@ -7,8 +7,8 @@ import pick from "../../../shared/pick";
 import { bookFilterableFields } from "./book.constants";
 import { paginationFields } from "../../constants/pagination";
 
-const createBook = catchAsync(async (req: Request, res: Response) => {
-  const result = await BookService.createBook(req.body);
+const addBook = catchAsync(async (req: Request, res: Response) => {
+  const result = await BookService.addBook(req);
 
   sendResponse(res, {
     success: true,
@@ -69,7 +69,7 @@ const deleteBook = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const BookController = {
-  createBook,
+  addBook,
   getAllBooks,
   getSingleBook,
   updateBook,

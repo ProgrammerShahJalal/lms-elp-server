@@ -1,9 +1,10 @@
-import { Router } from "express";
+import { NextFunction, Request, Response, Router } from "express";
 import validateRequest from "../../middlewares/validateRequest";
 import authRole from "../../middlewares/authRole";
 import { ENUM_USER_ROLE } from "../../enums/user";
 import { SubCategoryValidation } from "./sub-category.validation";
 import { SubCategoryController } from "./sub-category.controller";
+import { FileUploadHelper } from "../../helpers/fileUploadHelper";
 
 const router = Router();
 
@@ -11,8 +12,13 @@ const router = Router();
 router.post(
   "/",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
-  validateRequest(SubCategoryValidation.createSubCategorySchema),
-  SubCategoryController.createSubCategory
+  FileUploadHelper.upload.single("file"),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = SubCategoryValidation.createSubCategorySchema.parse(
+      JSON.parse(req.body.data)
+    );
+    return SubCategoryController.createSubCategory(req, res, next);
+  }
 );
 
 // get all sub-categories
