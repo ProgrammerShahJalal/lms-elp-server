@@ -45,9 +45,7 @@ const getSingleBook = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateBook = catchAsync(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const payload = req.body;
-  const result = await BookService.updateBook(id, payload);
+  const result = await BookService.updateBook(req);
 
   sendResponse(res, {
     success: true,

@@ -4,7 +4,6 @@ import path from "path";
 import ApiError from "../../../errors/ApiError";
 import { ICategory } from "./category.interface";
 import { Category } from "./category.model";
-import sharp from "sharp";
 import { Request } from "express";
 import { IUploadFile } from "../../../interfaces/file";
 import { FileUploadHelper } from "../../helpers/fileUploadHelper";
@@ -25,7 +24,7 @@ const createCategory = async (req: Request) => {
 };
 
 // get all categories
-const getAllCategorys = async (): Promise<ICategory[]> => {
+const getAllCategories = async (): Promise<ICategory[]> => {
   const result = await Category.find({});
 
   // if there is no category, throw error
@@ -49,23 +48,35 @@ const getSingleCategory = async (id: string): Promise<ICategory | null> => {
 };
 
 // update category
-const updateCategory = async (
-  id: string,
-  payload: Partial<ICategory>
-): Promise<ICategory | null> => {
-  // updating category
-  const result = await Category.findOneAndUpdate({ _id: id }, payload, {
-    new: true,
-  });
-
-  // if the category you want to update was not present, i.e. not updated, throw error
-  if (!result) {
-    throw new ApiError(
-      httpStatus.NOT_FOUND,
-      "Couldn't update. Category not found!"
-    );
+const updateCategory = async (req: Request): Promise<ICategory | null> => {
+  // find category of given id
+  const category = await Category.findById(req.params.id);
+  if (!category) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Category not found!");
   }
 
+  // if image is given, upload new, and delete old one
+  if (req.file) {
+    const file = req.file as IUploadFile;
+    const uploadedImage = await FileUploadHelper.uploadToCloudinary(file);
+
+    if (uploadedImage) {
+      req.body.icon = uploadedImage.secure_url;
+    }
+    if (category.icon) {
+      // delete that category icon from cloudinary
+      FileUploadHelper.deleteFromCloudinary(category?.icon as string);
+    }
+  }
+
+  // updating category
+  const result = await Category.findOneAndUpdate(
+    { _id: req.params.id },
+    req.body,
+    {
+      new: true,
+    }
+  );
   return result;
 };
 
@@ -89,7 +100,7 @@ const deleteCategory = async (id: string) => {
 
 export const CategoryService = {
   createCategory,
-  getAllCategorys,
+  getAllCategories,
   getSingleCategory,
   updateCategory,
   deleteCategory,

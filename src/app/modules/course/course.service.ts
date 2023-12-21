@@ -132,22 +132,35 @@ const getSingleCourse = async (id: string): Promise<ICourse | null> => {
 };
 
 // update Course
-const updateCourse = async (
-  id: string,
-  payload: Partial<ICourse>
-): Promise<ICourse | null> => {
-  // updating Course
-  const result = await Course.findOneAndUpdate({ _id: id }, payload, {
-    new: true,
-  });
-
-  // if the Course you want to update was not present, i.e. not updated, throw error
-  if (!result) {
-    throw new ApiError(
-      httpStatus.NOT_FOUND,
-      "Couldn't update. Course not found!"
-    );
+const updateCourse = async (req: Request): Promise<ICourse | null> => {
+  // find course of given id
+  const course = await Course.findById(req.params.id);
+  if (!course) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Course not found!");
   }
+
+  // if image is given, upload new, and delete old one
+  if (req.file) {
+    const file = req.file as IUploadFile;
+    const uploadedImage = await FileUploadHelper.uploadToCloudinary(file);
+
+    if (uploadedImage) {
+      req.body.banner = uploadedImage.secure_url;
+    }
+    if (course.banner) {
+      // delete that course banner image from cloudinary
+      FileUploadHelper.deleteFromCloudinary(course?.banner as string);
+    }
+  }
+
+  // updating course
+  const result = await Course.findOneAndUpdate(
+    { _id: req.params.id },
+    req.body,
+    {
+      new: true,
+    }
+  );
 
   return result;
 };

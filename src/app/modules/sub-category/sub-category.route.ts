@@ -31,8 +31,21 @@ router.get("/:id", SubCategoryController.getSingleSubCategory);
 router.patch(
   "/:id",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
-  validateRequest(SubCategoryValidation.updateSubCategoryZodSchema),
-  SubCategoryController.updateSubCategory
+  FileUploadHelper.upload.single("file"),
+  (req: Request, res: Response, next: NextFunction) => {
+    try {
+      if (req.body.data) {
+        req.body = SubCategoryValidation.updateSubCategoryZodSchema.parse(
+          JSON.parse(req.body.data)
+        );
+      } else {
+        req.body = SubCategoryValidation.updateSubCategoryZodSchema.parse({});
+      }
+    } catch (error) {
+      return next(error);
+    }
+    return SubCategoryController.updateSubCategory(req, res, next);
+  }
 );
 
 // delete SubCategory

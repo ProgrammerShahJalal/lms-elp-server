@@ -115,23 +115,49 @@ const getSingleSubCategory = async (
   return result;
 };
 
-// update SubCategory
+// update Sub-category
 const updateSubCategory = async (
-  id: string,
-  payload: Partial<ISubCategory>
+  req: Request
 ): Promise<ISubCategory | null> => {
-  // updating SubCategory
-  const result = await SubCategory.findOneAndUpdate({ _id: id }, payload, {
-    new: true,
-  });
-
-  // if the SubCategory you want to update was not present, i.e. not updated, throw error
-  if (!result) {
-    throw new ApiError(
-      httpStatus.NOT_FOUND,
-      "Couldn't update. SubCategory not found!"
-    );
+  // find sub-category of given id
+  const subCategory = await SubCategory.findById(req.params.id);
+  if (!subCategory) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Sub-category not found!");
   }
+
+  // if image is given, upload new, and delete old one
+  if (req.file) {
+    const file = req.file as IUploadFile;
+    const uploadedImage = await FileUploadHelper.uploadToCloudinary(file);
+
+    if (uploadedImage) {
+      req.body.icon = uploadedImage.secure_url;
+    }
+    if (subCategory.icon) {
+      // delete that sub-category icon from cloudinary
+      FileUploadHelper.deleteFromCloudinary(subCategory?.icon as string);
+    }
+  }
+
+  // if the category_id is to be update, check if the category exists on that category_id
+  if (req.body.category_id) {
+    const category = await Category.findById(req.body.category_id);
+    if (!category) {
+      throw new ApiError(
+        httpStatus.NOT_FOUND,
+        "Category not found on given category_id!"
+      );
+    }
+  }
+
+  // updating sub-category
+  const result = await SubCategory.findOneAndUpdate(
+    { _id: req.params.id },
+    req.body,
+    {
+      new: true,
+    }
+  );
 
   return result;
 };

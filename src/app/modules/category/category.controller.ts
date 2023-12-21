@@ -16,7 +16,7 @@ const createCategory = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllCategories = catchAsync(async (req: Request, res: Response) => {
-  const result = await CategoryService.getAllCategorys();
+  const result = await CategoryService.getAllCategories();
 
   sendResponse(res, {
     success: true,
@@ -39,9 +39,7 @@ const getSingleCategory = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateCategory = catchAsync(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const payload = req.body;
-  const result = await CategoryService.updateCategory(id, payload);
+  const result = await CategoryService.updateCategory(req);
 
   sendResponse(res, {
     success: true,
@@ -50,6 +48,7 @@ const updateCategory = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
 const deleteCategory = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const result = await CategoryService.deleteCategory(id);

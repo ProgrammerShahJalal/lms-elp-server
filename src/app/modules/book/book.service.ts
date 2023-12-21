@@ -104,11 +104,29 @@ const getSingleBook = async (id: string): Promise<IBook | null> => {
 };
 
 // update Book
-const updateBook = async (
-  id: string,
-  payload: Partial<IBook>
-): Promise<IBook | null> => {
-  const result = await Book.findByIdAndUpdate(id, payload, {
+const updateBook = async (req: Request): Promise<IBook | null> => {
+  // find book of given id
+  const book = await Book.findById(req.params.id);
+  if (!book) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Book not found!");
+  }
+
+  // if image is given, upload new, and delete old one
+  if (req.file) {
+    const file = req.file as IUploadFile;
+    const uploadedImage = await FileUploadHelper.uploadToCloudinary(file);
+
+    if (uploadedImage) {
+      req.body.cover_page = uploadedImage.secure_url;
+    }
+    if (book.cover_page) {
+      // delete that book cover page from cloudinary
+      FileUploadHelper.deleteFromCloudinary(book?.cover_page as string);
+    }
+  }
+
+  // updating book
+  const result = await Book.findOneAndUpdate({ _id: req.params.id }, req.body, {
     new: true,
   });
 
