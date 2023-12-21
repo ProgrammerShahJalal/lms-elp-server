@@ -1,11 +1,24 @@
 import httpStatus from "http-status";
+import fs from "fs/promises";
+import path from "path";
 import ApiError from "../../../errors/ApiError";
 import { ICategory } from "./category.interface";
 import { Category } from "./category.model";
+import sharp from "sharp";
+import { Request } from "express";
+import { IUploadFile } from "../../../interfaces/file";
+import { FileUploadHelper } from "../../helpers/fileUploadHelper";
 
 // create category
-const createCategory = async (payload: ICategory): Promise<ICategory> => {
-  const result = await Category.create(payload);
+const createCategory = async (req: Request) => {
+  const file = req.file as IUploadFile;
+  const uploadedImage = await FileUploadHelper.uploadToCloudinary(file);
+
+  if (uploadedImage) {
+    req.body.icon = uploadedImage.secure_url;
+  }
+
+  const result = await Category.create(req.body);
   return result;
 };
 

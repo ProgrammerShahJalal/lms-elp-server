@@ -1,18 +1,16 @@
 import { z } from "zod";
 
 const createCategorySchema = z.object({
-  body: z.object({
-    name: z.string({
-      required_error: "Category name is required!",
-    }),
-    icon_link: z.string({}).optional(),
+  name: z.string({
+    required_error: "Category name is required!",
   }),
+  icon: z.string({}).optional(),
 });
 
 const updateCategoryZodSchema = z.object({
   body: z.object({
     name: z.string({}).optional(),
-    icon_link: z.string({}).optional(),
+    icon: z.string({}).optional(),
   }),
 });
 

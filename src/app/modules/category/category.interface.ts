@@ -1,6 +1,6 @@
 export interface ICategory {
   name: string;
-  icon_link?: string;
+  icon?: string;
   createdAt: Date;
   updatedAt?: Date;
 }
