@@ -24,15 +24,13 @@ const createCourseSchema = z.object({
 });
 
 const updateCourseZodSchema = z.object({
-  body: z.object({
-    name: z.string({}).optional(),
-    membership_type: z.enum(["free", "paid"]).optional(),
-    sub_category_id: z.string({}).optional(),
-    description: z.string({}).optional(),
-    banner: z.string({}).optional(),
-    syllabus: z.string({}).optional(),
-    study_materials: z.string({}).optional(),
-  }),
+  name: z.string({}).optional(),
+  membership_type: z.enum(["free", "paid"]).optional(),
+  sub_category_id: z.string({}).optional(),
+  description: z.string({}).optional(),
+  banner: z.string({}).optional(),
+  syllabus: z.string({}).optional(),
+  study_materials: z.string({}).optional(),
 });
 
 export const CourseValidation = {

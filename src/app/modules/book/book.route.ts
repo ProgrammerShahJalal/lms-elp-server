@@ -29,8 +29,21 @@ router.get("/:id", BookController.getSingleBook);
 router.patch(
   "/:id",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
-  validateRequest(BookValidation.updateBookZodSchema),
-  BookController.updateBook
+  FileUploadHelper.upload.single("file"),
+  (req: Request, res: Response, next: NextFunction) => {
+    try {
+      if (req.body.data) {
+        req.body = BookValidation.updateBookZodSchema.parse(
+          JSON.parse(req.body.data)
+        );
+      } else {
+        req.body = BookValidation.updateBookZodSchema.parse({});
+      }
+    } catch (error) {
+      return next(error);
+    }
+    return BookController.updateBook(req, res, next);
+  }
 );
 
 // delete single Book

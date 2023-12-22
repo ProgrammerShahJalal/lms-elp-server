@@ -132,39 +132,54 @@ const getSingleCourse = async (id: string): Promise<ICourse | null> => {
 };
 
 // update Course
-const updateCourse = async (
-  id: string,
-  payload: Partial<ICourse>
-): Promise<ICourse | null> => {
-  // updating Course
-  const result = await Course.findOneAndUpdate({ _id: id }, payload, {
-    new: true,
-  });
-
-  // if the Course you want to update was not present, i.e. not updated, throw error
-  if (!result) {
-    throw new ApiError(
-      httpStatus.NOT_FOUND,
-      "Couldn't update. Course not found!"
-    );
+const updateCourse = async (req: Request): Promise<ICourse | null> => {
+  // find course of given id
+  const course = await Course.findById(req.params.id);
+  if (!course) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Course not found!");
   }
+
+  // if image is given, upload new, and delete old one
+  if (req.file) {
+    const file = req.file as IUploadFile;
+    const uploadedImage = await FileUploadHelper.uploadToCloudinary(file);
+
+    if (uploadedImage) {
+      req.body.banner = uploadedImage.secure_url;
+    }
+    if (course.banner) {
+      // delete that course banner image from cloudinary
+      FileUploadHelper.deleteFromCloudinary(course?.banner as string);
+    }
+  }
+
+  // updating course
+  const result = await Course.findOneAndUpdate(
+    { _id: req.params.id },
+    req.body,
+    {
+      new: true,
+    }
+  );
 
   return result;
 };
 
-// delete user
+// delete course
 const deleteCourse = async (id: string) => {
-  // find and delete Course in one operation
-  const result = await Course.findOneAndDelete({ _id: id });
+  const course = await Course.findById(id);
 
-  // if the Course you want to delete was not present, i.e. not deleted, throw error
-  if (!result) {
-    throw new ApiError(
-      httpStatus.NOT_FOUND,
-      "Couldn't delete. Course not found!"
-    );
+  if (!course) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Course not found!");
+  } else {
+    if (course.banner) {
+      // delete that course banner from cloudinary
+      FileUploadHelper.deleteFromCloudinary(course?.banner as string);
+    }
   }
 
+  // find and delete course in one operation
+  const result = await Course.findByIdAndDelete(id);
   return result;
 };
 
