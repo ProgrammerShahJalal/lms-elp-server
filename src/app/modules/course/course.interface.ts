@@ -2,8 +2,9 @@ import { Types } from "mongoose";
 import { ISubCategory } from "../sub-category/sub-category.interface";
 
 export interface ICourse {
-  name: string;
-  membership_type: "free" | "paid";
+  title: string;
+  author?: string;
+  membership_type: "0" | "1";
   sub_category_id: Types.ObjectId | ISubCategory;
   category_id: string;
   description: string;
@@ -14,8 +15,9 @@ export interface ICourse {
 
 export interface ICourseFilters {
   searchTerm?: string;
-  name?: string;
-  membership_type?: string;
+  title?: string;
+  author?: string;
+  membership_type?: "0" | "1";
   sub_category_id?: string;
   category_id?: string;
 }

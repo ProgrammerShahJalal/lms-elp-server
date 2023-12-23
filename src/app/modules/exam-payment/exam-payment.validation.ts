@@ -5,14 +5,11 @@ const createExamPaymentZodSchema = z.object({
     user_id: z.string({
       required_error: "User id is required!",
     }),
-    exam: z.string({
+    exam_id: z.string({
       required_error: "Exam id is required!",
     }),
     invalid_date: z.date({}).optional(),
     trx_id: z.string({}).optional(),
-    payment_date: z.date({
-      required_error: "Payment date is required!",
-    }),
   }),
 });
 
@@ -22,7 +19,6 @@ const updateExamPaymentZodSchema = z.object({
     exam_id: z.string({}).optional(),
     invalid_date: z.date({}).optional(),
     trx_id: z.string({}).optional(),
-    payment_date: z.date({}).optional(),
   }),
 });
 

@@ -1,7 +1,8 @@
 import { z } from "zod";
+
 const createExamZodSchema = z.object({
   body: z.object({
-    name: z.string({
+    title: z.string({
       required_error: "Exam name is required!",
     }),
     description: z.string({
@@ -24,7 +25,7 @@ const createExamZodSchema = z.object({
 
 const updateExamZodSchema = z.object({
   body: z.object({
-    name: z.string({}).optional(),
+    title: z.string({}).optional(),
     description: z.string({}).optional(),
     total_marks: z.number({}).optional(),
     duration_in_minutes: z.number({}).optional(),

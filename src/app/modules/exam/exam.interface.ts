@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 
 export interface IExam {
-  name: string;
+  title: string;
   description: string;
   total_marks: number;
   duration_in_minutes: number;
@@ -13,7 +13,7 @@ export interface IExam {
 
 export type IExamFilters = {
   searchTerm?: string;
-  name?: string;
+  title?: string;
   total_marks?: number;
   duration_in_minutes?: number;
   fee?: string;

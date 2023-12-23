@@ -1,14 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
 import { Secret } from "jsonwebtoken";
-import config from "../../config";
 import ApiError from "../../errors/ApiError";
 import { jwtHelpers } from "../helpers/jwtHelpers";
+import config from "../../config";
 import { User } from "../modules/user/user.model";
 
-const authUserOrRole =
-  (...requiredRoles: string[]) =>
-  async (req: Request, res: Response, next: NextFunction) => {
+const authUserFromParam =
+  () => async (req: Request, res: Response, next: NextFunction) => {
     try {
       //get authorization token
       const token = req.headers.authorization;
@@ -26,18 +25,10 @@ const authUserOrRole =
         req.user = verifiedUser; // role  , userId
       } else {
         req.user = null;
-        throw new ApiError(httpStatus.BAD_REQUEST, "User not found!");
+        throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
       }
-      if (
-        verifiedUser?.userId === (req?.params?.user_id || req?.query?.user_id)
-      ) {
-        next();
-      } else if (verifiedUser?.userId === req?.params?.id) {
-        next();
-      } else if (
-        requiredRoles.length &&
-        requiredRoles.includes(verifiedUser.role)
-      ) {
+
+      if (verifiedUser.userId === req?.params?.id) {
         next();
       } else {
         throw new ApiError(httpStatus.FORBIDDEN, "Permission denied!");
@@ -47,4 +38,4 @@ const authUserOrRole =
     }
   };
 
-export default authUserOrRole;
+export default authUserFromParam;

@@ -5,7 +5,6 @@ import { UserValidation } from "./user.validation";
 import authRole from "../../middlewares/authRole";
 import { ENUM_USER_ROLE } from "../../enums/user";
 import authUserOrRole from "../../middlewares/authUserOrRole";
-import authUser from "../../middlewares/authUser";
 
 const router = Router();
 
@@ -47,14 +46,14 @@ router.get(
 
 // get single user
 router.get(
-  "/:id",
+  "/:user_id",
   authUserOrRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
   UserController.getSingleUser
 );
 
 // update user
 router.patch(
-  "/:id",
+  "/:user_id",
   authUserOrRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
   validateRequest(UserValidation.updateUserZodSchema),
   UserController.updateUser
@@ -62,7 +61,7 @@ router.patch(
 
 // delete user
 router.delete(
-  "/:id",
+  "/:user_id",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
   UserController.deleteUser
 );

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const createSubCategorySchema = z.object({
-  name: z.string({
+  title: z.string({
     required_error: "Sub Category name is required!",
   }),
   icon: z.string({}).optional(),
@@ -11,7 +11,7 @@ const createSubCategorySchema = z.object({
 });
 
 const updateSubCategoryZodSchema = z.object({
-  name: z.string({}).optional(),
+  title: z.string({}).optional(),
   icon: z.string({}).optional(),
   category_id: z.string({}).optional(),
 });

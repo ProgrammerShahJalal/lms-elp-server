@@ -3,7 +3,7 @@ import { ISubCategory } from "./sub-category.interface";
 
 const subCategorySchema = new Schema<ISubCategory>(
   {
-    name: { type: String, required: true },
+    title: { type: String, required: true },
     icon: { type: String },
     category_id: {
       type: Schema.Types.ObjectId,
@@ -14,7 +14,7 @@ const subCategorySchema = new Schema<ISubCategory>(
   { timestamps: true, toJSON: { virtuals: true } }
 );
 
-subCategorySchema.index({ name: 1, category_id: 1 }, { unique: true });
+subCategorySchema.index({ title: 1, category_id: 1 }, { unique: true });
 
 export const SubCategory = model<ISubCategory>(
   "SubCategory",

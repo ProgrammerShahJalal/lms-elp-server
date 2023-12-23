@@ -3,7 +3,7 @@ import { IBook } from "./book.interface";
 
 const bookSchema = new Schema<IBook>(
   {
-    name: { type: String, required: true },
+    title: { type: String, required: true },
     writer: { type: String },
     price: { type: Number },
     discount_price: { type: Number },
@@ -17,7 +17,7 @@ const bookSchema = new Schema<IBook>(
 );
 
 bookSchema.index(
-  { name: 1, writer: 1, price: 1, format: 1, is_paid: 1 },
+  { title: 1, writer: 1, price: 1, format: 1, is_paid: 1 },
   { unique: true }
 );
 

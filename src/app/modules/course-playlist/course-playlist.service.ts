@@ -22,7 +22,7 @@ const createCoursePlaylist = async (
 
 // get all CoursePlaylists
 const getAllCoursePlaylists = async (): Promise<ICoursePlaylist[]> => {
-  const result = await CoursePlaylist.find({});
+  const result = await CoursePlaylist.find({}).populate("course_id");
 
   // if there is no CoursePlaylist, throw error
   if (!result.length) {
@@ -36,7 +36,17 @@ const getAllCoursePlaylists = async (): Promise<ICoursePlaylist[]> => {
 const getSingleCoursePlaylist = async (
   id: string
 ): Promise<ICoursePlaylist | null> => {
-  const result = await CoursePlaylist.findById(id);
+  const result = await CoursePlaylist.findById(id).populate({
+    path: "course_id",
+    populate: {
+      path: "sub_category_id",
+      select: "title _id",
+      populate: {
+        path: "category_id",
+        select: "title _id",
+      },
+    },
+  });
 
   // if the Course Playlist is not found, throw error
   if (!result) {
