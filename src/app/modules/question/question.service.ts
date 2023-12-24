@@ -96,6 +96,11 @@ const getAllQuestions = async (
   };
 };
 
+const getQuestionsOfAnExam = async (exam_id: string) => {
+  const result = await Question.find({ exam_id });
+  return result;
+};
+
 // get single quiz question
 const getSingleQuestion = async (id: string): Promise<IQuestion | null> => {
   const result = await Question.findById(id).populate("exam_id");
@@ -142,6 +147,7 @@ const deleteQuestion = async (id: string) => {
 export const QuestionService = {
   createQuestion,
   getAllQuestions,
+  getQuestionsOfAnExam,
   getSingleQuestion,
   updateQuestion,
   deleteQuestion,

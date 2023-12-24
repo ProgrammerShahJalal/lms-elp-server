@@ -7,19 +7,31 @@ import { ExamResultController } from "./exam-result.controller";
 
 const router = Router();
 
-// create ExamResult
+// create Exam Result
 router.post(
   "/",
-  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authRole(
+    ENUM_USER_ROLE.SUPER_ADMIN,
+    ENUM_USER_ROLE.ADMIN,
+    ENUM_USER_ROLE.STUDENT
+  ),
   validateRequest(ExamResultValidation.createExamResultZodSchema),
   ExamResultController.createExamResult
 );
 
-// get all ExamResults
-router.get("/", ExamResultController.getAllExamResults);
+// get all Exam Results
+router.get(
+  "/",
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  ExamResultController.getAllExamResults
+);
 
-// get single ExamResult
-router.get("/:id", ExamResultController.getSingleExamResult);
+// get single Exam Result
+router.get(
+  "/:id",
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  ExamResultController.getSingleExamResult
+);
 
 // give question mark
 router.patch(
@@ -29,7 +41,7 @@ router.patch(
   ExamResultController.giveQuestionMark
 );
 
-// update single ExamResult
+// update single Exam Result
 router.patch(
   "/:id",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
@@ -37,7 +49,7 @@ router.patch(
   ExamResultController.updateExamResult
 );
 
-// delete single ExamResult
+// delete single Exam Result
 router.delete(
   "/:id",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),

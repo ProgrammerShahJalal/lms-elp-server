@@ -10,7 +10,7 @@ const handleZodError = (error: ZodError): IGenericErrorResponse => {
     };
   });
 
-  const statusCode = 400;
+  const statusCode = 200;
 
   return {
     statusCode,
