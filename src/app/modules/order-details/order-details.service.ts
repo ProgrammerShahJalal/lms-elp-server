@@ -91,6 +91,22 @@ const getAllOrderDetails = async (
   };
 };
 
+// get Order Details of an user
+const getOrderDetailsOfAnUser = async (
+  user_id: string
+): Promise<IOrderDetails[] | null> => {
+  const result = await OrderDetails.find({ user_id }).populate(
+    "user_id book_id"
+  );
+
+  // if the OrderDetails is not found, throw error
+  if (!result.length) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Order status not found!");
+  }
+
+  return result;
+};
+
 // get OrderDetails
 const getSingleOrderDetails = async (
   id: string
@@ -145,6 +161,7 @@ const deleteOrderDetails = async (id: string) => {
 export const OrderDetailsService = {
   createOrderDetails,
   getAllOrderDetails,
+  getOrderDetailsOfAnUser,
   getSingleOrderDetails,
   updateOrderDetails,
   deleteOrderDetails,

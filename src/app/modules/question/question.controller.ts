@@ -43,7 +43,7 @@ const getQuestionsOfAnExam = catchAsync(async (req: Request, res: Response) => {
 
   const exam = await Exam.findById(exam_id);
   if (!exam) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Exam not found!");
+    throw new ApiError(httpStatus.OK, "Exam not found!");
   }
 
   const examPayment = await ExamPayment.findOne({
@@ -53,10 +53,7 @@ const getQuestionsOfAnExam = catchAsync(async (req: Request, res: Response) => {
 
   // if there is exam fee and you haven't paid, throw error
   if (exam.fee && !examPayment) {
-    throw new ApiError(
-      httpStatus.BAD_REQUEST,
-      "You have to pay first for the exam!"
-    );
+    throw new ApiError(httpStatus.OK, "You have to pay first for the exam!");
   }
 
   const result = await QuestionService.getQuestionsOfAnExam(exam_id);

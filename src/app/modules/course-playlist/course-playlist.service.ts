@@ -32,7 +32,17 @@ const getAllCoursePlaylists = async (): Promise<ICoursePlaylist[]> => {
   return result;
 };
 
-// get CoursePlaylist
+// get playlists of a course
+const getPlaylistsOfACourse = async (
+  course_id: string
+): Promise<ICoursePlaylist[]> => {
+  const result = await CoursePlaylist.find({
+    course_id,
+  });
+  return result;
+};
+
+// get Course Playlist
 const getSingleCoursePlaylist = async (
   id: string
 ): Promise<ICoursePlaylist | null> => {
@@ -96,6 +106,7 @@ const deleteCoursePlaylist = async (id: string) => {
 export const CoursePlaylistService = {
   createCoursePlaylist,
   getAllCoursePlaylists,
+  getPlaylistsOfACourse,
   getSingleCoursePlaylist,
   updateCoursePlaylist,
   deleteCoursePlaylist,

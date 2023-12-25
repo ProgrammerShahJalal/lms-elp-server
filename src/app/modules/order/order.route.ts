@@ -11,20 +11,44 @@ const router = Router();
 // create Order
 router.post(
   "/",
+  authRole(
+    ENUM_USER_ROLE.SUPER_ADMIN,
+    ENUM_USER_ROLE.ADMIN,
+    ENUM_USER_ROLE.STUDENT
+  ),
   validateRequest(OrderValidation.createOrderSchema),
   OrderController.createOrder
 );
 
 // get all Orders
-router.get("/", OrderController.getAllOrders);
+router.get(
+  "/",
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  OrderController.getAllOrders
+);
+
+// get Orders of an User
+router.get(
+  "/user/:user_id",
+  authUserOrRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  OrderController.getOrdersOfAnUser
+);
 
 // get single Order
-router.get("/:id", OrderController.getSingleOrder);
+router.get(
+  "/:id",
+  authRole(
+    ENUM_USER_ROLE.SUPER_ADMIN,
+    ENUM_USER_ROLE.ADMIN,
+    ENUM_USER_ROLE.STUDENT
+  ),
+  OrderController.getSingleOrder
+);
 
 // update single Order
 router.patch(
   "/:id",
-  authUserOrRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
   validateRequest(OrderValidation.updateOrderZodSchema),
   OrderController.updateOrder
 );
@@ -32,7 +56,7 @@ router.patch(
 // delete Order
 router.delete(
   "/:id",
-  authUserOrRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
   OrderController.deleteOrder
 );
 

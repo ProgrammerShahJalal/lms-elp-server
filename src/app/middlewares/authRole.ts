@@ -13,7 +13,10 @@ const authRole =
       //get authorization token
       const token = req.headers.authorization;
       if (!token) {
-        throw new ApiError(httpStatus.UNAUTHORIZED, "You are not authorized");
+        throw new ApiError(
+          httpStatus.UNAUTHORIZED,
+          "You are not authorized! Login first."
+        );
       }
       // verify token
       let verifiedUser = null;
@@ -25,12 +28,12 @@ const authRole =
         req.user = verifiedUser; // role  , userid
       } else {
         req.user = null;
-        throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
+        throw new ApiError(httpStatus.UNAUTHORIZED, "User not found!");
       }
 
       // guard that specific role
       if (requiredRoles.length && !requiredRoles.includes(verifiedUser.role)) {
-        throw new ApiError(httpStatus.FORBIDDEN, "Forbidden");
+        throw new ApiError(httpStatus.UNAUTHORIZED, "Forbidden access!");
       }
       next();
     } catch (error) {
