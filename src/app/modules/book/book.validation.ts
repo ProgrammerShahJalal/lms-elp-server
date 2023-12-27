@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 const addBookZodSchema = z.object({
-  name: z.string({
-    required_error: "Exam name is required!",
+  title: z.string({
+    required_error: "Book title is required!",
   }),
   writer: z.string({}).optional(),
   price: z.number({}).optional(),
@@ -21,7 +21,7 @@ const addBookZodSchema = z.object({
 });
 
 const updateBookZodSchema = z.object({
-  name: z.string({}).optional(),
+  title: z.string({}).optional(),
   writer: z.string({}).optional(),
   price: z.number({}).optional(),
   discount_price: z.number({}).optional(),

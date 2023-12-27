@@ -15,11 +15,22 @@ router.post(
   QuestionController.createQuestion
 );
 
-// get all questions
+// get all questions with filter
 router.get(
   "/",
-  // authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
   QuestionController.getAllQuestions
+);
+
+// get questions of an exam
+router.get(
+  "/exam/:exam_id",
+  authRole(
+    ENUM_USER_ROLE.SUPER_ADMIN,
+    ENUM_USER_ROLE.ADMIN,
+    ENUM_USER_ROLE.STUDENT
+  ),
+  QuestionController.getQuestionsOfAnExam
 );
 
 // get single question

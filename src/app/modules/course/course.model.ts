@@ -3,7 +3,8 @@ import { ICourse } from "./course.interface";
 
 const courseSchema = new Schema<ICourse>(
   {
-    name: { type: String, required: true },
+    title: { type: String, required: true },
+    author: { type: String },
     membership_type: { type: String, required: true },
     sub_category_id: {
       type: Schema.Types.ObjectId,
@@ -20,7 +21,7 @@ const courseSchema = new Schema<ICourse>(
 );
 
 courseSchema.index(
-  { name: 1, membership_type: 1, sub_category_id: 1 },
+  { name: 1, author: 1, membership_type: 1, sub_category_id: 1 },
   { unique: true }
 );
 

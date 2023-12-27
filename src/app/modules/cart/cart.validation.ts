@@ -7,7 +7,7 @@ const createCartZodSchema = z.object({
     book_id: z.string({
       required_error: "Book id required!",
     }),
-    quantity: z.number({}).optional(),
+    quantity: z.number({}).positive().optional(),
   }),
 });
 

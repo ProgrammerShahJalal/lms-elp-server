@@ -28,6 +28,22 @@ const getAllCoursePlaylists = catchAsync(
   }
 );
 
+const getPlaylistsOfACourse = catchAsync(
+  async (req: Request, res: Response) => {
+    const user_id = req.user?.userId;
+    const { course_id } = req.params;
+
+    const result = await CoursePlaylistService.getPlaylistsOfACourse(course_id);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Course playlists fetched successfully!",
+      data: result,
+    });
+  }
+);
+
 const getSingleCoursePlaylist = catchAsync(
   async (req: Request, res: Response) => {
     const { id } = req.params;
@@ -69,6 +85,7 @@ const deleteCoursePlaylist = catchAsync(async (req: Request, res: Response) => {
 export const CoursePlaylistController = {
   createCoursePlaylist,
   getAllCoursePlaylists,
+  getPlaylistsOfACourse,
   getSingleCoursePlaylist,
   updateCoursePlaylist,
   deleteCoursePlaylist,

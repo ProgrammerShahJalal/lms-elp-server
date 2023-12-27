@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 
 export interface IBook {
-  name: string;
+  title: string;
   writer?: string;
   price?: number;
   discount_price?: number;
@@ -14,7 +14,7 @@ export interface IBook {
 
 export interface IBookFilters {
   searchTerm?: string;
-  name?: string;
+  title?: string;
   writer?: string;
   price?: number;
   discount_price?: number;

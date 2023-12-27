@@ -16,7 +16,22 @@ router.post(
 );
 
 // get all CoursePlaylists
-router.get("/", CoursePlaylistController.getAllCoursePlaylists);
+router.get(
+  "/",
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  CoursePlaylistController.getAllCoursePlaylists
+);
+
+// Get All Course Playlists of a Course
+router.get(
+  "/course/:course_id",
+  authRole(
+    ENUM_USER_ROLE.SUPER_ADMIN,
+    ENUM_USER_ROLE.ADMIN,
+    ENUM_USER_ROLE.STUDENT
+  ),
+  CoursePlaylistController.getPlaylistsOfACourse
+);
 
 // get single Course Playlist
 router.get("/:id", CoursePlaylistController.getSingleCoursePlaylist);

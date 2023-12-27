@@ -28,10 +28,10 @@ const authUser =
         throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
       }
 
-      if (verifiedUser.userId === req?.params?.id) {
+      if (verifiedUser.userId === req?.params?.user_id) {
         next();
       } else {
-        throw new ApiError(httpStatus.FORBIDDEN, "Permission denied!");
+        throw new ApiError(httpStatus.UNAUTHORIZED, "Permission denied!");
       }
     } catch (error) {
       next(error);

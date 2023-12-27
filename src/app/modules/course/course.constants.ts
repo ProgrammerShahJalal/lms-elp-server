@@ -3,11 +3,13 @@ export const courseFilterableFields = [
   "membership_type",
   "sub_category_id",
   "category_id",
-  "name",
+  "title",
+  "author",
 ];
 
 export const courseSearchableFields = [
-  "name",
+  "title",
+  "author",
   "description",
   "syllabus",
   "study_materials",

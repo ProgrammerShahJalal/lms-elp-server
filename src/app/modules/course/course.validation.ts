@@ -1,15 +1,16 @@
 import { z } from "zod";
 
 const createCourseSchema = z.object({
-  name: z.string({
+  title: z.string({
     required_error: "Course name is required!",
   }),
-  membership_type: z.enum(["free", "paid"]).refine(
+  author: z.string({}).optional(),
+  membership_type: z.enum(["0", "1"]).refine(
     (value) => {
-      return value === "free" || value === "paid";
+      return value === "0" || value === "1";
     },
     {
-      message: "Membership type must be either 'free' or 'paid'",
+      message: "Membership type must be either '0'(free) or '1'(paid)",
     }
   ),
   sub_category_id: z.string({
@@ -24,8 +25,9 @@ const createCourseSchema = z.object({
 });
 
 const updateCourseZodSchema = z.object({
-  name: z.string({}).optional(),
-  membership_type: z.enum(["free", "paid"]).optional(),
+  title: z.string({}).optional(),
+  author: z.string({}).optional(),
+  membership_type: z.enum(["0", "1"]).optional(),
   sub_category_id: z.string({}).optional(),
   description: z.string({}).optional(),
   banner: z.string({}).optional(),

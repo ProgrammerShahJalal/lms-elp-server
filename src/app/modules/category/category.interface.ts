@@ -1,5 +1,5 @@
 export interface ICategory {
-  name: string;
+  title: string;
   icon?: string;
   createdAt: Date;
   updatedAt?: Date;

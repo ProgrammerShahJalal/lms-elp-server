@@ -1,7 +1,7 @@
 export const subCategoryFilterableFields = [
   "searchTerm",
-  "name",
+  "title",
   "category_id",
 ];
 
-export const subCategorySearchableFields = ["name"];
+export const subCategorySearchableFields = ["title"];

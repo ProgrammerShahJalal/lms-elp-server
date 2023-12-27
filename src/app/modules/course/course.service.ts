@@ -36,10 +36,10 @@ const createCourse = async (req: Request): Promise<ICourse> => {
 
   const result = (await Course.create(req.body)).populate({
     path: "sub_category_id",
-    select: "name _id",
+    select: "title _id",
     populate: {
       path: "category_id",
-      select: "name _id",
+      select: "title _id",
     },
   });
   return result;
@@ -91,10 +91,10 @@ const getAllCourses = async (
     .limit(limit)
     .populate({
       path: "sub_category_id",
-      select: "name _id",
+      select: "title _id",
       populate: {
         path: "category_id",
-        select: "name _id",
+        select: "title _id",
       },
     })
     .select("-createdAt -updatedAt -__v");
@@ -115,10 +115,10 @@ const getSingleCourse = async (id: string): Promise<ICourse | null> => {
   const result = await Course.findById(id)
     .populate({
       path: "sub_category_id",
-      select: "name _id",
+      select: "title _id",
       populate: {
         path: "category_id",
-        select: "name _id",
+        select: "title _id",
       },
     })
     .select("-createdAt -updatedAt -__v");

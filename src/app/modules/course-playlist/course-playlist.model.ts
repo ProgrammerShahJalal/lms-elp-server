@@ -3,7 +3,7 @@ import { ICoursePlaylist } from "./course-playlist.interface";
 
 const coursePlaylistSchema = new Schema<ICoursePlaylist>(
   {
-    name: { type: String, required: true },
+    title: { type: String, required: true },
     course_id: {
       type: Schema.Types.ObjectId,
       required: true,

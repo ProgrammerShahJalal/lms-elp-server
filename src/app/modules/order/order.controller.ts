@@ -6,9 +6,12 @@ import { paginationFields } from "../../constants/pagination";
 import pick from "../../../shared/pick";
 import { OrderService } from "./order.service";
 import { orderFilterableFields } from "./order.constants";
+import ApiError from "../../../errors/ApiError";
 
 const createOrder = catchAsync(async (req: Request, res: Response) => {
-  const result = await OrderService.createOrder(req.body);
+  const user_id = req.user?.userId;
+
+  const result = await OrderService.createOrder(user_id);
 
   sendResponse(res, {
     success: true,
@@ -31,9 +34,32 @@ const getAllOrders = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getOrdersOfAnUser = catchAsync(async (req: Request, res: Response) => {
+  const { user_id } = req.params;
+
+  const result = await OrderService.getOrdersOfAnUser(user_id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Orders fetched successfully!",
+    data: result,
+  });
+});
+
 const getSingleOrder = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
+
   const result = await OrderService.getSingleOrder(id);
+
+  // throw error if not admin/super_admin/user_id match
+  if (
+    req.user?.role === "admin" &&
+    req.user?.role === "super_admin" &&
+    req.user?.userId === result?.user_id?._id?.toString()
+  ) {
+    throw new ApiError(httpStatus.OK, "Unauthorized!");
+  }
 
   sendResponse(res, {
     success: true,
@@ -70,6 +96,7 @@ const deleteOrder = catchAsync(async (req: Request, res: Response) => {
 export const OrderController = {
   createOrder,
   getAllOrders,
+  getOrdersOfAnUser,
   getSingleOrder,
   updateOrder,
   deleteOrder,

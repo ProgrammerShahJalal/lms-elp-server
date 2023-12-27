@@ -1,6 +1,6 @@
 export const bookFilterableFields = [
   "searchTerm",
-  "name",
+  "title",
   "price",
   "discount_price",
   "format",
@@ -8,4 +8,4 @@ export const bookFilterableFields = [
   "course_id",
 ];
 
-export const bookSearchableFields = ["name", "description"];
+export const bookSearchableFields = ["title", "description"];

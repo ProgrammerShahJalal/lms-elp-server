@@ -4,21 +4,54 @@ import { ENUM_USER_ROLE } from "../../enums/user";
 import authUserOrRole from "../../middlewares/authUserOrRole";
 import { OrderDetailsValidation } from "./order-details.validation";
 import { OrderDetailsController } from "./order-details.controller";
+import authRole from "../../middlewares/authRole";
 
 const router = Router();
 
 // create OrderDetails
 router.post(
   "/",
+  authRole(
+    ENUM_USER_ROLE.SUPER_ADMIN,
+    ENUM_USER_ROLE.ADMIN,
+    ENUM_USER_ROLE.STUDENT
+  ),
   validateRequest(OrderDetailsValidation.createOrderDetailsSchema),
   OrderDetailsController.createOrderDetails
 );
 
 // get all OrderDetails
-router.get("/", OrderDetailsController.getAllOrderDetails);
+router.get(
+  "/",
+  authRole(
+    ENUM_USER_ROLE.SUPER_ADMIN,
+    ENUM_USER_ROLE.ADMIN,
+    ENUM_USER_ROLE.STUDENT
+  ),
+  OrderDetailsController.getAllOrderDetails
+);
+
+// get all Order Details of an user
+router.get(
+  "/user/:user_id",
+  authUserOrRole(
+    ENUM_USER_ROLE.SUPER_ADMIN,
+    ENUM_USER_ROLE.ADMIN,
+    ENUM_USER_ROLE.STUDENT
+  ),
+  OrderDetailsController.getOrderDetailsOfAnUser
+);
 
 // get single OrderDetails
-router.get("/:id", OrderDetailsController.getSingleOrderDetails);
+router.get(
+  "/:id",
+  authRole(
+    ENUM_USER_ROLE.SUPER_ADMIN,
+    ENUM_USER_ROLE.ADMIN,
+    ENUM_USER_ROLE.STUDENT
+  ),
+  OrderDetailsController.getSingleOrderDetails
+);
 
 // update single OrderDetails
 router.patch(

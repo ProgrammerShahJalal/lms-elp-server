@@ -1,11 +1,9 @@
 import bcrypt from "bcrypt";
-import config from "../../../config";
 import { ILoginInfo, IUser, IUserFilters } from "./user.interface";
 import { User } from "./user.model";
 import { ENUM_USER_ROLE } from "../../enums/user";
 import ApiError from "../../../errors/ApiError";
 import httpStatus from "http-status";
-import { jwtHelpers } from "../../helpers/jwtHelpers";
 import { UserUtills } from "./user.utills";
 import { userSearchableFields } from "./user.constants";
 import { paginationHelpers } from "../../helpers/paginationHelpers";
@@ -142,8 +140,10 @@ const getAllUsers = async (
 };
 
 // get single user
-const getSingleUser = async (id: string): Promise<Omit<IUser, "password">> => {
-  const result = await User.findById(id);
+const getSingleUser = async (
+  user_id: string
+): Promise<Omit<IUser, "password">> => {
+  const result = await User.findById(user_id);
 
   if (!result) {
     throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
@@ -155,10 +155,10 @@ const getSingleUser = async (id: string): Promise<Omit<IUser, "password">> => {
 
 // update user
 const updateUser = async (
-  id: string,
+  user_id: string,
   payload: Partial<IUser>
 ): Promise<Omit<IUser, "password">> => {
-  const result = await User.findByIdAndUpdate(id, payload, { new: true });
+  const result = await User.findByIdAndUpdate(user_id, payload, { new: true });
 
   if (!result) {
     throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
@@ -169,8 +169,8 @@ const updateUser = async (
 };
 
 // delete user
-const deleteUser = async (id: string) => {
-  const result = await User.findByIdAndDelete(id);
+const deleteUser = async (user_id: string) => {
+  const result = await User.findByIdAndDelete(user_id);
 
   if (!result) {
     throw new ApiError(httpStatus.NOT_FOUND, "User not found!");

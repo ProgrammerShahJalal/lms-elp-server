@@ -26,11 +26,13 @@ const authUserOrRole =
         req.user = verifiedUser; // role  , userId
       } else {
         req.user = null;
-        throw new ApiError(httpStatus.BAD_REQUEST, "User not found!");
+        throw new ApiError(httpStatus.UNAUTHORIZED, "User not found!");
       }
-      if (verifiedUser?.userId === req?.params?.id) {
+      if (
+        verifiedUser?.userId === (req?.params?.user_id || req?.query?.user_id)
+      ) {
         next();
-      } else if (verifiedUser?.userId === req?.params?.id) {
+      } else if (verifiedUser?.userId === req?.params?.user_id) {
         next();
       } else if (
         requiredRoles.length &&
@@ -38,7 +40,7 @@ const authUserOrRole =
       ) {
         next();
       } else {
-        throw new ApiError(httpStatus.FORBIDDEN, "Permission denied!");
+        throw new ApiError(httpStatus.UNAUTHORIZED, "Permission denied!");
       }
     } catch (error) {
       next(error);

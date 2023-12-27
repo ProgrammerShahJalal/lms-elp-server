@@ -1,6 +1,6 @@
 export const examFilterableFields = [
   "searchTerm",
-  "name",
+  "title",
   "total_marks",
   "duration_in_minutes",
   "course_id",
@@ -9,4 +9,4 @@ export const examFilterableFields = [
   "exam_type",
 ];
 
-export const examSearchableFields = ["description", "name"];
+export const examSearchableFields = ["description", "title"];

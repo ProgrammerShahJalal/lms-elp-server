@@ -80,8 +80,8 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getSingleUser = catchAsync(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const result = await UserService.getSingleUser(id);
+  const { user_id } = req.params;
+  const result = await UserService.getSingleUser(user_id);
 
   sendResponse(res, {
     success: true,
@@ -92,9 +92,9 @@ const getSingleUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateUser = catchAsync(async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const { user_id } = req.params;
   const payload = req.body;
-  const result = await UserService.updateUser(id, payload);
+  const result = await UserService.updateUser(user_id, payload);
 
   sendResponse(res, {
     success: true,
@@ -104,9 +104,8 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const deleteUser = catchAsync(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const payload = req.body;
-  const result = await UserService.deleteUser(id);
+  const { user_id } = req.params;
+  const result = await UserService.deleteUser(user_id);
 
   sendResponse(res, {
     success: true,

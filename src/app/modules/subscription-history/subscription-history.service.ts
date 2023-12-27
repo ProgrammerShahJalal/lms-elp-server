@@ -39,6 +39,7 @@ const createSubscriptionHistory = async (
     expire_date.getMonth() + subscription.subcription_duration_in_months
   );
   payload.expire_date = expire_date;
+  payload.is_active = payload?.is_active || true;
 
   const result = await SubscriptionHistory.create(payload);
   return result;
