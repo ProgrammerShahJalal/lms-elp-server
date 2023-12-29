@@ -6,6 +6,10 @@ import { CourseService } from "./course.service";
 import { courseFilterableFields } from "./course.constants";
 import { paginationFields } from "../../constants/pagination";
 import pick from "../../../shared/pick";
+import { SubscriptionHistory } from "../subscription-history/subscription-history.model";
+import ApiError from "../../../errors/ApiError";
+import { jwtHelpers } from "../../helpers/jwtHelpers";
+import config from "../../../config";
 
 const createCourse = catchAsync(async (req: Request, res: Response) => {
   const result = await CourseService.createCourse(req);
@@ -33,6 +37,26 @@ const getAllCourses = catchAsync(async (req: Request, res: Response) => {
 
 const getSingleCourse = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
+
+  // const token = req.headers.authorization;
+  // let verifiedUser = null;
+  // verifiedUser = jwtHelpers.verifyToken(token, config.jwt.secret)
+
+  // if(!token){
+  //   const result = await CourseService.getSingleCourse(id, true);
+  // }
+
+  // const currentDate = new Date();
+  //   const subscribed = await SubscriptionHistory.find({
+  //     user_id,
+  //     course_id: id,
+  //     expire_date: { $gte: currentDate },
+  //   });
+
+  //   if (!subscribed.length) {
+  //     throw new ApiError(httpStatus.OK, "No subscription found!");
+  //   }
+
   const result = await CourseService.getSingleCourse(id);
 
   sendResponse(res, {
