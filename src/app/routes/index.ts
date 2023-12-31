@@ -16,6 +16,7 @@ import { OrderRoutes } from "../modules/order/order.route";
 import { OrderStatusRoutes } from "../modules/order-status/order-status.route";
 import { SubscriptionHistoryRoutes } from "../modules/subscription-history/subscription-history.route";
 import { OrderDetailsStatusRoutes } from "../modules/order-details/order-details.route";
+import { BkashRoutes } from "../modules/bkash/bkash.route";
 
 const router = Router();
 
@@ -37,6 +38,7 @@ const moduleRoutes = [
   { path: "/orders", route: OrderRoutes },
   { path: "/order-details", route: OrderDetailsStatusRoutes },
   { path: "/order-statuses", route: OrderStatusRoutes },
+  { path: "/bkash", route: BkashRoutes },
 ];
 
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

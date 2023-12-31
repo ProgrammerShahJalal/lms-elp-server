@@ -6,7 +6,7 @@ const createExamResultZodSchema = z.object({
     exam_id: z.string(),
     exam_type: z.enum(["0", "1"]),
     answer: z.string({}),
-    total_marks: z.number(),
+    total_marks: z.number().positive(),
     total_correct_answer: z.number().default(0),
     total_wrong_answer: z.number().default(0),
     isApproved: z.boolean().default(false),

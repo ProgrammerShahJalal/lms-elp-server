@@ -35,10 +35,7 @@ const createExamResult = async (payload: IExamResult): Promise<IExamResult> => {
   if (exam.exam_type === "1") {
     // if written exam is submitted by student
     if (!payload.answer) {
-      throw new ApiError(
-        httpStatus.BAD_REQUEST,
-        "Please provide your answer link."
-      );
+      throw new ApiError(httpStatus.OK, "Please provide your answer link.");
     }
     result = await ExamResult.create(payload);
     return result;

@@ -3,6 +3,8 @@ import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
 import { CoursePlaylistService } from "./course-playlist.service";
+import { SubscriptionHistory } from "../subscription-history/subscription-history.model";
+import ApiError from "../../../errors/ApiError";
 
 const createCoursePlaylist = catchAsync(async (req: Request, res: Response) => {
   const result = await CoursePlaylistService.createCoursePlaylist(req.body);
@@ -32,6 +34,17 @@ const getPlaylistsOfACourse = catchAsync(
   async (req: Request, res: Response) => {
     const user_id = req.user?.userId;
     const { course_id } = req.params;
+
+    const currentDate = new Date();
+    const subscribed = await SubscriptionHistory.find({
+      user_id,
+      course_id,
+      expire_date: { $gte: currentDate },
+    });
+
+    if (!subscribed.length) {
+      throw new ApiError(httpStatus.OK, "No subscription found!");
+    }
 
     const result = await CoursePlaylistService.getPlaylistsOfACourse(course_id);
 

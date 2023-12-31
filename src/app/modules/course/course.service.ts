@@ -97,7 +97,7 @@ const getAllCourses = async (
         select: "title _id",
       },
     })
-    .select("-createdAt -updatedAt -__v");
+    .select("-createdAt -updatedAt -__v -study_materials");
   const total = await Course.countDocuments(whereConditions);
 
   return {
@@ -122,10 +122,9 @@ const getSingleCourse = async (id: string): Promise<ICourse | null> => {
       },
     })
     .select("-createdAt -updatedAt -__v");
-
   // if the Course is not found, throw error
   if (!result) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Course not found!");
+    throw new ApiError(httpStatus.OK, "Course not found!");
   }
 
   return result;
