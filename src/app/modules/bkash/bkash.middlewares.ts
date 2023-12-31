@@ -5,6 +5,7 @@ import config from "../../../config";
 
 const bkashAuth = async (req: Request, res: Response, next: NextFunction) => {
   unset("id_token");
+  // res.clearCookie("id_token");
   try {
     const { data } = await axios.post(
       config.bkash.grand_token_url as string,
@@ -21,6 +22,11 @@ const bkashAuth = async (req: Request, res: Response, next: NextFunction) => {
         },
       }
     );
+
+    // res.cookie("id_token", data?.id_token, {
+    //   httpOnly: true,
+    //   secure: config.env === "production",
+    // });
 
     set("id_token", data?.id_token, { protected: true });
     next();

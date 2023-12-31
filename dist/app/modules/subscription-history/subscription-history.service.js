@@ -27,7 +27,6 @@ exports.SubscriptionHistoryService = void 0;
 const http_status_1 = __importDefault(require("http-status"));
 const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const paginationHelpers_1 = require("../../helpers/paginationHelpers");
-const course_model_1 = require("../course/course.model");
 const subscription_history_model_1 = require("./subscription-history.model");
 const user_model_1 = require("../user/user.model");
 const subscription_model_1 = require("../subscription/subscription.model");
@@ -39,18 +38,16 @@ const createSubscriptionHistory = (payload) => __awaiter(void 0, void 0, void 0,
     if (!user) {
         throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "User not found!");
     }
-    const course = yield course_model_1.Course.findById(course_id);
-    if (!course) {
-        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "Course not found!");
-    }
     const subscription = yield subscription_model_1.Subscription.findById(subscription_id);
     if (!subscription) {
         throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "Subscription not found!");
     }
+    payload.course_id = subscription.course_id;
     payload.amount = subscription.cost;
     const expire_date = new Date();
-    expire_date.setMonth(expire_date.getMonth() + subscription.subcription_duration_in_months);
+    expire_date.setMonth(expire_date.getMonth() + subscription.subscription_duration_in_months);
     payload.expire_date = expire_date;
+    payload.is_active = (payload === null || payload === void 0 ? void 0 : payload.is_active) || true;
     const result = yield subscription_history_model_1.SubscriptionHistory.create(payload);
     return result;
 });

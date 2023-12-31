@@ -10,7 +10,7 @@ const authRole_1 = __importDefault(require("../../middlewares/authRole"));
 const subscription_history_validation_1 = require("./subscription-history.validation");
 const subscription_history_controller_1 = require("./subscription-history.controller");
 const router = (0, express_1.Router)();
-// create SubscriptionHistory
+// create Subscription History
 router.post("/", (0, validateRequest_1.default)(subscription_history_validation_1.SubscriptionHistoryValidation.createSubscriptionHistorySchema), subscription_history_controller_1.SubscriptionHistoryController.createSubscriptionHistory);
 // get all SubscriptionHistorys
 router.get("/", subscription_history_controller_1.SubscriptionHistoryController.getAllSubscriptionHistorys);

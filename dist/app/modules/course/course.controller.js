@@ -42,6 +42,21 @@ const getAllCourses = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
 }));
 const getSingleCourse = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
+    // const token = req.headers.authorization;
+    // let verifiedUser = null;
+    // verifiedUser = jwtHelpers.verifyToken(token, config.jwt.secret)
+    // if(!token){
+    //   const result = await CourseService.getSingleCourse(id, true);
+    // }
+    // const currentDate = new Date();
+    //   const subscribed = await SubscriptionHistory.find({
+    //     user_id,
+    //     course_id: id,
+    //     expire_date: { $gte: currentDate },
+    //   });
+    //   if (!subscribed.length) {
+    //     throw new ApiError(httpStatus.OK, "No subscription found!");
+    //   }
     const result = yield course_service_1.CourseService.getSingleCourse(id);
     (0, sendResponse_1.default)(res, {
         success: true,

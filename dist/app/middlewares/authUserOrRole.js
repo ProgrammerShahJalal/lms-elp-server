@@ -34,12 +34,12 @@ const authUserOrRole = (...requiredRoles) => (req, res, next) => __awaiter(void 
         }
         else {
             req.user = null;
-            throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, "User not found!");
+            throw new ApiError_1.default(http_status_1.default.UNAUTHORIZED, "User not found!");
         }
         if ((verifiedUser === null || verifiedUser === void 0 ? void 0 : verifiedUser.userId) === (((_a = req === null || req === void 0 ? void 0 : req.params) === null || _a === void 0 ? void 0 : _a.user_id) || ((_b = req === null || req === void 0 ? void 0 : req.query) === null || _b === void 0 ? void 0 : _b.user_id))) {
             next();
         }
-        else if ((verifiedUser === null || verifiedUser === void 0 ? void 0 : verifiedUser.userId) === ((_c = req === null || req === void 0 ? void 0 : req.params) === null || _c === void 0 ? void 0 : _c.id)) {
+        else if ((verifiedUser === null || verifiedUser === void 0 ? void 0 : verifiedUser.userId) === ((_c = req === null || req === void 0 ? void 0 : req.params) === null || _c === void 0 ? void 0 : _c.user_id)) {
             next();
         }
         else if (requiredRoles.length &&
@@ -47,7 +47,7 @@ const authUserOrRole = (...requiredRoles) => (req, res, next) => __awaiter(void 
             next();
         }
         else {
-            throw new ApiError_1.default(http_status_1.default.FORBIDDEN, "Permission denied!");
+            throw new ApiError_1.default(http_status_1.default.UNAUTHORIZED, "Permission denied!");
         }
     }
     catch (error) {

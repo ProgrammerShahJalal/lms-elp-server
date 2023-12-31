@@ -29,21 +29,48 @@ const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const paginationHelpers_1 = require("../../helpers/paginationHelpers");
 const order_model_1 = require("./order.model");
 const book_model_1 = require("../book/book.model");
-const user_model_1 = require("../user/user.model");
+const cart_model_1 = require("../cart/cart.model");
+const shipping_address_model_1 = require("../shipping-address/shipping-address.model");
+const order_details_model_1 = require("../order-details/order-details.model");
 // create Order
-const createOrder = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const { user_id, book_id } = payload;
-    // to check if the user is present of the provided user_id
-    const user = yield user_model_1.User.findById(user_id);
-    if (!user) {
-        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "User not found!");
-    }
-    // to check if the book is present of the provided book_id
-    const book = yield book_model_1.Book.findById(book_id);
-    if (!book) {
-        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "Book not found!");
-    }
-    const result = yield order_model_1.Order.create(payload);
+const createOrder = (user_id) => __awaiter(void 0, void 0, void 0, function* () {
+    const cartItems = yield cart_model_1.Cart.find({ user_id });
+    let totalPrice = 0;
+    let discountPrice = 0;
+    const orders = [];
+    cartItems.forEach((cartItem) => __awaiter(void 0, void 0, void 0, function* () {
+        const book = yield book_model_1.Book.findOne({ book_id: cartItem.book_id });
+        const order = yield order_model_1.Order.create({
+            user_id,
+            book_id: book === null || book === void 0 ? void 0 : book._id,
+            book_quantity: cartItem === null || cartItem === void 0 ? void 0 : cartItem.quantity,
+            unit_price: book === null || book === void 0 ? void 0 : book.discount_price,
+        });
+        orders.push(order);
+        totalPrice += Number(cartItem === null || cartItem === void 0 ? void 0 : cartItem.quantity) * Number(book === null || book === void 0 ? void 0 : book.discount_price);
+        discountPrice +=
+            (Number(book === null || book === void 0 ? void 0 : book.price) - Number(book === null || book === void 0 ? void 0 : book.discount_price)) *
+                Number(cartItem === null || cartItem === void 0 ? void 0 : cartItem.quantity);
+    }));
+    const shipping = yield shipping_address_model_1.ShippingAddress.findOne({ user_id });
+    const shippingAddress = JSON.stringify({
+        division: shipping === null || shipping === void 0 ? void 0 : shipping.division,
+        district: shipping === null || shipping === void 0 ? void 0 : shipping.district,
+        upazilla: shipping === null || shipping === void 0 ? void 0 : shipping.upazilla,
+        address: shipping === null || shipping === void 0 ? void 0 : shipping.address,
+        phone: shipping === null || shipping === void 0 ? void 0 : shipping.contact_no,
+        billing_name: shipping === null || shipping === void 0 ? void 0 : shipping.billing_name,
+    });
+    const result = yield order_details_model_1.OrderDetails.create({
+        user_id,
+        total_price: totalPrice,
+        discounts: discountPrice,
+        shipping_charge: 0,
+        shipping_address_id: shipping === null || shipping === void 0 ? void 0 : shipping._id,
+        orders: JSON.stringify(orders),
+        trx_id: "dummy trx id",
+        shipping_address: shippingAddress,
+    });
     return result;
 });
 // get all Orders
@@ -67,7 +94,10 @@ const getAllOrders = (filters, paginationOptions) => __awaiter(void 0, void 0, v
         .sort(sortConditions)
         .skip(skip)
         .limit(limit)
-        .populate("course_id");
+        .populate({
+        path: "user_id book_id",
+        select: "name email contact_no title writer price discount_price format pdf_link",
+    });
     const total = yield order_model_1.Order.countDocuments(whereConditions);
     return {
         meta: {
@@ -78,12 +108,24 @@ const getAllOrders = (filters, paginationOptions) => __awaiter(void 0, void 0, v
         data: result,
     };
 });
+// get Orders of an user
+const getOrdersOfAnUser = (user_id) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield order_model_1.Order.find({ user_id }).populate({
+        path: "user_id book_id",
+        select: "name title writer format discount_price",
+    });
+    // if the Order is not found, throw error
+    if (!result.length) {
+        throw new ApiError_1.default(http_status_1.default.OK, "Order not found!");
+    }
+    return result;
+});
 // get Order
 const getSingleOrder = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield order_model_1.Order.findById(id).populate("user_id book_id");
     // if the Order is not found, throw error
     if (!result) {
-        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "Order not found!");
+        throw new ApiError_1.default(http_status_1.default.OK, "Order not found!");
     }
     return result;
 });
@@ -95,7 +137,7 @@ const updateOrder = (id, payload) => __awaiter(void 0, void 0, void 0, function*
     });
     // if the Order you want to update was not present, i.e. not updated, throw error
     if (!result) {
-        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "Couldn't update. Order not found!");
+        throw new ApiError_1.default(http_status_1.default.OK, "Couldn't update. Order not found!");
     }
     return result;
 });
@@ -105,13 +147,14 @@ const deleteOrder = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield order_model_1.Order.findOneAndDelete({ _id: id });
     // if the Order you want to delete was not present, i.e. not deleted, throw error
     if (!result) {
-        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "Couldn't delete. Order not found!");
+        throw new ApiError_1.default(http_status_1.default.OK, "Couldn't delete. Order not found!");
     }
     return result;
 });
 exports.OrderService = {
     createOrder,
     getAllOrders,
+    getOrdersOfAnUser,
     getSingleOrder,
     updateOrder,
     deleteOrder,

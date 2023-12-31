@@ -50,7 +50,7 @@ const createExamResult = (payload) => __awaiter(void 0, void 0, void 0, function
     if (exam.exam_type === "1") {
         // if written exam is submitted by student
         if (!payload.answer) {
-            throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, "Please provide your answer link.");
+            throw new ApiError_1.default(http_status_1.default.OK, "Please provide your answer link.");
         }
         result = yield exam_result_model_1.ExamResult.create(payload);
         return result;

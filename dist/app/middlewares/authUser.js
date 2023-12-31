@@ -36,11 +36,11 @@ const authUser = () => (req, res, next) => __awaiter(void 0, void 0, void 0, fun
             req.user = null;
             throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "User not found!");
         }
-        if (verifiedUser.userId === ((_a = req === null || req === void 0 ? void 0 : req.params) === null || _a === void 0 ? void 0 : _a.id)) {
+        if (verifiedUser.userId === ((_a = req === null || req === void 0 ? void 0 : req.params) === null || _a === void 0 ? void 0 : _a.user_id)) {
             next();
         }
         else {
-            throw new ApiError_1.default(http_status_1.default.FORBIDDEN, "Permission denied!");
+            throw new ApiError_1.default(http_status_1.default.UNAUTHORIZED, "Permission denied!");
         }
     }
     catch (error) {

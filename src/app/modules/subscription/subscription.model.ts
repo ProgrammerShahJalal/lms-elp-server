@@ -4,7 +4,7 @@ import { ISubscription } from "./subscription.interface";
 const subscriptionSchema = new Schema<ISubscription>(
   {
     name: { type: String },
-    subcription_duration_in_months: { type: Number, required: true },
+    subscription_duration_in_months: { type: Number, required: true },
     cost: { type: Number, required: true },
     logo: { type: String },
     description: { type: String },

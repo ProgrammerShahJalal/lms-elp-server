@@ -20,7 +20,23 @@ const exam_result_service_1 = require("./exam-result.service");
 const exam_result_constants_1 = require("./exam-result.constants");
 const pagination_1 = require("../../constants/pagination");
 const pick_1 = __importDefault(require("../../../shared/pick"));
+const exam_result_model_1 = require("./exam-result.model");
+const exam_payment_model_1 = require("../exam-payment/exam-payment.model");
+const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const createExamResult = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const user_id = (_a = req.user) === null || _a === void 0 ? void 0 : _a.user_id;
+    const examResult = yield exam_result_model_1.ExamResult.find({
+        user_id: user_id,
+        exam_id: req.body.exam_id,
+    });
+    const examPayment = yield exam_payment_model_1.ExamPayment.find({
+        user_id,
+        exam_id: req.body.exam_id,
+    });
+    if (examResult.length >= examPayment.length) {
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, "Already exam result is created for this user!");
+    }
     const result = yield exam_result_service_1.ExamResultService.createExamResult(req.body);
     (0, sendResponse_1.default)(res, {
         success: true,

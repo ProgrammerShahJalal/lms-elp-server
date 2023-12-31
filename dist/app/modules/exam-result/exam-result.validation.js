@@ -8,7 +8,7 @@ const createExamResultZodSchema = zod_1.z.object({
         exam_id: zod_1.z.string(),
         exam_type: zod_1.z.enum(["0", "1"]),
         answer: zod_1.z.string({}),
-        total_marks: zod_1.z.number(),
+        total_marks: zod_1.z.number().positive(),
         total_correct_answer: zod_1.z.number().default(0),
         total_wrong_answer: zod_1.z.number().default(0),
         isApproved: zod_1.z.boolean().default(false),

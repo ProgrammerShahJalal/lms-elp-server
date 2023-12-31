@@ -4,7 +4,7 @@ exports.Subscription = void 0;
 const mongoose_1 = require("mongoose");
 const subscriptionSchema = new mongoose_1.Schema({
     name: { type: String },
-    subcription_duration_in_months: { type: Number, required: true },
+    subscription_duration_in_months: { type: Number, required: true },
     cost: { type: Number, required: true },
     logo: { type: String },
     description: { type: String },

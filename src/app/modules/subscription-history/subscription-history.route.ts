@@ -7,7 +7,7 @@ import { SubscriptionHistoryController } from "./subscription-history.controller
 
 const router = Router();
 
-// create SubscriptionHistory
+// create Subscription History
 router.post(
   "/",
   validateRequest(

@@ -17,6 +17,8 @@ const subscription_route_1 = require("../modules/subscription/subscription.route
 const order_route_1 = require("../modules/order/order.route");
 const order_status_route_1 = require("../modules/order-status/order-status.route");
 const subscription_history_route_1 = require("../modules/subscription-history/subscription-history.route");
+const order_details_route_1 = require("../modules/order-details/order-details.route");
+const bkash_route_1 = require("../modules/bkash/bkash.route");
 const router = (0, express_1.Router)();
 const moduleRoutes = [
     { path: "/users", route: user_route_1.UserRoutes },
@@ -34,7 +36,9 @@ const moduleRoutes = [
     { path: "/subscriptions", route: subscription_route_1.SubscriptionRoutes },
     { path: "/subscription-histories", route: subscription_history_route_1.SubscriptionHistoryRoutes },
     { path: "/orders", route: order_route_1.OrderRoutes },
+    { path: "/order-details", route: order_details_route_1.OrderDetailsStatusRoutes },
     { path: "/order-statuses", route: order_status_route_1.OrderStatusRoutes },
+    { path: "/bkash", route: bkash_route_1.BkashRoutes },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
 exports.default = router;

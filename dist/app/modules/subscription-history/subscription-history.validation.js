@@ -5,7 +5,6 @@ const zod_1 = require("zod");
 const createSubscriptionHistorySchema = zod_1.z.object({
     body: zod_1.z.object({
         user_id: zod_1.z.string({ required_error: "User id is required!" }),
-        course_id: zod_1.z.string({ required_error: "Course id is required!" }),
         subscription_id: zod_1.z.string({
             required_error: "Subscription id is required!",
         }),

@@ -86,6 +86,15 @@ const getAllOrderDetails = (filters, paginationOptions) => __awaiter(void 0, voi
         data: result,
     };
 });
+// get Order Details of an user
+const getOrderDetailsOfAnUser = (user_id) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield order_details_model_1.OrderDetails.find({ user_id }).populate("user_id book_id");
+    // if the OrderDetails is not found, throw error
+    if (!result.length) {
+        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "Order status not found!");
+    }
+    return result;
+});
 // get OrderDetails
 const getSingleOrderDetails = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield order_details_model_1.OrderDetails.findById(id).populate("user_id book_id");
@@ -120,6 +129,7 @@ const deleteOrderDetails = (id) => __awaiter(void 0, void 0, void 0, function* (
 exports.OrderDetailsService = {
     createOrderDetails,
     getAllOrderDetails,
+    getOrderDetailsOfAnUser,
     getSingleOrderDetails,
     updateOrderDetails,
     deleteOrderDetails,

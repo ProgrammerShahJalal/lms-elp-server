@@ -1,6 +1,5 @@
 import httpStatus from "http-status";
 import ApiError from "../../../errors/ApiError";
-import { SubCategory } from "../sub-category/sub-category.model";
 import { IPaginationOptions } from "../../../interfaces/pagination";
 import { IGenericResponse } from "../../../interfaces/common";
 import { paginationHelpers } from "../../helpers/paginationHelpers";
@@ -24,19 +23,16 @@ const createSubscriptionHistory = async (
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
   }
-  const course = await Course.findById(course_id);
-  if (!course) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Course not found!");
-  }
   const subscription = await Subscription.findById(subscription_id);
   if (!subscription) {
     throw new ApiError(httpStatus.NOT_FOUND, "Subscription not found!");
   }
 
+  payload.course_id = subscription.course_id;
   payload.amount = subscription.cost;
   const expire_date = new Date();
   expire_date.setMonth(
-    expire_date.getMonth() + subscription.subcription_duration_in_months
+    expire_date.getMonth() + subscription.subscription_duration_in_months
   );
   payload.expire_date = expire_date;
   payload.is_active = payload?.is_active || true;

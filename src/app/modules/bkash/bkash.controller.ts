@@ -28,7 +28,7 @@ const createPayment = async (req: Request, res: Response) => {
         amount: amount,
         currency: "BDT",
         intent: "sale",
-        merchantInvoiceNumber: "Inv" + uuidv4().substring(0, 6),
+        merchantInvoiceNumber: "Inv-" + uuidv4().substring(0, 6),
       },
       {
         headers: await bkashHeaders(),
@@ -65,7 +65,9 @@ const callBack = async (req: Request, res: Response) => {
         }
       );
       if (data && data.statusCode === "0000") {
-        return res.redirect(`${config.frontend_site_url}/bkash/success`);
+        return res.redirect(
+          `${config.frontend_site_url}/bkash/success?trx_id=${data.trxID}`
+        );
       } else {
         return res.redirect(
           `${config.frontend_site_url}/bkash/error?message=${data?.statusMessage}`
@@ -78,6 +80,30 @@ const callBack = async (req: Request, res: Response) => {
         }`
       );
     }
+  }
+};
+
+const checkPaymentStatus = async (req: Request, res: Response) => {
+  const { paymentID } = req.body;
+  try {
+    const { data } = await axios.post(
+      config.bkash.query_payment_url as string,
+      {
+        paymentID,
+      },
+      {
+        headers: await bkashHeaders(),
+      }
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Payment details fetched successfully!",
+      data: data,
+    });
+  } catch (error) {
+    throw new ApiError(httpStatus.OK, "Error querying payment!");
   }
 };
 
@@ -137,4 +163,5 @@ export const BkashController = {
   createPayment,
   callBack,
   refund,
+  checkPaymentStatus,
 };

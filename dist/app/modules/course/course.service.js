@@ -97,7 +97,7 @@ const getAllCourses = (filters, paginationOptions) => __awaiter(void 0, void 0, 
             select: "title _id",
         },
     })
-        .select("-createdAt -updatedAt -__v");
+        .select("-createdAt -updatedAt -__v -study_materials");
     const total = yield course_model_1.Course.countDocuments(whereConditions);
     return {
         meta: {
@@ -113,16 +113,16 @@ const getSingleCourse = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield course_model_1.Course.findById(id)
         .populate({
         path: "sub_category_id",
-        select: "name _id",
+        select: "title _id",
         populate: {
             path: "category_id",
-            select: "name _id",
+            select: "title _id",
         },
     })
         .select("-createdAt -updatedAt -__v");
     // if the Course is not found, throw error
     if (!result) {
-        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "Course not found!");
+        throw new ApiError_1.default(http_status_1.default.OK, "Course not found!");
     }
     return result;
 });
