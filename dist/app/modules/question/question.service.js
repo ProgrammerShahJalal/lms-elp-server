@@ -94,6 +94,10 @@ const getAllQuestions = (filters, paginationOptions) => __awaiter(void 0, void 0
         data: result,
     };
 });
+const getQuestionsOfAnExam = (exam_id) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield question_model_1.Question.find({ exam_id });
+    return result;
+});
 // get single quiz question
 const getSingleQuestion = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield question_model_1.Question.findById(id).populate("exam_id");
@@ -124,6 +128,7 @@ const deleteQuestion = (id) => __awaiter(void 0, void 0, void 0, function* () {
 exports.QuestionService = {
     createQuestion,
     getAllQuestions,
+    getQuestionsOfAnExam,
     getSingleQuestion,
     updateQuestion,
     deleteQuestion,

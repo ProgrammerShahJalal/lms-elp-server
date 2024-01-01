@@ -11,6 +11,7 @@ import { SortOrder } from "mongoose";
 import { Request } from "express";
 import { IUploadFile } from "../../../interfaces/file";
 import { FileUploadHelper } from "../../helpers/fileUploadHelper";
+import sharp from "sharp";
 
 // create Course
 const createCourse = async (req: Request): Promise<ICourse> => {
@@ -27,6 +28,7 @@ const createCourse = async (req: Request): Promise<ICourse> => {
 
   if (req.file) {
     const file = req.file as IUploadFile;
+
     const uploadedImage = await FileUploadHelper.uploadToCloudinary(file);
 
     if (uploadedImage) {

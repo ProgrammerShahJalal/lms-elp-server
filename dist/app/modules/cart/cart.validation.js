@@ -10,7 +10,7 @@ const createCartZodSchema = zod_1.z.object({
         book_id: zod_1.z.string({
             required_error: "Book id required!",
         }),
-        quantity: zod_1.z.number({}).optional(),
+        quantity: zod_1.z.number({}).positive().optional(),
     }),
 });
 const updateCartZodSchema = zod_1.z.object({

@@ -17,12 +17,12 @@ const addCart = async (payload: ICart): Promise<ICart | null> => {
   // if the provided user_id have the user or not in db
   const user = await User.findById(user_id);
   if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
+    throw new ApiError(httpStatus.OK, "User not found!");
   }
   // if the provided book_id have the book or not in db
   const book = await Book.findById(book_id);
   if (!book) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Book not found!");
+    throw new ApiError(httpStatus.OK, "Book not found!");
   }
 
   const cartExisting = await Cart.findOne({
@@ -33,13 +33,21 @@ const addCart = async (payload: ICart): Promise<ICart | null> => {
   let result;
 
   if (!cartExisting) {
+    if (Number(payload?.quantity) <= 0) {
+      throw new ApiError(
+        httpStatus.OK,
+        "Quantity can not be negative or zero!"
+      );
+    }
     // Create the cart
     const createdCart = await Cart.create(payload);
 
     // Query the created cart to populate the user and book information
-    result = await Cart.findById(createdCart._id)
-      .populate("user_id", "name email contact_no")
-      .populate("book_id", "name writer price");
+    result = await Cart.findById(createdCart._id).populate(
+      "book_id",
+      "name writer price"
+    );
+    // .populate("user_id", "name email contact_no")
   } else {
     if (Number(cartExisting?.quantity) + Number(payload?.quantity) < 0) {
       return cartExisting;
@@ -107,12 +115,22 @@ const getAllCarts = async (
 };
 // get single Cart
 const getSingleCart = async (id: string): Promise<ICart | null> => {
-  const result = await Cart.findById(id).populate("course_id");
+  const result = await Cart.findById(id).populate("book_id");
 
   if (!result) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Cart not found!");
+    throw new ApiError(httpStatus.OK, "Cart not found!");
   }
 
+  return result;
+};
+
+// get Carts of an User
+const getCartsOfAnUser = async (user_id: string): Promise<ICart[] | null> => {
+  const result = await Cart.find({ user_id }).populate("book_id");
+
+  if (!result) {
+    throw new ApiError(httpStatus.OK, "Cart not found!");
+  }
   return result;
 };
 
@@ -138,6 +156,7 @@ export const CartService = {
   addCart,
   getAllCarts,
   getSingleCart,
+  getCartsOfAnUser,
   updateCart,
   deleteCart,
 };

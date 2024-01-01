@@ -3,6 +3,7 @@ import multer from "multer";
 import * as fs from "fs";
 import config from "../../config";
 import { ICloudinaryResponse, IUploadFile } from "../../interfaces/file";
+import sharp from "sharp";
 
 cloudinary.config({
   cloud_name: config.cloudinary.cloud_name,

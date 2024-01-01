@@ -25,6 +25,13 @@ router.get(
   BkashController.callBack
 );
 
+// query payment/check payment status
+router.get(
+  "/payment/check",
+  BkashMiddlewares.bkashAuth,
+  BkashController.checkPaymentStatus
+);
+
 // callback
 router.get(
   "/payment/refund/:trx_id",

@@ -4,7 +4,8 @@ exports.subscriptionSearchableFields = exports.subscriptionFilterableFields = vo
 exports.subscriptionFilterableFields = [
     "searchTerm",
     "name",
-    "subcription_duration_in_months",
+    "subscription_duration_in_months",
     "cost",
+    "course_id",
 ];
 exports.subscriptionSearchableFields = ["name"];

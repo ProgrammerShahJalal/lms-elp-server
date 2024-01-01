@@ -8,9 +8,22 @@ import globalErrorHandler from "./app/middlewares/globalErrorHandler";
 const app: Application = express();
 
 // use middlewares
+// app.use(
+//   cors({
+//     origin: ["http://localhost:3000", "https://elp-client.vercel.app/"],
+//     credentials: true,
+//   })
+// );
+
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://elp-client.vercel.app",
+  // Add other allowed origins as needed
+];
+
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: allowedOrigins.includes("*") ? "*" : allowedOrigins,
     credentials: true,
   })
 );

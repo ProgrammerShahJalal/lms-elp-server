@@ -20,8 +20,11 @@ const pagination_1 = require("../../constants/pagination");
 const pick_1 = __importDefault(require("../../../shared/pick"));
 const order_service_1 = require("./order.service");
 const order_constants_1 = require("./order.constants");
+const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const createOrder = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield order_service_1.OrderService.createOrder(req.body);
+    var _a;
+    const user_id = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
+    const result = yield order_service_1.OrderService.createOrder(user_id);
     (0, sendResponse_1.default)(res, {
         success: true,
         statusCode: http_status_1.default.OK,
@@ -40,9 +43,26 @@ const getAllOrders = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
         data: result,
     });
 }));
+const getOrdersOfAnUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { user_id } = req.params;
+    const result = yield order_service_1.OrderService.getOrdersOfAnUser(user_id);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Orders fetched successfully!",
+        data: result,
+    });
+}));
 const getSingleOrder = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _b, _c, _d, _e, _f;
     const { id } = req.params;
     const result = yield order_service_1.OrderService.getSingleOrder(id);
+    // throw error if not admin/super_admin/user_id match
+    if (((_b = req.user) === null || _b === void 0 ? void 0 : _b.role) === "admin" &&
+        ((_c = req.user) === null || _c === void 0 ? void 0 : _c.role) === "super_admin" &&
+        ((_d = req.user) === null || _d === void 0 ? void 0 : _d.userId) === ((_f = (_e = result === null || result === void 0 ? void 0 : result.user_id) === null || _e === void 0 ? void 0 : _e._id) === null || _f === void 0 ? void 0 : _f.toString())) {
+        throw new ApiError_1.default(http_status_1.default.OK, "Unauthorized!");
+    }
     (0, sendResponse_1.default)(res, {
         success: true,
         statusCode: http_status_1.default.OK,
@@ -74,6 +94,7 @@ const deleteOrder = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, vo
 exports.OrderController = {
     createOrder,
     getAllOrders,
+    getOrdersOfAnUser,
     getSingleOrder,
     updateOrder,
     deleteOrder,

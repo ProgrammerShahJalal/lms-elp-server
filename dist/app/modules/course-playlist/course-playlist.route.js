@@ -13,7 +13,9 @@ const router = (0, express_1.Router)();
 // create Course  Playlist
 router.post("/", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */, "admin" /* ENUM_USER_ROLE.ADMIN */), (0, validateRequest_1.default)(course_playlist_validation_1.CoursePlaylistValidation.createCoursePlaylistSchema), course_playlist_controller_1.CoursePlaylistController.createCoursePlaylist);
 // get all CoursePlaylists
-router.get("/", course_playlist_controller_1.CoursePlaylistController.getAllCoursePlaylists);
+router.get("/", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */, "admin" /* ENUM_USER_ROLE.ADMIN */), course_playlist_controller_1.CoursePlaylistController.getAllCoursePlaylists);
+// Get All Course Playlists of a Course
+router.get("/course/:course_id", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */, "admin" /* ENUM_USER_ROLE.ADMIN */, "student" /* ENUM_USER_ROLE.STUDENT */), course_playlist_controller_1.CoursePlaylistController.getPlaylistsOfACourse);
 // get single Course Playlist
 router.get("/:id", course_playlist_controller_1.CoursePlaylistController.getSingleCoursePlaylist);
 // update single CoursePlaylist

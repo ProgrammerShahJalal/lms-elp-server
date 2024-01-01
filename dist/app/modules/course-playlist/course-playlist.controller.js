@@ -17,6 +17,8 @@ const catchAsync_1 = __importDefault(require("../../../shared/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../../shared/sendResponse"));
 const http_status_1 = __importDefault(require("http-status"));
 const course_playlist_service_1 = require("./course-playlist.service");
+const subscription_history_model_1 = require("../subscription-history/subscription-history.model");
+const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const createCoursePlaylist = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield course_playlist_service_1.CoursePlaylistService.createCoursePlaylist(req.body);
     (0, sendResponse_1.default)(res, {
@@ -32,6 +34,27 @@ const getAllCoursePlaylists = (0, catchAsync_1.default)((req, res) => __awaiter(
         success: true,
         statusCode: http_status_1.default.OK,
         message: "All course playlists fetched successfully!",
+        data: result,
+    });
+}));
+const getPlaylistsOfACourse = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const user_id = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
+    const { course_id } = req.params;
+    const currentDate = new Date();
+    const subscribed = yield subscription_history_model_1.SubscriptionHistory.find({
+        user_id,
+        course_id,
+        expire_date: { $gte: currentDate },
+    });
+    if (!subscribed.length) {
+        throw new ApiError_1.default(http_status_1.default.OK, "No subscription found!");
+    }
+    const result = yield course_playlist_service_1.CoursePlaylistService.getPlaylistsOfACourse(course_id);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Course playlists fetched successfully!",
         data: result,
     });
 }));
@@ -69,6 +92,7 @@ const deleteCoursePlaylist = (0, catchAsync_1.default)((req, res) => __awaiter(v
 exports.CoursePlaylistController = {
     createCoursePlaylist,
     getAllCoursePlaylists,
+    getPlaylistsOfACourse,
     getSingleCoursePlaylist,
     updateCoursePlaylist,
     deleteCoursePlaylist,

@@ -40,8 +40,19 @@ const getAllOrderDetails = (0, catchAsync_1.default)((req, res) => __awaiter(voi
         data: result,
     });
 }));
+const getOrderDetailsOfAnUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { user_id } = req.params;
+    const result = yield order_details_service_1.OrderDetailsService.getOrderDetailsOfAnUser(user_id);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Order details fetched successfully!",
+        data: result,
+    });
+}));
 const getSingleOrderDetails = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
+    console.log(id, req.user);
     const result = yield order_details_service_1.OrderDetailsService.getSingleOrderDetails(id);
     (0, sendResponse_1.default)(res, {
         success: true,
@@ -74,6 +85,7 @@ const deleteOrderDetails = (0, catchAsync_1.default)((req, res) => __awaiter(voi
 exports.OrderDetailsController = {
     createOrderDetails,
     getAllOrderDetails,
+    getOrderDetailsOfAnUser,
     getSingleOrderDetails,
     updateOrderDetails,
     deleteOrderDetails,

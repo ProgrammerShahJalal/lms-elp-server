@@ -3,7 +3,7 @@ import ApiError from "../../../errors/ApiError";
 import { IPaginationOptions } from "../../../interfaces/pagination";
 import { IGenericResponse } from "../../../interfaces/common";
 import { paginationHelpers } from "../../helpers/paginationHelpers";
-import { SortOrder } from "mongoose";
+import mongoose, { SortOrder } from "mongoose";
 import { IOrder, IOrderFilters } from "./order.interface";
 import { Order } from "./order.model";
 import { Book } from "../book/book.model";
@@ -14,48 +14,65 @@ import { IOrderDetails } from "../order-details/order-details.interface";
 
 // create Order
 const createOrder = async (user_id: string): Promise<IOrderDetails> => {
-  const cartItems = await Cart.find({ user_id });
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-  let totalPrice: number = 0;
-  let discountPrice: number = 0;
-  const orders: IOrder[] = [];
-  cartItems.forEach(async (cartItem) => {
-    const book = await Book.findOne({ book_id: cartItem.book_id });
-    const order = await Order.create({
-      user_id,
-      book_id: book?._id,
-      book_quantity: cartItem?.quantity,
-      unit_price: book?.discount_price,
+  let result;
+  try {
+    const cartItems = await Cart.find({ user_id }).session(session);
+
+    let totalPrice: number = 0;
+    let discountPrice: number = 0;
+    const orders: IOrder[] = [];
+    cartItems.forEach(async (cartItem) => {
+      const book = await Book.findOne({ book_id: cartItem.book_id }).session(session);
+      const order = await Order.create({
+        user_id,
+        book_id: book?._id,
+        book_quantity: cartItem?.quantity,
+        unit_price: book?.discount_price,
+      }, {session});
+      // @ts-ignore
+      orders.push(order);
+      totalPrice += Number(cartItem?.quantity) * Number(book?.discount_price);
+      discountPrice +=
+        (Number(book?.price) - Number(book?.discount_price)) *
+        Number(cartItem?.quantity);
     });
-    orders.push(order);
-    totalPrice += Number(cartItem?.quantity) * Number(book?.discount_price);
-    discountPrice +=
-      (Number(book?.price) - Number(book?.discount_price)) *
-      Number(cartItem?.quantity);
-  });
 
-  const shipping = await ShippingAddress.findOne({ user_id });
-  const shippingAddress = JSON.stringify({
-    division: shipping?.division,
-    district: shipping?.district,
-    upazilla: shipping?.upazilla,
-    address: shipping?.address,
-    phone: shipping?.contact_no,
-    billing_name: shipping?.billing_name,
-  });
+    const shipping = await ShippingAddress.findOne({ user_id }).session(session);
+    const shippingAddress = JSON.stringify({
+      division: shipping?.division,
+      district: shipping?.district,
+      upazilla: shipping?.upazilla,
+      address: shipping?.address,
+      phone: shipping?.contact_no,
+      billing_name: shipping?.billing_name,
+    });
 
-  const result = await OrderDetails.create({
-    user_id,
-    total_price: totalPrice,
-    discounts: discountPrice,
-    shipping_charge: 0,
-    shipping_address_id: shipping?._id,
-    orders: JSON.stringify(orders),
-    trx_id: "dummy trx id",
-    shipping_address: shippingAddress,
-  });
+    result = await OrderDetails.create({
+      user_id,
+      total_price: totalPrice,
+      discounts: discountPrice,
+      shipping_charge: 0,
+      shipping_address_id: shipping?._id,
+      orders: JSON.stringify(orders),
+      trx_id: "dummy trx id",
+      shipping_address: shippingAddress,
+    },{session});
 
-  return result;
+    // If everything is successful, commit the transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    // @ts-ignore
+    return result;
+  } catch (error) {
+    // If any error occurs, abort the transaction
+    await session.abortTransaction();
+    session.endSession();
+    throw new ApiError(httpStatus.OK, "Error creating order!");
+  }
 };
 
 // get all Orders
@@ -110,7 +127,7 @@ const getAllOrders = async (
 // get Orders of an user
 const getOrdersOfAnUser = async (user_id: string): Promise<IOrder[] | null> => {
   const result = await Order.find({ user_id }).populate({
-    path: "user_id book_id",
+    path: "book_id",
     select: "name title writer format discount_price",
   });
 

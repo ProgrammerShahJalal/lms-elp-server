@@ -37,7 +37,14 @@ const getAllCoursePlaylists = () => __awaiter(void 0, void 0, void 0, function* 
     }
     return result;
 });
-// get CoursePlaylist
+// get playlists of a course
+const getPlaylistsOfACourse = (course_id) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield course_playlist_model_1.CoursePlaylist.find({
+        course_id,
+    });
+    return result;
+});
+// get Course Playlist
 const getSingleCoursePlaylist = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield course_playlist_model_1.CoursePlaylist.findById(id).populate({
         path: "course_id",
@@ -81,6 +88,7 @@ const deleteCoursePlaylist = (id) => __awaiter(void 0, void 0, void 0, function*
 exports.CoursePlaylistService = {
     createCoursePlaylist,
     getAllCoursePlaylists,
+    getPlaylistsOfACourse,
     getSingleCoursePlaylist,
     updateCoursePlaylist,
     deleteCoursePlaylist,

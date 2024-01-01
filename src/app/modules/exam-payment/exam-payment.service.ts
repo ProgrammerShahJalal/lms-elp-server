@@ -5,6 +5,8 @@ import { IExamPayment } from "./exam-payment.interface";
 import { User } from "../user/user.model";
 import { Exam } from "../exam/exam.model";
 import { ExamPayment } from "./exam-payment.model";
+import axios from "axios";
+import config from "../../../config";
 
 // create Exam Payment
 const createExamPayment = async (

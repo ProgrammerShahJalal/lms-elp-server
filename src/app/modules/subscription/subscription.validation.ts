@@ -3,10 +3,10 @@ import { z } from "zod";
 const createSubscriptionSchema = z.object({
   body: z.object({
     name: z.string({}).optional(),
-    subcription_duration_in_months: z.number({
+    subscription_duration_in_months: z.number({
       required_error: "Subscription duration in months is required!",
     }),
-    cost: z.string({
+    cost: z.number({
       required_error: "Cost is required!",
     }),
     logo: z.string({}).optional(),

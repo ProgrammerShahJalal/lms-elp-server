@@ -22,7 +22,7 @@ const authRole = (...requiredRoles) => (req, res, next) => __awaiter(void 0, voi
         //get authorization token
         const token = req.headers.authorization;
         if (!token) {
-            throw new ApiError_1.default(http_status_1.default.UNAUTHORIZED, "You are not authorized");
+            throw new ApiError_1.default(http_status_1.default.UNAUTHORIZED, "You are not authorized! Login first.");
         }
         // verify token
         let verifiedUser = null;
@@ -33,11 +33,11 @@ const authRole = (...requiredRoles) => (req, res, next) => __awaiter(void 0, voi
         }
         else {
             req.user = null;
-            throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "User not found!");
+            throw new ApiError_1.default(http_status_1.default.UNAUTHORIZED, "User not found!");
         }
         // guard that specific role
         if (requiredRoles.length && !requiredRoles.includes(verifiedUser.role)) {
-            throw new ApiError_1.default(http_status_1.default.FORBIDDEN, "Forbidden");
+            throw new ApiError_1.default(http_status_1.default.UNAUTHORIZED, "Forbidden access!");
         }
         next();
     }
