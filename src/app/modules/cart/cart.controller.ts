@@ -8,7 +8,11 @@ import { CartService } from "./cart.service";
 import { cartFilterableFields } from "./cart.constants";
 
 const addCart = catchAsync(async (req: Request, res: Response) => {
-  const result = await CartService.addCart(req.body);
+  const user_id = req.user?.userId;
+  const payload = req.body;
+  payload.user_id = user_id;
+
+  const result = await CartService.addCart(payload);
 
   sendResponse(res, {
     success: true,
@@ -44,6 +48,18 @@ const getSingleCart = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getCartsOfAnUser = catchAsync(async (req: Request, res: Response) => {
+  const user_id = req.user?.userId;
+  const result = await CartService.getCartsOfAnUser(user_id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Carts fetched successfully!",
+    data: result,
+  });
+});
+
 const updateCart = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const payload = req.body;
@@ -72,6 +88,7 @@ export const CartController = {
   addCart,
   getAllCarts,
   getSingleCart,
+  getCartsOfAnUser,
   updateCart,
   deleteCart,
 };
