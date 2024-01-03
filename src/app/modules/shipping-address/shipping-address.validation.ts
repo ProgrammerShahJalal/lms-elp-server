@@ -8,6 +8,9 @@ const createShippingAddressZodSchema = z.object({
     division: z.string({
       required_error: "Division is required!",
     }),
+    outside_dhaka: z.boolean({
+      required_error: "Is location outside Dhaka required!",
+    }),
     district: z.string({
       required_error: "District is required!",
     }),
@@ -34,6 +37,7 @@ const createShippingAddressZodSchema = z.object({
 const updateShippingAddressZodSchema = z.object({
   body: z.object({
     userId: z.string({}).optional(),
+    outside_dhaka: z.boolean({}).optional(),
     division: z.string({}).optional(),
     district: z.string({}).optional(),
     upazilla: z.string({}).optional(),

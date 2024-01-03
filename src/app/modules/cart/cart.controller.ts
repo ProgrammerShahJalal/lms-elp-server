@@ -6,13 +6,16 @@ import pick from "../../../shared/pick";
 import { paginationFields } from "../../constants/pagination";
 import { CartService } from "./cart.service";
 import { cartFilterableFields } from "./cart.constants";
+import ApiError from "../../../errors/ApiError";
+import { Cart } from "./cart.model";
 
 const addCart = catchAsync(async (req: Request, res: Response) => {
   const user_id = req.user?.userId;
+  const role = req.user?.role;
   const payload = req.body;
   payload.user_id = user_id;
 
-  const result = await CartService.addCart(payload);
+  const result = await CartService.addCart(payload, role);
 
   sendResponse(res, {
     success: true,
@@ -73,8 +76,22 @@ const updateCart = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const deleteCart = catchAsync(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const result = await CartService.deleteCart(id);
+  const id = req.params.id;
+  const user_id = req.user?.userId;
+  const role = req.user?.role;
+
+  const cart = await Cart.findById(id);
+
+  let result;
+  if (
+    role == "admin" ||
+    role == "super_admin" ||
+    cart?.user_id.toString() == user_id
+  ) {
+    result = await CartService.deleteCart(id);
+  } else {
+    throw new ApiError(httpStatus.OK, "Permission denied!");
+  }
 
   sendResponse(res, {
     success: true,

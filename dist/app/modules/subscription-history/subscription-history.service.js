@@ -82,6 +82,14 @@ const getAllSubscriptionHistorys = (filters, paginationOptions) => __awaiter(voi
         data: result,
     };
 });
+// get my subscription-histories
+const getMySubscriptionHistories = (user_id) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield subscription_history_model_1.SubscriptionHistory.find({ user_id });
+    if (!result.length) {
+        throw new ApiError_1.default(http_status_1.default.OK, "No subscription found!");
+    }
+    return result;
+});
 // get SubscriptionHistory
 const getSingleSubscriptionHistory = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield subscription_history_model_1.SubscriptionHistory.findById(id).populate("user_id course_id subscription_id");
@@ -116,6 +124,7 @@ const deleteSubscriptionHistory = (id) => __awaiter(void 0, void 0, void 0, func
 exports.SubscriptionHistoryService = {
     createSubscriptionHistory,
     getAllSubscriptionHistorys,
+    getMySubscriptionHistories,
     getSingleSubscriptionHistory,
     updateSubscriptionHistory,
     deleteSubscriptionHistory,

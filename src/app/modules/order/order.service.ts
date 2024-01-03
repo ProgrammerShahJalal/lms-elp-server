@@ -14,66 +14,130 @@ import { IOrderDetails } from "../order-details/order-details.interface";
 
 // create Order
 const createOrder = async (user_id: string): Promise<IOrderDetails> => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
   let result;
-  try {
-    const cartItems = await Cart.find({ user_id }).session(session);
 
-    let totalPrice: number = 0;
-    let discountPrice: number = 0;
-    const orders: IOrder[] = [];
-    cartItems.forEach(async (cartItem) => {
-      const book = await Book.findOne({ book_id: cartItem.book_id }).session(session);
-      const order = await Order.create({
-        user_id,
-        book_id: book?._id,
-        book_quantity: cartItem?.quantity,
-        unit_price: book?.discount_price,
-      }, {session});
-      // @ts-ignore
-      orders.push(order);
-      totalPrice += Number(cartItem?.quantity) * Number(book?.discount_price);
-      discountPrice +=
-        (Number(book?.price) - Number(book?.discount_price)) *
-        Number(cartItem?.quantity);
-    });
+  // Fetch cart items
+  const cartItems = await Cart.find({ user_id });
 
-    const shipping = await ShippingAddress.findOne({ user_id }).session(session);
-    const shippingAddress = JSON.stringify({
-      division: shipping?.division,
-      district: shipping?.district,
-      upazilla: shipping?.upazilla,
-      address: shipping?.address,
-      phone: shipping?.contact_no,
-      billing_name: shipping?.billing_name,
-    });
+  // Initialize variables
+  let totalPrice: number = 0;
+  let discountPrice: number = 0;
+  const orders: IOrder[] = [];
 
-    result = await OrderDetails.create({
+  // Use map instead of forEach for asynchronous operations
+  const orderPromises = cartItems.map(async (cartItem) => {
+    const book = await Book.findById(cartItem?.book_id);
+    const order = await Order.create({
       user_id,
-      total_price: totalPrice,
-      discounts: discountPrice,
-      shipping_charge: 0,
-      shipping_address_id: shipping?._id,
-      orders: JSON.stringify(orders),
-      trx_id: "dummy trx id",
-      shipping_address: shippingAddress,
-    },{session});
+      book_id: book?._id,
+      book_quantity: cartItem?.quantity,
+      unit_price: book?.discount_price,
+    });
+    console.log(order);
 
-    // If everything is successful, commit the transaction
-    await session.commitTransaction();
-    session.endSession();
+    orders.push(order);
+    totalPrice += Number(cartItem?.quantity) * Number(book?.discount_price);
+    discountPrice +=
+      (Number(book?.price) - Number(book?.discount_price)) *
+      Number(cartItem?.quantity);
+  });
 
-    // @ts-ignore
-    return result;
-  } catch (error) {
-    // If any error occurs, abort the transaction
-    await session.abortTransaction();
-    session.endSession();
-    throw new ApiError(httpStatus.OK, "Error creating order!");
-  }
+  // Wait for all orders to be created
+  await Promise.all(orderPromises);
+
+  // Fetch shipping information
+  const shipping = await ShippingAddress.findOne({ user_id });
+  const shippingAddress = JSON.stringify({
+    division: shipping?.division,
+    district: shipping?.district,
+    upazilla: shipping?.upazilla,
+    address: shipping?.address,
+    phone: shipping?.contact_no,
+    billing_name: shipping?.billing_name,
+  });
+
+  // Create order details
+  result = await OrderDetails.create({
+    user_id,
+    total_price: totalPrice,
+    discounts: discountPrice,
+    shipping_charge: 0,
+    shipping_address_id: shipping?._id,
+    orders: JSON.stringify(orders),
+    trx_id: "dummy trx id",
+    shipping_address: shippingAddress,
+  });
+
+  return result;
 };
+
+// const createOrder = async (user_id: string): Promise<IOrderDetails> => {
+//   const session = await mongoose.startSession();
+//   session.startTransaction();
+
+//   let result;
+//   try {
+//     const cartItems = await Cart.find({ user_id }).session(session);
+
+//     let totalPrice: number = 0;
+//     let discountPrice: number = 0;
+//     const orders: IOrder[] = [];
+//     cartItems.forEach(async (cartItem) => {
+//       const book = await Book.findById(cartItem.book_id).session(session);
+//       const order = await Order.create(
+//         {
+//           user_id,
+//           book_id: book?._id,
+//           book_quantity: cartItem?.quantity,
+//           unit_price: book?.discount_price,
+//         },
+//         { session }
+//       );
+//       orders.push(order);
+//       totalPrice += Number(cartItem?.quantity) * Number(book?.discount_price);
+//       discountPrice +=
+//         (Number(book?.price) - Number(book?.discount_price)) *
+//         Number(cartItem?.quantity);
+//     });
+
+//     const shipping = await ShippingAddress.findOne({ user_id }).session(
+//       session
+//     );
+//     const shippingAddress = JSON.stringify({
+//       division: shipping?.division,
+//       district: shipping?.district,
+//       upazilla: shipping?.upazilla,
+//       address: shipping?.address,
+//       phone: shipping?.contact_no,
+//       billing_name: shipping?.billing_name,
+//     });
+
+//     result = await OrderDetails.create(
+//       {
+//         user_id,
+//         total_price: totalPrice,
+//         discounts: discountPrice,
+//         shipping_charge: 0,
+//         shipping_address_id: shipping?._id,
+//         orders: JSON.stringify(orders),
+//         trx_id: "dummy trx id",
+//         shipping_address: shippingAddress,
+//       },
+//       { session }
+//     );
+
+//     // If everything is successful, commit the transaction
+//     await session.commitTransaction();
+//     session.endSession();
+
+//     return result;
+//   } catch (error) {
+//     // If any error occurs, abort the transaction
+//     await session.abortTransaction();
+//     session.endSession();
+//     throw new ApiError(httpStatus.OK, "Error creating order!");
+//   }
+// };
 
 // get all Orders
 const getAllOrders = async (

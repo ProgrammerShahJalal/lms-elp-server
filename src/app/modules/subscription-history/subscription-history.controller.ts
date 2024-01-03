@@ -40,6 +40,22 @@ const getAllSubscriptionHistorys = catchAsync(
   }
 );
 
+const getMySubscriptionHistories = catchAsync(
+  async (req: Request, res: Response) => {
+    const user_id = req.user?.userId;
+    const result = await SubscriptionHistoryService.getMySubscriptionHistories(
+      user_id
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Subscription histories fetched successfully!",
+      data: result,
+    });
+  }
+);
+
 const getSingleSubscriptionHistory = catchAsync(
   async (req: Request, res: Response) => {
     const { id } = req.params;
@@ -91,6 +107,7 @@ const deleteSubscriptionHistory = catchAsync(
 export const SubscriptionHistoryController = {
   createSubscriptionHistory,
   getAllSubscriptionHistorys,
+  getMySubscriptionHistories,
   getSingleSubscriptionHistory,
   updateSubscriptionHistory,
   deleteSubscriptionHistory,

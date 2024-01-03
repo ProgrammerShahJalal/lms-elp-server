@@ -31,17 +31,17 @@ const paginationHelpers_1 = require("../../helpers/paginationHelpers");
 const book_model_1 = require("../book/book.model");
 const user_model_1 = require("../user/user.model");
 // add Cart
-const addCart = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+const addCart = (payload, role) => __awaiter(void 0, void 0, void 0, function* () {
     const { user_id, book_id } = payload;
     // if the provided user_id have the user or not in db
     const user = yield user_model_1.User.findById(user_id);
     if (!user) {
-        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "User not found!");
+        throw new ApiError_1.default(http_status_1.default.OK, "User not found!");
     }
     // if the provided book_id have the book or not in db
     const book = yield book_model_1.Book.findById(book_id);
     if (!book) {
-        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "Book not found!");
+        throw new ApiError_1.default(http_status_1.default.OK, "Book not found!");
     }
     const cartExisting = yield cart_model_1.Cart.findOne({
         user_id,
@@ -49,14 +49,22 @@ const addCart = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     });
     let result;
     if (!cartExisting) {
+        if (Number(payload === null || payload === void 0 ? void 0 : payload.quantity) <= 0) {
+            throw new ApiError_1.default(http_status_1.default.OK, "Quantity can not be negative or zero!");
+        }
         // Create the cart
         const createdCart = yield cart_model_1.Cart.create(payload);
         // Query the created cart to populate the user and book information
-        result = yield cart_model_1.Cart.findById(createdCart._id)
-            .populate("user_id", "name email contact_no")
-            .populate("book_id", "name writer price");
+        result = yield cart_model_1.Cart.findById(createdCart._id).populate("book_id", "name writer price");
+        // .populate("user_id", "name email contact_no")
     }
     else {
+        const cartUserId = cartExisting === null || cartExisting === void 0 ? void 0 : cartExisting.user_id.toString();
+        if (role !== "super_admin" &&
+            role !== "admin" &&
+            cartUserId !== payload.user_id) {
+            throw new ApiError_1.default(http_status_1.default.OK, "Permission denied!");
+        }
         if (Number(cartExisting === null || cartExisting === void 0 ? void 0 : cartExisting.quantity) + Number(payload === null || payload === void 0 ? void 0 : payload.quantity) < 0) {
             return cartExisting;
         }
@@ -104,9 +112,17 @@ const getAllCarts = (filters, paginationOptions) => __awaiter(void 0, void 0, vo
 });
 // get single Cart
 const getSingleCart = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield cart_model_1.Cart.findById(id).populate("course_id");
+    const result = yield cart_model_1.Cart.findById(id).populate("book_id");
     if (!result) {
-        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "Cart not found!");
+        throw new ApiError_1.default(http_status_1.default.OK, "Cart not found!");
+    }
+    return result;
+});
+// get Carts of an User
+const getCartsOfAnUser = (user_id) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield cart_model_1.Cart.find({ user_id }).populate("book_id");
+    if (!result) {
+        throw new ApiError_1.default(http_status_1.default.OK, "Cart not found!");
     }
     return result;
 });
@@ -126,6 +142,7 @@ exports.CartService = {
     addCart,
     getAllCarts,
     getSingleCart,
+    getCartsOfAnUser,
     updateCart,
     deleteCart,
 };

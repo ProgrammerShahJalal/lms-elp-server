@@ -20,8 +20,15 @@ const pick_1 = __importDefault(require("../../../shared/pick"));
 const pagination_1 = require("../../constants/pagination");
 const cart_service_1 = require("./cart.service");
 const cart_constants_1 = require("./cart.constants");
+const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
+const cart_model_1 = require("./cart.model");
 const addCart = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield cart_service_1.CartService.addCart(req.body);
+    var _a, _b;
+    const user_id = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
+    const role = (_b = req.user) === null || _b === void 0 ? void 0 : _b.role;
+    const payload = req.body;
+    payload.user_id = user_id;
+    const result = yield cart_service_1.CartService.addCart(payload, role);
     (0, sendResponse_1.default)(res, {
         success: true,
         statusCode: http_status_1.default.OK,
@@ -50,6 +57,17 @@ const getSingleCart = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
         data: result,
     });
 }));
+const getCartsOfAnUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _c;
+    const user_id = (_c = req.user) === null || _c === void 0 ? void 0 : _c.userId;
+    const result = yield cart_service_1.CartService.getCartsOfAnUser(user_id);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Carts fetched successfully!",
+        data: result,
+    });
+}));
 const updateCart = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const payload = req.body;
@@ -62,8 +80,20 @@ const updateCart = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
     });
 }));
 const deleteCart = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    const result = yield cart_service_1.CartService.deleteCart(id);
+    var _d, _e;
+    const id = req.params.id;
+    const user_id = (_d = req.user) === null || _d === void 0 ? void 0 : _d.userId;
+    const role = (_e = req.user) === null || _e === void 0 ? void 0 : _e.role;
+    const cart = yield cart_model_1.Cart.findById(id);
+    let result;
+    if (role == "admin" ||
+        role == "super_admin" ||
+        (cart === null || cart === void 0 ? void 0 : cart.user_id.toString()) == user_id) {
+        result = yield cart_service_1.CartService.deleteCart(id);
+    }
+    else {
+        throw new ApiError_1.default(http_status_1.default.OK, "Permission denied!");
+    }
     (0, sendResponse_1.default)(res, {
         success: true,
         statusCode: http_status_1.default.OK,
@@ -75,6 +105,7 @@ exports.CartController = {
     addCart,
     getAllCarts,
     getSingleCart,
+    getCartsOfAnUser,
     updateCart,
     deleteCart,
 };

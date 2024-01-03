@@ -16,7 +16,6 @@ router.post(
     ENUM_USER_ROLE.ADMIN,
     ENUM_USER_ROLE.STUDENT
   ),
-  validateRequest(OrderValidation.createOrderSchema),
   OrderController.createOrder
 );
 
