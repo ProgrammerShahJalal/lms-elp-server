@@ -34,24 +34,32 @@ const shipping_address_model_1 = require("../shipping-address/shipping-address.m
 const order_details_model_1 = require("../order-details/order-details.model");
 // create Order
 const createOrder = (user_id) => __awaiter(void 0, void 0, void 0, function* () {
+    let result;
+    // Fetch cart items
     const cartItems = yield cart_model_1.Cart.find({ user_id });
+    // Initialize variables
     let totalPrice = 0;
     let discountPrice = 0;
     const orders = [];
-    cartItems.forEach((cartItem) => __awaiter(void 0, void 0, void 0, function* () {
-        const book = yield book_model_1.Book.findOne({ book_id: cartItem.book_id });
+    // Use map instead of forEach for asynchronous operations
+    const orderPromises = cartItems.map((cartItem) => __awaiter(void 0, void 0, void 0, function* () {
+        const book = yield book_model_1.Book.findById(cartItem === null || cartItem === void 0 ? void 0 : cartItem.book_id);
         const order = yield order_model_1.Order.create({
             user_id,
             book_id: book === null || book === void 0 ? void 0 : book._id,
             book_quantity: cartItem === null || cartItem === void 0 ? void 0 : cartItem.quantity,
             unit_price: book === null || book === void 0 ? void 0 : book.discount_price,
         });
+        console.log(order);
         orders.push(order);
         totalPrice += Number(cartItem === null || cartItem === void 0 ? void 0 : cartItem.quantity) * Number(book === null || book === void 0 ? void 0 : book.discount_price);
         discountPrice +=
             (Number(book === null || book === void 0 ? void 0 : book.price) - Number(book === null || book === void 0 ? void 0 : book.discount_price)) *
                 Number(cartItem === null || cartItem === void 0 ? void 0 : cartItem.quantity);
     }));
+    // Wait for all orders to be created
+    yield Promise.all(orderPromises);
+    // Fetch shipping information
     const shipping = yield shipping_address_model_1.ShippingAddress.findOne({ user_id });
     const shippingAddress = JSON.stringify({
         division: shipping === null || shipping === void 0 ? void 0 : shipping.division,
@@ -61,7 +69,8 @@ const createOrder = (user_id) => __awaiter(void 0, void 0, void 0, function* () 
         phone: shipping === null || shipping === void 0 ? void 0 : shipping.contact_no,
         billing_name: shipping === null || shipping === void 0 ? void 0 : shipping.billing_name,
     });
-    const result = yield order_details_model_1.OrderDetails.create({
+    // Create order details
+    result = yield order_details_model_1.OrderDetails.create({
         user_id,
         total_price: totalPrice,
         discounts: discountPrice,
@@ -73,6 +82,67 @@ const createOrder = (user_id) => __awaiter(void 0, void 0, void 0, function* () 
     });
     return result;
 });
+// const createOrder = async (user_id: string): Promise<IOrderDetails> => {
+//   const session = await mongoose.startSession();
+//   session.startTransaction();
+//   let result;
+//   try {
+//     const cartItems = await Cart.find({ user_id }).session(session);
+//     let totalPrice: number = 0;
+//     let discountPrice: number = 0;
+//     const orders: IOrder[] = [];
+//     cartItems.forEach(async (cartItem) => {
+//       const book = await Book.findById(cartItem.book_id).session(session);
+//       const order = await Order.create(
+//         {
+//           user_id,
+//           book_id: book?._id,
+//           book_quantity: cartItem?.quantity,
+//           unit_price: book?.discount_price,
+//         },
+//         { session }
+//       );
+//       orders.push(order);
+//       totalPrice += Number(cartItem?.quantity) * Number(book?.discount_price);
+//       discountPrice +=
+//         (Number(book?.price) - Number(book?.discount_price)) *
+//         Number(cartItem?.quantity);
+//     });
+//     const shipping = await ShippingAddress.findOne({ user_id }).session(
+//       session
+//     );
+//     const shippingAddress = JSON.stringify({
+//       division: shipping?.division,
+//       district: shipping?.district,
+//       upazilla: shipping?.upazilla,
+//       address: shipping?.address,
+//       phone: shipping?.contact_no,
+//       billing_name: shipping?.billing_name,
+//     });
+//     result = await OrderDetails.create(
+//       {
+//         user_id,
+//         total_price: totalPrice,
+//         discounts: discountPrice,
+//         shipping_charge: 0,
+//         shipping_address_id: shipping?._id,
+//         orders: JSON.stringify(orders),
+//         trx_id: "dummy trx id",
+//         shipping_address: shippingAddress,
+//       },
+//       { session }
+//     );
+//     // If everything is successful, commit the transaction
+//     await session.commitTransaction();
+//     session.endSession();
+//     return result;
+//   } catch (error) {
+//     // If any error occurs, abort the transaction
+//     await session.abortTransaction();
+//     session.endSession();
+//     throw new ApiError(httpStatus.OK, "Error creating order!");
+//   }
+// };
 // get all Orders
 const getAllOrders = (filters, paginationOptions) => __awaiter(void 0, void 0, void 0, function* () {
     const { searchTerm } = filters, filtersData = __rest(filters, ["searchTerm"]);
@@ -111,7 +181,7 @@ const getAllOrders = (filters, paginationOptions) => __awaiter(void 0, void 0, v
 // get Orders of an user
 const getOrdersOfAnUser = (user_id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield order_model_1.Order.find({ user_id }).populate({
-        path: "user_id book_id",
+        path: "book_id",
         select: "name title writer format discount_price",
     });
     // if the Order is not found, throw error

@@ -19,6 +19,13 @@ router.post(
 // get all SubscriptionHistorys
 router.get("/", SubscriptionHistoryController.getAllSubscriptionHistorys);
 
+// get my subscription histories
+router.get(
+  "/my-subscription-histories",
+  authRole(ENUM_USER_ROLE.STUDENT),
+  SubscriptionHistoryController.getMySubscriptionHistories
+);
+
 // get single SubscriptionHistory
 router.get("/:id", SubscriptionHistoryController.getSingleSubscriptionHistory);
 

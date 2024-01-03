@@ -40,6 +40,17 @@ const getAllSubscriptionHistorys = (0, catchAsync_1.default)((req, res) => __awa
         data: result,
     });
 }));
+const getMySubscriptionHistories = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const user_id = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
+    const result = yield subscription_history_service_1.SubscriptionHistoryService.getMySubscriptionHistories(user_id);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Subscription histories fetched successfully!",
+        data: result,
+    });
+}));
 const getSingleSubscriptionHistory = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const result = yield subscription_history_service_1.SubscriptionHistoryService.getSingleSubscriptionHistory(id);
@@ -74,6 +85,7 @@ const deleteSubscriptionHistory = (0, catchAsync_1.default)((req, res) => __awai
 exports.SubscriptionHistoryController = {
     createSubscriptionHistory,
     getAllSubscriptionHistorys,
+    getMySubscriptionHistories,
     getSingleSubscriptionHistory,
     updateSubscriptionHistory,
     deleteSubscriptionHistory,

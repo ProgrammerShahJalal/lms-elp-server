@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 
 export interface IShippingAddress {
   user_id: Types.ObjectId;
+  outside_dhaka: boolean;
   division: string;
   district: string;
   upazilla: string;

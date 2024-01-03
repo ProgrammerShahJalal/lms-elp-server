@@ -85,6 +85,16 @@ const getAllSubscriptionHistorys = async (
   };
 };
 
+// get my subscription-histories
+const getMySubscriptionHistories = async (user_id: string) => {
+  const result = await SubscriptionHistory.find({ user_id });
+
+  if (!result.length) {
+    throw new ApiError(httpStatus.OK, "No subscription found!");
+  }
+  return result;
+};
+
 // get SubscriptionHistory
 const getSingleSubscriptionHistory = async (
   id: string
@@ -145,6 +155,7 @@ const deleteSubscriptionHistory = async (id: string) => {
 export const SubscriptionHistoryService = {
   createSubscriptionHistory,
   getAllSubscriptionHistorys,
+  getMySubscriptionHistories,
   getSingleSubscriptionHistory,
   updateSubscriptionHistory,
   deleteSubscriptionHistory,

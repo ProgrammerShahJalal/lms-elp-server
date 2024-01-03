@@ -11,7 +11,7 @@ import { Book } from "../book/book.model";
 import { User } from "../user/user.model";
 
 // add Cart
-const addCart = async (payload: ICart): Promise<ICart | null> => {
+const addCart = async (payload: ICart, role: string): Promise<ICart | null> => {
   const { user_id, book_id } = payload;
 
   // if the provided user_id have the user or not in db
@@ -49,6 +49,14 @@ const addCart = async (payload: ICart): Promise<ICart | null> => {
     );
     // .populate("user_id", "name email contact_no")
   } else {
+    const cartUserId = cartExisting?.user_id.toString();
+    if (
+      role !== "super_admin" &&
+      role !== "admin" &&
+      cartUserId !== (payload.user_id as unknown as string)
+    ) {
+      throw new ApiError(httpStatus.OK, "Permission denied!");
+    }
     if (Number(cartExisting?.quantity) + Number(payload?.quantity) < 0) {
       return cartExisting;
     }
