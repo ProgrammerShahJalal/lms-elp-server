@@ -8,6 +8,5 @@ export interface IShippingAddress {
   upazilla: string;
   address: string;
   contact_no: string;
-  is_default: boolean;
   billing_name: string;
 }

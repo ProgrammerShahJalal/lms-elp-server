@@ -31,7 +31,6 @@ const settings_model_1 = require("./settings.model");
 const settings_constants_1 = require("./settings.constants");
 // add Settings
 const addSettings = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    // if the provided course_id have the course or not in db
     const result = yield settings_model_1.Settings.create(payload);
     return result;
 });
@@ -84,6 +83,26 @@ const getSingleSettings = (id) => __awaiter(void 0, void 0, void 0, function* ()
     }
     return result;
 });
+// get shipping charge inside dhaka
+const getShippingChargeInsideDhaka = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield settings_model_1.Settings.findOne({
+        key: "shipping_charge_inside_dhaka",
+    });
+    if (!result) {
+        throw new ApiError_1.default(http_status_1.default.OK, "Shipping charge inside dhaka not found!");
+    }
+    return Number(result.value);
+});
+// get shipping charge outside dhaka
+const getShippingChargeOutsideDhaka = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield settings_model_1.Settings.findOne({
+        key: "shipping_charge_outside_dhaka",
+    });
+    if (!result) {
+        throw new ApiError_1.default(http_status_1.default.OK, "Shipping charge inside dhaka not found!");
+    }
+    return Number(result.value);
+});
 // update Settings
 const updateSettings = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield settings_model_1.Settings.findByIdAndUpdate(id, payload, {
@@ -99,6 +118,8 @@ const deleteSettings = (id) => __awaiter(void 0, void 0, void 0, function* () {
 exports.SettingsService = {
     addSettings,
     getAllSettings,
+    getShippingChargeInsideDhaka,
+    getShippingChargeOutsideDhaka,
     getSingleSettings,
     updateSettings,
     deleteSettings,

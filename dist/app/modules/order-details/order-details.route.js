@@ -16,7 +16,7 @@ router.post("/", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_A
 // get all OrderDetails
 router.get("/", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */, "admin" /* ENUM_USER_ROLE.ADMIN */, "student" /* ENUM_USER_ROLE.STUDENT */), order_details_controller_1.OrderDetailsController.getAllOrderDetails);
 // get all Order Details of an user
-router.get("/user/:user_id", (0, authUserOrRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */, "admin" /* ENUM_USER_ROLE.ADMIN */, "student" /* ENUM_USER_ROLE.STUDENT */), order_details_controller_1.OrderDetailsController.getOrderDetailsOfAnUser);
+router.get("/my-order-details", (0, authRole_1.default)("student" /* ENUM_USER_ROLE.STUDENT */), order_details_controller_1.OrderDetailsController.getMyOrderDetails);
 // get single OrderDetails
 router.get("/:id", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */, "admin" /* ENUM_USER_ROLE.ADMIN */, "student" /* ENUM_USER_ROLE.STUDENT */), order_details_controller_1.OrderDetailsController.getSingleOrderDetails);
 // update single OrderDetails

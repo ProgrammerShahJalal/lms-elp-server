@@ -10,8 +10,9 @@ import ApiError from "../../../errors/ApiError";
 
 const createOrder = catchAsync(async (req: Request, res: Response) => {
   const user_id = req.user?.userId;
+  const payload = req.body;
 
-  const result = await OrderService.createOrder(user_id);
+  const result = await OrderService.createOrder(user_id, payload);
 
   sendResponse(res, {
     success: true,

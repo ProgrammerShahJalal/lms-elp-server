@@ -17,7 +17,7 @@ const http_status_1 = __importDefault(require("http-status"));
 const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const user_model_1 = require("../user/user.model");
 const shipping_address_model_1 = require("./shipping-address.model");
-// registering user/student
+// creating shipping address
 const createShippingAddress = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const { user_id } = payload;
     const user = yield user_model_1.User.findById(user_id);
@@ -27,24 +27,38 @@ const createShippingAddress = (payload) => __awaiter(void 0, void 0, void 0, fun
     const result = yield shipping_address_model_1.ShippingAddress.create(payload);
     return result;
 });
-// get all quiz questions
+// get all shipping address
 const getAllShippingAddresss = () => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield shipping_address_model_1.ShippingAddress.find({});
     return result;
 });
-// get single quiz question
-const getSingleShippingAddress = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield shipping_address_model_1.ShippingAddress.findById(id);
-    return result;
+// get single shipping address
+const getSingleShippingAddress = (id, user_id) => __awaiter(void 0, void 0, void 0, function* () {
+    const shipping_address = yield shipping_address_model_1.ShippingAddress.findById(id);
+    if ((shipping_address === null || shipping_address === void 0 ? void 0 : shipping_address.user_id.toString()) !== user_id.toString()) {
+        throw new ApiError_1.default(http_status_1.default.OK, "Unauthorized!");
+    }
+    return shipping_address;
 });
-// update user
-const updateShippingAddress = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield shipping_address_model_1.ShippingAddress.findByIdAndUpdate(id, payload, {
+// get my shipping address
+const getMyShippingAddress = (user_id) => __awaiter(void 0, void 0, void 0, function* () {
+    const shipping_address = yield shipping_address_model_1.ShippingAddress.findOne({
+        user_id,
+    });
+    if (!shipping_address) {
+        throw new ApiError_1.default(http_status_1.default.OK, "No shipping address found!");
+    }
+    return shipping_address;
+});
+// update shipping address
+const updateShippingAddress = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield shipping_address_model_1.ShippingAddress.findOneAndUpdate({ user_id: payload === null || payload === void 0 ? void 0 : payload.user_id }, payload, {
+        upsert: true,
         new: true,
     });
     return result;
 });
-// delete user
+// delete shipping address
 const deleteShippingAddress = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield shipping_address_model_1.ShippingAddress.findByIdAndDelete(id);
     return result;
@@ -52,6 +66,7 @@ const deleteShippingAddress = (id) => __awaiter(void 0, void 0, void 0, function
 exports.ShippingAddressService = {
     createShippingAddress,
     getAllShippingAddresss,
+    getMyShippingAddress,
     getSingleShippingAddress,
     updateShippingAddress,
     deleteShippingAddress,

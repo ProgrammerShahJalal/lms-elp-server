@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const createShippingAddressZodSchema = z.object({
   body: z.object({
-    userId: z.string({
+    user_id: z.string({
       required_error: "User id is required!",
     }),
     division: z.string({
@@ -23,11 +23,6 @@ const createShippingAddressZodSchema = z.object({
     contact_no: z.string({
       required_error: "Contact number is required!",
     }),
-    is_default: z
-      .boolean({
-        required_error: "Contact number is required!",
-      })
-      .default(true),
     billing_name: z.string({
       required_error: "Billing name is required!",
     }),
@@ -36,14 +31,13 @@ const createShippingAddressZodSchema = z.object({
 
 const updateShippingAddressZodSchema = z.object({
   body: z.object({
-    userId: z.string({}).optional(),
+    user_id: z.string({}).optional(),
     outside_dhaka: z.boolean({}).optional(),
     division: z.string({}).optional(),
     district: z.string({}).optional(),
     upazilla: z.string({}).optional(),
     address: z.string({}).optional(),
     contact_no: z.string({}).optional(),
-    is_default: z.boolean({}).optional(),
     billing_name: z.string({}).optional(),
   }),
 });

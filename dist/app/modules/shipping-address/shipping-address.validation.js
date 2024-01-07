@@ -4,7 +4,7 @@ exports.ShippingAddressValidation = void 0;
 const zod_1 = require("zod");
 const createShippingAddressZodSchema = zod_1.z.object({
     body: zod_1.z.object({
-        userId: zod_1.z.string({
+        user_id: zod_1.z.string({
             required_error: "User id is required!",
         }),
         division: zod_1.z.string({
@@ -25,11 +25,6 @@ const createShippingAddressZodSchema = zod_1.z.object({
         contact_no: zod_1.z.string({
             required_error: "Contact number is required!",
         }),
-        is_default: zod_1.z
-            .boolean({
-            required_error: "Contact number is required!",
-        })
-            .default(true),
         billing_name: zod_1.z.string({
             required_error: "Billing name is required!",
         }),
@@ -37,14 +32,13 @@ const createShippingAddressZodSchema = zod_1.z.object({
 });
 const updateShippingAddressZodSchema = zod_1.z.object({
     body: zod_1.z.object({
-        userId: zod_1.z.string({}).optional(),
+        user_id: zod_1.z.string({}).optional(),
         outside_dhaka: zod_1.z.boolean({}).optional(),
         division: zod_1.z.string({}).optional(),
         district: zod_1.z.string({}).optional(),
         upazilla: zod_1.z.string({}).optional(),
         address: zod_1.z.string({}).optional(),
         contact_no: zod_1.z.string({}).optional(),
-        is_default: zod_1.z.boolean({}).optional(),
         billing_name: zod_1.z.string({}).optional(),
     }),
 });

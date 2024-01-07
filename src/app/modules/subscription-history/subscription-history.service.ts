@@ -87,7 +87,9 @@ const getAllSubscriptionHistorys = async (
 
 // get my subscription-histories
 const getMySubscriptionHistories = async (user_id: string) => {
-  const result = await SubscriptionHistory.find({ user_id });
+  const result = await SubscriptionHistory.find({ user_id }).populate(
+    "course_id"
+  );
 
   if (!result.length) {
     throw new ApiError(httpStatus.OK, "No subscription found!");

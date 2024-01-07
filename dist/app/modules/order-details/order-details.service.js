@@ -37,15 +37,15 @@ const createOrderDetails = (payload) => __awaiter(void 0, void 0, void 0, functi
     // to check if the user is present of the provided user_id
     const user = yield user_model_1.User.findById(user_id);
     if (!user) {
-        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "User not found!");
+        throw new ApiError_1.default(http_status_1.default.OK, "User not found!");
     }
     // to check if the shipping address is present of the provided shipping_address_id
     const shipping_address = yield shipping_address_model_1.ShippingAddress.findById(shipping_address_id);
     if (!shipping_address) {
-        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "Shipping address not found!");
+        throw new ApiError_1.default(http_status_1.default.OK, "Shipping address not found!");
     }
     if (!(0, common_1.isJSON)(payload.orders)) {
-        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, "Invalid orders format!");
+        throw new ApiError_1.default(http_status_1.default.OK, "Invalid orders format!");
     }
     const orders = JSON.parse(payload.orders);
     payload.total_price = orders.reduce((sum, order) => sum + order.book_quantity * order.unit_price, 0);
@@ -86,12 +86,12 @@ const getAllOrderDetails = (filters, paginationOptions) => __awaiter(void 0, voi
         data: result,
     };
 });
-// get Order Details of an user
-const getOrderDetailsOfAnUser = (user_id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield order_details_model_1.OrderDetails.find({ user_id }).populate("user_id book_id");
+// get my Order Details
+const getMyOrderDetails = (user_id) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield order_details_model_1.OrderDetails.find({ user_id }).populate("user_id");
     // if the OrderDetails is not found, throw error
     if (!result.length) {
-        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "Order status not found!");
+        throw new ApiError_1.default(http_status_1.default.OK, "Order details not found!");
     }
     return result;
 });
@@ -129,7 +129,7 @@ const deleteOrderDetails = (id) => __awaiter(void 0, void 0, void 0, function* (
 exports.OrderDetailsService = {
     createOrderDetails,
     getAllOrderDetails,
-    getOrderDetailsOfAnUser,
+    getMyOrderDetails,
     getSingleOrderDetails,
     updateOrderDetails,
     deleteOrderDetails,

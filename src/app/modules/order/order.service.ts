@@ -11,133 +11,157 @@ import { Cart } from "../cart/cart.model";
 import { ShippingAddress } from "../shipping-address/shipping-address.model";
 import { OrderDetails } from "../order-details/order-details.model";
 import { IOrderDetails } from "../order-details/order-details.interface";
+import { Settings } from "../settings/settings.model";
+import { isJSON } from "../../helpers/common";
+import { OrderStatus } from "../order-status/order-status.model";
 
 // create Order
-const createOrder = async (user_id: string): Promise<IOrderDetails> => {
-  let result;
+const createOrder = async (
+  user_id: string,
+  payload: { trx_id: string; shipping_address: string }
+): Promise<IOrderDetails> => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-  // Fetch cart items
-  const cartItems = await Cart.find({ user_id });
+  try {
+    // Fetch cart items
+    const cartItems = await Cart.find({ user_id }).session(session);
+    if (!cartItems?.length) {
+      throw new ApiError(httpStatus.OK, "No item in the cart!");
+    }
 
-  // Initialize variables
-  let totalPrice: number = 0;
-  let discountPrice: number = 0;
-  const orders: IOrder[] = [];
+    // Initialize variables
+    let totalPrice: number = 0;
+    let discountPrice: number = 0;
+    let needShippingCharge: boolean = false;
+    let shippingCharge;
+    const orders: Partial<IOrder>[] = [];
 
-  // Use map instead of forEach for asynchronous operations
-  const orderPromises = cartItems.map(async (cartItem) => {
-    const book = await Book.findById(cartItem?.book_id);
-    const order = await Order.create({
-      user_id,
-      book_id: book?._id,
-      book_quantity: cartItem?.quantity,
-      unit_price: book?.discount_price,
+    // Use map instead of forEach for asynchronous operations
+    const orderPromises = cartItems.map(async (cartItem) => {
+      const book = await Book.findById(cartItem?.book_id).session(session);
+      const order = await Order.create(
+        [
+          {
+            user_id,
+            book_id: book?._id,
+            book_quantity: cartItem?.quantity,
+            unit_price: book?.discount_price,
+          },
+        ],
+        {
+          session,
+        }
+      );
+
+      const orderToPush = {
+        book_id: order[0]?.book_id,
+        book_quantity: order[0]?.book_quantity,
+        unit_price: order[0]?.unit_price,
+      };
+      orders.push(orderToPush);
+
+      if (book?.format === "hard copy") {
+        needShippingCharge = true;
+      }
+
+      totalPrice += Number(cartItem?.quantity) * Number(book?.discount_price);
+      discountPrice +=
+        (Number(book?.price) - Number(book?.discount_price)) *
+        Number(cartItem?.quantity);
     });
-    console.log(order);
 
-    orders.push(order);
-    totalPrice += Number(cartItem?.quantity) * Number(book?.discount_price);
-    discountPrice +=
-      (Number(book?.price) - Number(book?.discount_price)) *
-      Number(cartItem?.quantity);
-  });
+    // Wait for all orders to be created
+    await Promise.all(orderPromises);
 
-  // Wait for all orders to be created
-  await Promise.all(orderPromises);
+    // if shipping address is given in payload, but in invalid format
+    if (payload.shipping_address && !isJSON(payload.shipping_address)) {
+      throw new ApiError(httpStatus.OK, "Invalid shipping address format!");
+    }
 
-  // Fetch shipping information
-  const shipping = await ShippingAddress.findOne({ user_id });
-  const shippingAddress = JSON.stringify({
-    division: shipping?.division,
-    district: shipping?.district,
-    upazilla: shipping?.upazilla,
-    address: shipping?.address,
-    phone: shipping?.contact_no,
-    billing_name: shipping?.billing_name,
-  });
+    // Fetch shipping information
+    const shipping = await ShippingAddress.findOne({ user_id }).session(
+      session
+    );
+    if (needShippingCharge && !shipping) {
+      throw new ApiError(httpStatus.OK, "No shipping address found!");
+    }
 
-  // Create order details
-  result = await OrderDetails.create({
-    user_id,
-    total_price: totalPrice,
-    discounts: discountPrice,
-    shipping_charge: 0,
-    shipping_address_id: shipping?._id,
-    orders: JSON.stringify(orders),
-    trx_id: "dummy trx id",
-    shipping_address: shippingAddress,
-  });
+    // fetch and calculate shipping charge
+    if (needShippingCharge) {
+      if (shipping?.outside_dhaka) {
+        shippingCharge = await Settings.findOne({
+          key: "shipping_charge_inside_dhaka",
+        }).session(session);
+      } else {
+        shippingCharge = await Settings.findOne({
+          key: "shipping_charge_outside_dhaka",
+        }).session(session);
+      }
+    }
+    shippingCharge = needShippingCharge ? Number(shippingCharge?.value) : 0;
 
-  return result;
+    const shippingAddress = needShippingCharge
+      ? payload.shipping_address || JSON.stringify(shipping)
+      : "";
+
+    // Create order details
+    const result = await OrderDetails.create(
+      [
+        {
+          user_id,
+          total_price: totalPrice + shippingCharge,
+          discounts: discountPrice,
+          shipping_charge: shippingCharge,
+          shipping_address_id: shipping?._id,
+          orders: JSON.stringify(orders),
+          trx_id: payload.trx_id,
+          shipping_address: shippingAddress,
+        },
+      ],
+      {
+        session,
+      }
+    );
+    // on successfull order, clear carts of that user
+    await Cart.deleteMany(
+      {
+        user_id,
+      },
+      {
+        session,
+      }
+    );
+
+    // create order status
+    if (needShippingCharge) {
+      await OrderStatus.create(
+        [
+          {
+            user_id,
+            order_details_id: result[0]?._id,
+            status: "Pending Approve",
+            shipping_address_id: shipping?.id,
+          },
+        ],
+        {
+          session,
+        }
+      );
+    }
+
+    await session.commitTransaction();
+    return result[0];
+  } catch (error: any) {
+    await session.abortTransaction();
+    throw new ApiError(
+      httpStatus.OK,
+      `Order creation failed: ${error.message}`
+    );
+  } finally {
+    session.endSession();
+  }
 };
-
-// const createOrder = async (user_id: string): Promise<IOrderDetails> => {
-//   const session = await mongoose.startSession();
-//   session.startTransaction();
-
-//   let result;
-//   try {
-//     const cartItems = await Cart.find({ user_id }).session(session);
-
-//     let totalPrice: number = 0;
-//     let discountPrice: number = 0;
-//     const orders: IOrder[] = [];
-//     cartItems.forEach(async (cartItem) => {
-//       const book = await Book.findById(cartItem.book_id).session(session);
-//       const order = await Order.create(
-//         {
-//           user_id,
-//           book_id: book?._id,
-//           book_quantity: cartItem?.quantity,
-//           unit_price: book?.discount_price,
-//         },
-//         { session }
-//       );
-//       orders.push(order);
-//       totalPrice += Number(cartItem?.quantity) * Number(book?.discount_price);
-//       discountPrice +=
-//         (Number(book?.price) - Number(book?.discount_price)) *
-//         Number(cartItem?.quantity);
-//     });
-
-//     const shipping = await ShippingAddress.findOne({ user_id }).session(
-//       session
-//     );
-//     const shippingAddress = JSON.stringify({
-//       division: shipping?.division,
-//       district: shipping?.district,
-//       upazilla: shipping?.upazilla,
-//       address: shipping?.address,
-//       phone: shipping?.contact_no,
-//       billing_name: shipping?.billing_name,
-//     });
-
-//     result = await OrderDetails.create(
-//       {
-//         user_id,
-//         total_price: totalPrice,
-//         discounts: discountPrice,
-//         shipping_charge: 0,
-//         shipping_address_id: shipping?._id,
-//         orders: JSON.stringify(orders),
-//         trx_id: "dummy trx id",
-//         shipping_address: shippingAddress,
-//       },
-//       { session }
-//     );
-
-//     // If everything is successful, commit the transaction
-//     await session.commitTransaction();
-//     session.endSession();
-
-//     return result;
-//   } catch (error) {
-//     // If any error occurs, abort the transaction
-//     await session.abortTransaction();
-//     session.endSession();
-//     throw new ApiError(httpStatus.OK, "Error creating order!");
-//   }
-// };
 
 // get all Orders
 const getAllOrders = async (

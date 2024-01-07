@@ -12,7 +12,7 @@ const order_validation_1 = require("./order.validation");
 const authUserOrRole_1 = __importDefault(require("../../middlewares/authUserOrRole"));
 const router = (0, express_1.Router)();
 // create Order
-router.post("/", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */, "admin" /* ENUM_USER_ROLE.ADMIN */, "student" /* ENUM_USER_ROLE.STUDENT */), order_controller_1.OrderController.createOrder);
+router.post("/", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */, "admin" /* ENUM_USER_ROLE.ADMIN */, "student" /* ENUM_USER_ROLE.STUDENT */), (0, validateRequest_1.default)(order_validation_1.OrderValidation.createOrderZodSchema), order_controller_1.OrderController.createOrder);
 // get all Orders
 router.get("/", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */, "admin" /* ENUM_USER_ROLE.ADMIN */), order_controller_1.OrderController.getAllOrders);
 // get Orders of an User
