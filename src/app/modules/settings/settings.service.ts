@@ -11,8 +11,6 @@ import { settingsSearchableFields } from "./settings.constants";
 
 // add Settings
 const addSettings = async (payload: ISettings): Promise<ISettings> => {
-  // if the provided course_id have the course or not in db
-
   const result = await Settings.create(payload);
 
   return result;
@@ -84,6 +82,38 @@ const getSingleSettings = async (id: string): Promise<ISettings | null> => {
   return result;
 };
 
+// get shipping charge inside dhaka
+const getShippingChargeInsideDhaka = async (): Promise<number> => {
+  const result = await Settings.findOne({
+    key: "shipping_charge_inside_dhaka",
+  });
+
+  if (!result) {
+    throw new ApiError(
+      httpStatus.OK,
+      "Shipping charge inside dhaka not found!"
+    );
+  }
+
+  return Number(result.value);
+};
+
+// get shipping charge outside dhaka
+const getShippingChargeOutsideDhaka = async (): Promise<number> => {
+  const result = await Settings.findOne({
+    key: "shipping_charge_outside_dhaka",
+  });
+
+  if (!result) {
+    throw new ApiError(
+      httpStatus.OK,
+      "Shipping charge inside dhaka not found!"
+    );
+  }
+
+  return Number(result.value);
+};
+
 // update Settings
 const updateSettings = async (
   id: string,
@@ -105,6 +135,8 @@ const deleteSettings = async (id: string) => {
 export const SettingsService = {
   addSettings,
   getAllSettings,
+  getShippingChargeInsideDhaka,
+  getShippingChargeOutsideDhaka,
   getSingleSettings,
   updateSettings,
   deleteSettings,

@@ -40,6 +40,24 @@ const getAllSettings = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
         data: result,
     });
 }));
+const getShippingChargeInsideDhaka = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield settings_service_1.SettingsService.getShippingChargeInsideDhaka();
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Shipping charge inside Dhaka fetched successfully!",
+        data: result,
+    });
+}));
+const getShippingChargeOutsideDhaka = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield settings_service_1.SettingsService.getShippingChargeOutsideDhaka();
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Shipping charge outside Dhaka fetched successfully!",
+        data: result,
+    });
+}));
 const getSingleSettings = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const result = yield settings_service_1.SettingsService.getSingleSettings(id);
@@ -74,6 +92,8 @@ const deleteSettings = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
 exports.SettingsController = {
     addSettings,
     getAllSettings,
+    getShippingChargeInsideDhaka,
+    getShippingChargeOutsideDhaka,
     getSingleSettings,
     updateSettings,
     deleteSettings,

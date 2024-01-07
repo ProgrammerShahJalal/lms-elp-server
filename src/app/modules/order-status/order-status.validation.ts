@@ -1,23 +1,28 @@
 import { z } from "zod";
 
-const createOrderSchema = z.object({
+const createOrderStatusZodSchema = z.object({
   body: z.object({
+    user_id: z.string({
+      required_error: "User id is required!",
+    }),
     order_details_id: z.string({
       required_error: "Order details id is required!",
+    }),
+    shipping_address_id: z.string({
+      required_error: "Shipping address id is required!",
     }),
     status: z.string({ required_error: "Status is required!" }),
   }),
 });
 
-const updateOrderZodSchema = z.object({
+const updateOrderStatusZodSchema = z.object({
   body: z.object({
-    order_details_id: z.string({}).optional(),
+    shipping_address_id: z.string({}).optional(),
     status: z.string({}).optional(),
-    shipping_id: z.string({}).optional(),
   }),
 });
 
-export const OrderValidation = {
-  createOrderSchema,
-  updateOrderZodSchema,
+export const OrderStatusValidation = {
+  createOrderStatusZodSchema,
+  updateOrderStatusZodSchema,
 };

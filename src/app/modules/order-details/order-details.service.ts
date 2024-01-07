@@ -20,17 +20,17 @@ const createOrderDetails = async (
   // to check if the user is present of the provided user_id
   const user = await User.findById(user_id);
   if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
+    throw new ApiError(httpStatus.OK, "User not found!");
   }
 
   // to check if the shipping address is present of the provided shipping_address_id
   const shipping_address = await ShippingAddress.findById(shipping_address_id);
   if (!shipping_address) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Shipping address not found!");
+    throw new ApiError(httpStatus.OK, "Shipping address not found!");
   }
 
   if (!isJSON(payload.orders)) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Invalid orders format!");
+    throw new ApiError(httpStatus.OK, "Invalid orders format!");
   }
 
   const orders = JSON.parse(payload.orders);
@@ -91,17 +91,15 @@ const getAllOrderDetails = async (
   };
 };
 
-// get Order Details of an user
-const getOrderDetailsOfAnUser = async (
+// get my Order Details
+const getMyOrderDetails = async (
   user_id: string
 ): Promise<IOrderDetails[] | null> => {
-  const result = await OrderDetails.find({ user_id }).populate(
-    "user_id book_id"
-  );
+  const result = await OrderDetails.find({ user_id }).populate("user_id");
 
   // if the OrderDetails is not found, throw error
   if (!result.length) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Order status not found!");
+    throw new ApiError(httpStatus.OK, "Order details not found!");
   }
 
   return result;
@@ -161,7 +159,7 @@ const deleteOrderDetails = async (id: string) => {
 export const OrderDetailsService = {
   createOrderDetails,
   getAllOrderDetails,
-  getOrderDetailsOfAnUser,
+  getMyOrderDetails,
   getSingleOrderDetails,
   updateOrderDetails,
   deleteOrderDetails,

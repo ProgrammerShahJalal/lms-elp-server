@@ -84,7 +84,7 @@ const getAllSubscriptionHistorys = (filters, paginationOptions) => __awaiter(voi
 });
 // get my subscription-histories
 const getMySubscriptionHistories = (user_id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield subscription_history_model_1.SubscriptionHistory.find({ user_id });
+    const result = yield subscription_history_model_1.SubscriptionHistory.find({ user_id }).populate("course_id");
     if (!result.length) {
         throw new ApiError_1.default(http_status_1.default.OK, "No subscription found!");
     }

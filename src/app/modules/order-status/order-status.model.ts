@@ -27,7 +27,7 @@ const orderStatusSchema = new Schema<IOrderStatus>(
 );
 
 orderStatusSchema.index(
-  { user_id: 1, order_id: 1, shipping_address_id: 1, status: 1 },
+  { user_id: 1, order_details_id: 1, status: 1 },
   { unique: true }
 );
 

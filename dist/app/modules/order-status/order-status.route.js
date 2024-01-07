@@ -7,17 +7,17 @@ exports.OrderStatusRoutes = void 0;
 const express_1 = require("express");
 const validateRequest_1 = __importDefault(require("../../middlewares/validateRequest"));
 const order_status_validation_1 = require("./order-status.validation");
-const authUserOrRole_1 = __importDefault(require("../../middlewares/authUserOrRole"));
-const order_controller_1 = require("../order/order.controller");
+const authRole_1 = __importDefault(require("../../middlewares/authRole"));
+const order_status_controller_1 = require("./order-status.controller");
 const router = (0, express_1.Router)();
-// create Order
-router.post("/", (0, validateRequest_1.default)(order_status_validation_1.OrderValidation.createOrderSchema), order_controller_1.OrderController.createOrder);
-// get all Orders
-router.get("/", order_controller_1.OrderController.getAllOrders);
-// get single Order
-router.get("/:id", order_controller_1.OrderController.getSingleOrder);
-// update single Order
-router.patch("/:id", (0, authUserOrRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */, "admin" /* ENUM_USER_ROLE.ADMIN */), (0, validateRequest_1.default)(order_status_validation_1.OrderValidation.updateOrderZodSchema), order_controller_1.OrderController.updateOrder);
-// delete Order
-router.delete("/:id", (0, authUserOrRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */, "admin" /* ENUM_USER_ROLE.ADMIN */), order_controller_1.OrderController.deleteOrder);
+// create Order status
+router.post("/", (0, validateRequest_1.default)(order_status_validation_1.OrderStatusValidation.createOrderStatusZodSchema), order_status_controller_1.OrderStatusController.createOrderStatus);
+// get all Order statuses
+router.get("/", order_status_controller_1.OrderStatusController.getAllOrderStatuss);
+// get single Order status
+router.get("/:id", order_status_controller_1.OrderStatusController.getSingleOrderStatus);
+// update single Order status
+router.patch("/:id", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */, "admin" /* ENUM_USER_ROLE.ADMIN */), (0, validateRequest_1.default)(order_status_validation_1.OrderStatusValidation.updateOrderStatusZodSchema), order_status_controller_1.OrderStatusController.updateOrderStatus);
+// delete Order status
+router.delete("/:id", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */, "admin" /* ENUM_USER_ROLE.ADMIN */), order_status_controller_1.OrderStatusController.deleteOrderStatus);
 exports.OrderStatusRoutes = router;

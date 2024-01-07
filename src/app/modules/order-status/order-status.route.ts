@@ -1,38 +1,38 @@
 import { Router } from "express";
 import validateRequest from "../../middlewares/validateRequest";
 import { ENUM_USER_ROLE } from "../../enums/user";
-import { OrderValidation } from "./order-status.validation";
-import authUserOrRole from "../../middlewares/authUserOrRole";
-import { OrderController } from "../order/order.controller";
+import { OrderStatusValidation } from "./order-status.validation";
+import authRole from "../../middlewares/authRole";
+import { OrderStatusController } from "./order-status.controller";
 
 const router = Router();
 
-// create Order
+// create Order status
 router.post(
   "/",
-  validateRequest(OrderValidation.createOrderSchema),
-  OrderController.createOrder
+  validateRequest(OrderStatusValidation.createOrderStatusZodSchema),
+  OrderStatusController.createOrderStatus
 );
 
-// get all Orders
-router.get("/", OrderController.getAllOrders);
+// get all Order statuses
+router.get("/", OrderStatusController.getAllOrderStatuss);
 
-// get single Order
-router.get("/:id", OrderController.getSingleOrder);
+// get single Order status
+router.get("/:id", OrderStatusController.getSingleOrderStatus);
 
-// update single Order
+// update single Order status
 router.patch(
   "/:id",
-  authUserOrRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
-  validateRequest(OrderValidation.updateOrderZodSchema),
-  OrderController.updateOrder
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  validateRequest(OrderStatusValidation.updateOrderStatusZodSchema),
+  OrderStatusController.updateOrderStatus
 );
 
-// delete Order
+// delete Order status
 router.delete(
   "/:id",
-  authUserOrRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
-  OrderController.deleteOrder
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  OrderStatusController.deleteOrderStatus
 );
 
 export const OrderStatusRoutes = router;

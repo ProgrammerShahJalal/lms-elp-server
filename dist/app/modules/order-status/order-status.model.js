@@ -23,5 +23,5 @@ const orderStatusSchema = new mongoose_1.Schema({
         required: true,
     },
 }, { timestamps: true, toJSON: { virtuals: true } });
-orderStatusSchema.index({ user_id: 1, order_id: 1, shipping_address_id: 1, status: 1 }, { unique: true });
+orderStatusSchema.index({ user_id: 1, order_details_id: 1, status: 1 }, { unique: true });
 exports.OrderStatus = (0, mongoose_1.model)("OrderStatus", orderStatusSchema);

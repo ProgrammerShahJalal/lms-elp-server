@@ -33,13 +33,9 @@ router.get(
 
 // get all Order Details of an user
 router.get(
-  "/user/:user_id",
-  authUserOrRole(
-    ENUM_USER_ROLE.SUPER_ADMIN,
-    ENUM_USER_ROLE.ADMIN,
-    ENUM_USER_ROLE.STUDENT
-  ),
-  OrderDetailsController.getOrderDetailsOfAnUser
+  "/my-order-details",
+  authRole(ENUM_USER_ROLE.STUDENT),
+  OrderDetailsController.getMyOrderDetails
 );
 
 // get single OrderDetails

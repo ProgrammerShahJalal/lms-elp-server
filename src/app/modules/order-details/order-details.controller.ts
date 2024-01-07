@@ -33,20 +33,18 @@ const getAllOrderDetails = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getOrderDetailsOfAnUser = catchAsync(
-  async (req: Request, res: Response) => {
-    const { user_id } = req.params;
+const getMyOrderDetails = catchAsync(async (req: Request, res: Response) => {
+  const user_id = req.user?.userId;
 
-    const result = await OrderDetailsService.getOrderDetailsOfAnUser(user_id);
+  const result = await OrderDetailsService.getMyOrderDetails(user_id);
 
-    sendResponse(res, {
-      success: true,
-      statusCode: httpStatus.OK,
-      message: "Order details fetched successfully!",
-      data: result,
-    });
-  }
-);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Order details fetched successfully!",
+    data: result,
+  });
+});
 
 const getSingleOrderDetails = catchAsync(
   async (req: Request, res: Response) => {
@@ -90,7 +88,7 @@ const deleteOrderDetails = catchAsync(async (req: Request, res: Response) => {
 export const OrderDetailsController = {
   createOrderDetails,
   getAllOrderDetails,
-  getOrderDetailsOfAnUser,
+  getMyOrderDetails,
   getSingleOrderDetails,
   updateOrderDetails,
   deleteOrderDetails,

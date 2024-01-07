@@ -4,7 +4,7 @@ import { User } from "../user/user.model";
 import { IShippingAddress } from "./shipping-address.interface";
 import { ShippingAddress } from "./shipping-address.model";
 
-// registering user/student
+// creating shipping address
 const createShippingAddress = async (
   payload: IShippingAddress
 ): Promise<IShippingAddress> => {
@@ -19,33 +19,57 @@ const createShippingAddress = async (
   return result;
 };
 
-// get all quiz questions
+// get all shipping address
 const getAllShippingAddresss = async (): Promise<IShippingAddress[]> => {
   const result = await ShippingAddress.find({});
   return result;
 };
 
-// get single quiz question
+// get single shipping address
 const getSingleShippingAddress = async (
-  id: string
+  id: string,
+  user_id: string
 ): Promise<IShippingAddress | null> => {
-  const result = await ShippingAddress.findById(id);
-  return result;
+  const shipping_address = await ShippingAddress.findById(id);
+
+  if (shipping_address?.user_id.toString() !== user_id.toString()) {
+    throw new ApiError(httpStatus.OK, "Unauthorized!");
+  }
+  return shipping_address;
 };
 
-// update user
-const updateShippingAddress = async (
-  id: string,
-  payload: Partial<IShippingAddress>
+// get my shipping address
+const getMyShippingAddress = async (
+  user_id: string
 ): Promise<IShippingAddress | null> => {
-  const result = await ShippingAddress.findByIdAndUpdate(id, payload, {
-    new: true,
+  const shipping_address = await ShippingAddress.findOne({
+    user_id,
   });
 
+  if (!shipping_address) {
+    throw new ApiError(httpStatus.OK, "No shipping address found!");
+  }
+
+  return shipping_address;
+};
+
+// update shipping address
+const updateShippingAddress = async (
+  payload: Partial<IShippingAddress>
+): Promise<IShippingAddress | null> => {
+  const result = await ShippingAddress.findOneAndUpdate(
+    { user_id: payload?.user_id },
+    payload,
+    {
+      upsert: true,
+      new: true,
+    }
+  );
+
   return result;
 };
 
-// delete user
+// delete shipping address
 const deleteShippingAddress = async (id: string) => {
   const result = await ShippingAddress.findByIdAndDelete(id);
   return result;
@@ -54,6 +78,7 @@ const deleteShippingAddress = async (id: string) => {
 export const ShippingAddressService = {
   createShippingAddress,
   getAllShippingAddresss,
+  getMyShippingAddress,
   getSingleShippingAddress,
   updateShippingAddress,
   deleteShippingAddress,

@@ -24,7 +24,8 @@ const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const createOrder = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const user_id = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
-    const result = yield order_service_1.OrderService.createOrder(user_id);
+    const payload = req.body;
+    const result = yield order_service_1.OrderService.createOrder(user_id, payload);
     (0, sendResponse_1.default)(res, {
         success: true,
         statusCode: http_status_1.default.OK,
