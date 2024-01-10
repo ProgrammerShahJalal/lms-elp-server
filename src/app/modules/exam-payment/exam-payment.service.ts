@@ -39,6 +39,18 @@ const getAllExamPayments = async (): Promise<IExamPayment[]> => {
   return result;
 };
 
+// get all Exam Payments
+const getMyExamPayments = async (user_id: string): Promise<IExamPayment[]> => {
+  const result = await ExamPayment.find({
+    user_id,
+  }).populate("exam_id");
+
+  if (!result.length) {
+    throw new ApiError(httpStatus.NOT_FOUND, "No exam payment found!");
+  }
+  return result;
+};
+
 // get single Exam Payment
 const getSingleExamPayment = async (
   id: string
@@ -87,6 +99,7 @@ const deleteExamPayment = async (id: string) => {
 export const ExamPaymentService = {
   createExamPayment,
   getAllExamPayments,
+  getMyExamPayments,
   getSingleExamPayment,
   updateExamPayment,
   deleteExamPayment,

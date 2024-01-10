@@ -38,6 +38,18 @@ const getSingleExamPayment = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getMyExamPayments = catchAsync(async (req: Request, res: Response) => {
+  const user_id = req?.user?.userId;
+  const result = await ExamPaymentService.getMyExamPayments(user_id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Exam payments fetched successfully!",
+    data: result,
+  });
+});
+
 const updateExamPayment = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const payload = req.body;
@@ -65,6 +77,7 @@ const deleteExamPayment = catchAsync(async (req: Request, res: Response) => {
 export const ExamPaymentController = {
   createExamPayment,
   getAllExamPayments,
+  getMyExamPayments,
   getSingleExamPayment,
   updateExamPayment,
   deleteExamPayment,

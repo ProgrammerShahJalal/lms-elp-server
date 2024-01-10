@@ -77,8 +77,7 @@ const getAllOrderDetails = async (
   const result = await OrderDetails.find(whereConditions)
     .sort(sortConditions)
     .skip(skip)
-    .limit(limit)
-    .populate("user_id ");
+    .limit(limit);
   const total = await OrderDetails.countDocuments(whereConditions);
 
   return {
@@ -95,7 +94,7 @@ const getAllOrderDetails = async (
 const getMyOrderDetails = async (
   user_id: string
 ): Promise<IOrderDetails[] | null> => {
-  const result = await OrderDetails.find({ user_id }).populate("user_id");
+  const result = await OrderDetails.find({ user_id });
 
   // if the OrderDetails is not found, throw error
   if (!result.length) {
@@ -109,11 +108,11 @@ const getMyOrderDetails = async (
 const getSingleOrderDetails = async (
   id: string
 ): Promise<IOrderDetails | null> => {
-  const result = await OrderDetails.findById(id).populate("user_id book_id");
+  const result = await OrderDetails.findById(id);
 
   // if the OrderDetails is not found, throw error
   if (!result) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Order status not found!");
+    throw new ApiError(httpStatus.NOT_FOUND, "Order details not found!");
   }
 
   return result;

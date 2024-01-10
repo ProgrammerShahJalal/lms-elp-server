@@ -107,6 +107,30 @@ const checkPaymentStatus = async (req: Request, res: Response) => {
   }
 };
 
+const getTransactionStatus = async (req: Request, res: Response) => {
+  const { trx_id } = req.body;
+  try {
+    const { data } = await axios.post(
+      config.bkash.search_transactioin_url as string,
+      {
+        trx_id,
+      },
+      {
+        headers: await bkashHeaders(),
+      }
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Transaction details fetched successfully!",
+      data: data,
+    });
+  } catch (error) {
+    throw new ApiError(httpStatus.OK, "Error querying payment!");
+  }
+};
+
 export const refund = async (req: Request, res: Response) => {
   const { trx_id } = req.body;
 

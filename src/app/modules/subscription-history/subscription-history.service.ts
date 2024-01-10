@@ -13,24 +13,47 @@ import {
   ISubscriptionHistoryFilters,
 } from "./subscription-history.interface";
 
-// create SubscriptionHistory
+// create Subscription history
 const createSubscriptionHistory = async (
   payload: ISubscriptionHistory
 ): Promise<ISubscriptionHistory> => {
   // to check if the course is present of the provided course-id
-  const { user_id, course_id, subscription_id } = payload;
+  const { user_id, subscription_id } = payload;
+
   const user = await User.findById(user_id);
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
   }
-  const subscription = await Subscription.findById(subscription_id);
+  const subscription = await Subscription.findById(subscription_id).populate(
+    "course_id"
+  );
   if (!subscription) {
     throw new ApiError(httpStatus.NOT_FOUND, "Subscription not found!");
   }
 
+  // check if your subscription day left
+  const today: number = new Date().getTime();
+  const alreadyHaveSubscription: ISubscriptionHistory[] | null =
+    await SubscriptionHistory.find({
+      user_id,
+      course_id: subscription?.course_id?.id,
+      expire_date: { $gt: today },
+    });
+  if (alreadyHaveSubscription?.length) {
+    // Calculate the number of days left for the subscription
+    const daysLeft = Math.ceil(
+      (alreadyHaveSubscription[0].expire_date.getTime() - today) /
+        (1000 * 60 * 60 * 24)
+    );
+    throw new ApiError(
+      httpStatus.OK,
+      `You have an active subscription. It will expire in ${daysLeft} days.`
+    );
+  }
+
   payload.course_id = subscription.course_id;
   payload.amount = subscription.cost;
-  const expire_date = new Date();
+  let expire_date = new Date();
   expire_date.setMonth(
     expire_date.getMonth() + subscription.subscription_duration_in_months
   );

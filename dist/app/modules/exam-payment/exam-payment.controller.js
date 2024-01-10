@@ -45,6 +45,17 @@ const getSingleExamPayment = (0, catchAsync_1.default)((req, res) => __awaiter(v
         data: result,
     });
 }));
+const getMyExamPayments = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const user_id = (_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.userId;
+    const result = yield exam_payment_service_1.ExamPaymentService.getMyExamPayments(user_id);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Exam payments fetched successfully!",
+        data: result,
+    });
+}));
 const updateExamPayment = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const payload = req.body;
@@ -69,6 +80,7 @@ const deleteExamPayment = (0, catchAsync_1.default)((req, res) => __awaiter(void
 exports.ExamPaymentController = {
     createExamPayment,
     getAllExamPayments,
+    getMyExamPayments,
     getSingleExamPayment,
     updateExamPayment,
     deleteExamPayment,

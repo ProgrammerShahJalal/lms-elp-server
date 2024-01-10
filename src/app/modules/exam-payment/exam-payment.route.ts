@@ -23,14 +23,25 @@ router.post(
 // get all Exam Payments
 router.get(
   "/",
-  authUserOrRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
   ExamPaymentController.getAllExamPayments
+);
+
+// get my exam payments
+router.get(
+  "/my-exam-payments",
+  authRole(
+    ENUM_USER_ROLE.SUPER_ADMIN,
+    ENUM_USER_ROLE.ADMIN,
+    ENUM_USER_ROLE.STUDENT
+  ),
+  ExamPaymentController.getMyExamPayments
 );
 
 // get single Exam Payment
 router.get(
   "/:id",
-  authUserOrRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
   ExamPaymentController.getSingleExamPayment
 );
 
