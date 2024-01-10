@@ -140,7 +140,7 @@ const createOrder = async (
           {
             user_id,
             order_details_id: result[0]?._id,
-            status: "Pending Approve",
+            status: "Pending Approval",
             shipping_address_id: shipping?.id,
           },
         ],

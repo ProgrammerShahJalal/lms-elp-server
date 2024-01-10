@@ -16,7 +16,7 @@ const createQuestionZodSchema = z.object({
     exam_type: z.enum(["0", "1"] as const, {
       required_error: "Exam type is required!",
     }),
-    mark: z.number({}).optional(),
+    mark: z.number({}).default(1).optional(),
   }),
 });
 

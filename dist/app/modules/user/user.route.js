@@ -14,11 +14,7 @@ const router = (0, express_1.Router)();
 // register user
 router.post("/", (0, validateRequest_1.default)(user_validation_1.UserValidation.registerUserZodSchema), user_controller_1.UserController.registerUser);
 // create super admin
-// router.post(
-//   "/create-super-admin",
-//   validateRequest(UserValidation.registerUserZodSchema),
-//   UserController.createSuperAdmin
-// );
+router.post("/create-super-admin", (0, validateRequest_1.default)(user_validation_1.UserValidation.registerUserZodSchema), user_controller_1.UserController.createSuperAdmin);
 // create admin
 router.post("/create-admin", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */), (0, validateRequest_1.default)(user_validation_1.UserValidation.registerUserZodSchema), user_controller_1.UserController.createAdmin);
 // login user

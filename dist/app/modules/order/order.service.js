@@ -136,7 +136,7 @@ const createOrder = (user_id, payload) => __awaiter(void 0, void 0, void 0, func
                 {
                     user_id,
                     order_details_id: (_a = result[0]) === null || _a === void 0 ? void 0 : _a._id,
-                    status: "Pending Approve",
+                    status: "Pending Approval",
                     shipping_address_id: shipping === null || shipping === void 0 ? void 0 : shipping.id,
                 },
             ], {

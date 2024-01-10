@@ -30,21 +30,35 @@ const paginationHelpers_1 = require("../../helpers/paginationHelpers");
 const subscription_history_model_1 = require("./subscription-history.model");
 const user_model_1 = require("../user/user.model");
 const subscription_model_1 = require("../subscription/subscription.model");
-// create SubscriptionHistory
+// create Subscription history
 const createSubscriptionHistory = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     // to check if the course is present of the provided course-id
-    const { user_id, course_id, subscription_id } = payload;
+    const { user_id, subscription_id } = payload;
     const user = yield user_model_1.User.findById(user_id);
     if (!user) {
         throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "User not found!");
     }
-    const subscription = yield subscription_model_1.Subscription.findById(subscription_id);
+    const subscription = yield subscription_model_1.Subscription.findById(subscription_id).populate("course_id");
     if (!subscription) {
         throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "Subscription not found!");
     }
+    // check if your subscription day left
+    const today = new Date().getTime();
+    const alreadyHaveSubscription = yield subscription_history_model_1.SubscriptionHistory.find({
+        user_id,
+        course_id: (_a = subscription === null || subscription === void 0 ? void 0 : subscription.course_id) === null || _a === void 0 ? void 0 : _a.id,
+        expire_date: { $gt: today },
+    });
+    if (alreadyHaveSubscription === null || alreadyHaveSubscription === void 0 ? void 0 : alreadyHaveSubscription.length) {
+        // Calculate the number of days left for the subscription
+        const daysLeft = Math.ceil((alreadyHaveSubscription[0].expire_date.getTime() - today) /
+            (1000 * 60 * 60 * 24));
+        throw new ApiError_1.default(http_status_1.default.OK, `You have an active subscription. It will expire in ${daysLeft} days.`);
+    }
     payload.course_id = subscription.course_id;
     payload.amount = subscription.cost;
-    const expire_date = new Date();
+    let expire_date = new Date();
     expire_date.setMonth(expire_date.getMonth() + subscription.subscription_duration_in_months);
     payload.expire_date = expire_date;
     payload.is_active = (payload === null || payload === void 0 ? void 0 : payload.is_active) || true;

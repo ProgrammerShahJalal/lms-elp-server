@@ -4,10 +4,10 @@ export interface IOrderStatus {
   user_id: Types.ObjectId;
   order_details_id: Types.ObjectId;
   status:
-    | "Pending Approve"
+    | "Pending Approval"
     | "Approved"
-    | "Preparing"
     | "On The Way"
+    | "Did Not Receive"
     | "Delivered";
   shipping_address_id: Types.ObjectId;
 }
@@ -17,9 +17,8 @@ export interface IOrderStatusFilters {
   user_id?: Types.ObjectId;
   order_details_id?: Types.ObjectId;
   status?:
-    | "Pending Approve"
+    | "Pending Approval"
     | "Approved"
-    | "Preparing"
     | "On The Way"
     | "Did Not Receive"
     | "Delivered";

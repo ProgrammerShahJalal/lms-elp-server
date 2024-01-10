@@ -16,11 +16,11 @@ router.post(
 );
 
 // create super admin
-// router.post(
-//   "/create-super-admin",
-//   validateRequest(UserValidation.registerUserZodSchema),
-//   UserController.createSuperAdmin
-// );
+router.post(
+  "/create-super-admin",
+  validateRequest(UserValidation.registerUserZodSchema),
+  UserController.createSuperAdmin
+);
 
 // create admin
 router.post(

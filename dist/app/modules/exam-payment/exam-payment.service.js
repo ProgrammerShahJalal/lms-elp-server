@@ -42,6 +42,16 @@ const getAllExamPayments = () => __awaiter(void 0, void 0, void 0, function* () 
     }
     return result;
 });
+// get all Exam Payments
+const getMyExamPayments = (user_id) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield exam_payment_model_1.ExamPayment.find({
+        user_id,
+    }).populate("exam_id");
+    if (!result.length) {
+        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "No exam payment found!");
+    }
+    return result;
+});
 // get single Exam Payment
 const getSingleExamPayment = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield exam_payment_model_1.ExamPayment.findById(id);
@@ -71,6 +81,7 @@ const deleteExamPayment = (id) => __awaiter(void 0, void 0, void 0, function* ()
 exports.ExamPaymentService = {
     createExamPayment,
     getAllExamPayments,
+    getMyExamPayments,
     getSingleExamPayment,
     updateExamPayment,
     deleteExamPayment,

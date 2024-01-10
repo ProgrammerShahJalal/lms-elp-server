@@ -74,8 +74,7 @@ const getAllOrderDetails = (filters, paginationOptions) => __awaiter(void 0, voi
     const result = yield order_details_model_1.OrderDetails.find(whereConditions)
         .sort(sortConditions)
         .skip(skip)
-        .limit(limit)
-        .populate("user_id ");
+        .limit(limit);
     const total = yield order_details_model_1.OrderDetails.countDocuments(whereConditions);
     return {
         meta: {
@@ -88,7 +87,7 @@ const getAllOrderDetails = (filters, paginationOptions) => __awaiter(void 0, voi
 });
 // get my Order Details
 const getMyOrderDetails = (user_id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield order_details_model_1.OrderDetails.find({ user_id }).populate("user_id");
+    const result = yield order_details_model_1.OrderDetails.find({ user_id });
     // if the OrderDetails is not found, throw error
     if (!result.length) {
         throw new ApiError_1.default(http_status_1.default.OK, "Order details not found!");
@@ -97,10 +96,10 @@ const getMyOrderDetails = (user_id) => __awaiter(void 0, void 0, void 0, functio
 });
 // get OrderDetails
 const getSingleOrderDetails = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield order_details_model_1.OrderDetails.findById(id).populate("user_id book_id");
+    const result = yield order_details_model_1.OrderDetails.findById(id);
     // if the OrderDetails is not found, throw error
     if (!result) {
-        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "Order status not found!");
+        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "Order details not found!");
     }
     return result;
 });

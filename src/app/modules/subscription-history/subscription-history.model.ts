@@ -26,10 +26,7 @@ const subscriptionHistorySchema = new Schema<ISubscriptionHistory>(
   { timestamps: true, toJSON: { virtuals: true } }
 );
 
-subscriptionHistorySchema.index(
-  { user_id: 1, course_id: 1, name: 1, subscription_id: 1, trx_id: 1 },
-  { unique: true }
-);
+subscriptionHistorySchema.index({ user_id: 1, trx_id: 1 }, { unique: true });
 
 export const SubscriptionHistory = model<ISubscriptionHistory>(
   "SubscriptionHistory",
