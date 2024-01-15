@@ -18,6 +18,13 @@ router.post(
 // get all exams
 router.get("/", ExamController.getAllExams);
 
+// get all due exams
+router.get(
+  "/my-due-exams",
+  authRole(ENUM_USER_ROLE.STUDENT),
+  ExamController.getMyDueExams
+);
+
 // get single exam
 router.get("/:id", ExamController.getSingleExam);
 

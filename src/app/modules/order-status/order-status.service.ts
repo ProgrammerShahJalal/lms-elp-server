@@ -18,19 +18,19 @@ const createOrderStatus = async (
   // to check if the user is present of the provided user_id
   const user = await User.findById(user_id);
   if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
+    throw new ApiError(httpStatus.OK, "User not found!");
   }
 
   // to check if the order details is present of the provided order_details_id
   const order_details = await Order.findById(order_details_id);
   if (!order_details) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Order details found!");
+    throw new ApiError(httpStatus.OK, "Order details not found!");
   }
 
   // to check if the shipping address is present of the provided shipping address id
   const shippingAddress = await ShippingAddress.findById(shipping_address_id);
   if (!shippingAddress) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Shipping address not found!");
+    throw new ApiError(httpStatus.OK, "Shipping address not found!");
   }
 
   const result = await OrderStatus.create(payload);

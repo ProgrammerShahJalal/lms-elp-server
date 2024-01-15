@@ -106,9 +106,14 @@ const getMyOrderDetails = async (
 
 // get OrderDetails
 const getSingleOrderDetails = async (
-  id: string
+  id: string,
+  user_id: string
 ): Promise<IOrderDetails | null> => {
   const result = await OrderDetails.findById(id);
+
+  if (result?.user_id.toString() !== user_id) {
+    throw new ApiError(httpStatus.OK, "You are not authorized!");
+  }
 
   // if the OrderDetails is not found, throw error
   if (!result) {

@@ -5,11 +5,13 @@ const zod_1 = require("zod");
 const registerUserZodSchema = zod_1.z
     .object({
     body: zod_1.z.object({
-        name: zod_1.z.string({
+        name: zod_1.z
+            .string({
             required_error: "Name is required!",
-        }),
-        contact_no: zod_1.z.string({}).optional(),
-        email: zod_1.z.string({}).optional(),
+        })
+            .trim(),
+        contact_no: zod_1.z.string({}).trim().optional(),
+        email: zod_1.z.string({}).trim().optional(),
         password: zod_1.z.string({ required_error: "Password is required!" }),
     }),
 })
@@ -21,15 +23,15 @@ const registerUserZodSchema = zod_1.z
 });
 const loginUserZodSchema = zod_1.z.object({
     body: zod_1.z.object({
-        email_or_contact: zod_1.z.string({}).optional(),
+        email_or_contact: zod_1.z.string({}).trim().optional(),
         password: zod_1.z.string({ required_error: "Password is required!" }),
     }),
 });
 const updateUserZodSchema = zod_1.z.object({
     body: zod_1.z.object({
-        name: zod_1.z.string({}).optional(),
-        contact_no: zod_1.z.string({}).optional(),
-        email: zod_1.z.string({}).optional(),
+        name: zod_1.z.string({}).trim().optional(),
+        contact_no: zod_1.z.string({}).trim().optional(),
+        email: zod_1.z.string({}).trim().optional(),
     }),
 });
 exports.UserValidation = {

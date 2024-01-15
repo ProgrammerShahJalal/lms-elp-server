@@ -3,11 +3,13 @@ import { z } from "zod";
 const registerUserZodSchema = z
   .object({
     body: z.object({
-      name: z.string({
-        required_error: "Name is required!",
-      }),
-      contact_no: z.string({}).optional(),
-      email: z.string({}).optional(),
+      name: z
+        .string({
+          required_error: "Name is required!",
+        })
+        .trim(),
+      contact_no: z.string({}).trim().optional(),
+      email: z.string({}).trim().optional(),
       password: z.string({ required_error: "Password is required!" }),
     }),
   })
@@ -20,16 +22,16 @@ const registerUserZodSchema = z
 
 const loginUserZodSchema = z.object({
   body: z.object({
-    email_or_contact: z.string({}).optional(),
+    email_or_contact: z.string({}).trim().optional(),
     password: z.string({ required_error: "Password is required!" }),
   }),
 });
 
 const updateUserZodSchema = z.object({
   body: z.object({
-    name: z.string({}).optional(),
-    contact_no: z.string({}).optional(),
-    email: z.string({}).optional(),
+    name: z.string({}).trim().optional(),
+    contact_no: z.string({}).trim().optional(),
+    email: z.string({}).trim().optional(),
   }),
 });
 

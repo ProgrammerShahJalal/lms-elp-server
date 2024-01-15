@@ -40,6 +40,17 @@ const getAllExams = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, vo
         data: result,
     });
 }));
+const getMyDueExams = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const user_id = (_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.userId;
+    const result = yield exam_service_1.ExamService.getMyDueExams(user_id);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Due exams fetched successfully!",
+        data: result,
+    });
+}));
 const getSingleExam = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const result = yield exam_service_1.ExamService.getSingleExam(id);
@@ -74,6 +85,7 @@ const deleteExam = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
 exports.ExamController = {
     createExam,
     getAllExams,
+    getMyDueExams,
     getSingleExam,
     updateExam,
     deleteExam,

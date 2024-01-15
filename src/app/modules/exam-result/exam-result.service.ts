@@ -56,7 +56,7 @@ const giveQuestionMark = async (payload: IExamQuestionMarkPayload) => {
   });
 
   if (!examResult) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Invalid user id or exam id!");
+    throw new ApiError(httpStatus.OK, "Invalid user id or exam id!");
   }
 
   let totalCorrectAnswer = 0;
@@ -73,6 +73,7 @@ const giveQuestionMark = async (payload: IExamQuestionMarkPayload) => {
       },
     },
     {
+      upsert: true,
       new: true,
     }
   );

@@ -32,7 +32,7 @@ export default {
     create_payment_url: process.env.BKASH_CREATE_PAYMENT_URL,
     execute_payment_url: process.env.BKASH_EXECUTE_PAYMENT_URL,
     refund_transaction_url: process.env.BKASH_REFUND_TRANSACTION_URL,
-    search_transactioin_url: process.env.BKASH_SEARCH_TRAN_URL,
+    search_transaction_url: process.env.BKASH_SEARCH_TRAN_URL,
     query_payment_url: process.env.BKASH_QUERY_PAYMENT_URL,
   },
 };

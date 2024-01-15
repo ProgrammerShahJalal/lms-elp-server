@@ -4,7 +4,6 @@ import authRole from "../../middlewares/authRole";
 import { ENUM_USER_ROLE } from "../../enums/user";
 import { ExamPaymentValidation } from "./exam-payment.validation";
 import { ExamPaymentController } from "./exam-payment.controller";
-import authUserOrRole from "../../middlewares/authUserOrRole";
 
 const router = Router();
 
@@ -30,11 +29,7 @@ router.get(
 // get my exam payments
 router.get(
   "/my-exam-payments",
-  authRole(
-    ENUM_USER_ROLE.SUPER_ADMIN,
-    ENUM_USER_ROLE.ADMIN,
-    ENUM_USER_ROLE.STUDENT
-  ),
+  authRole(ENUM_USER_ROLE.STUDENT),
   ExamPaymentController.getMyExamPayments
 );
 

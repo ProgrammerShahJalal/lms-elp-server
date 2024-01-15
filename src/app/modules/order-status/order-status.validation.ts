@@ -12,13 +12,7 @@ const createOrderStatusZodSchema = z.object({
       required_error: "Shipping address id is required!",
     }),
     status: z.enum(
-      [
-        "Pending Approval",
-        "Approved",
-        "On The Way",
-        "Did Not Receive",
-        "Delivered",
-      ] as const,
+      ["Pending Approval", "Approved", "On The Way", "Delivered"] as const,
       {
         required_error: "Order status is required!",
       }
@@ -34,7 +28,6 @@ const updateOrderStatusZodSchema = z.object({
         "Pending Approval",
         "Approved",
         "On The Way",
-        "Did Not Receive",
         "Delivered",
       ] as const)
       .optional(),

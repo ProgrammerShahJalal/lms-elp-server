@@ -7,10 +7,12 @@ const examResultSchema = new mongoose_1.Schema({
     exam_id: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "Exam" },
     exam_type: { type: String, enum: ["0", "1"], required: true },
     answer: { type: String, required: true },
-    question_mark: {
-        question_id: { type: mongoose_1.Schema.Types.ObjectId },
-        mark_obtained: { type: Number },
-    },
+    question_mark: [
+        {
+            question_id: { type: mongoose_1.Schema.Types.ObjectId },
+            mark_obtained: { type: Number },
+        },
+    ],
     total_marks: { type: Number, required: true },
     total_correct_answer: { type: Number },
     total_wrong_answer: { type: Number },

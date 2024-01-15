@@ -6,28 +6,8 @@ import { ExamResultService } from "./exam-result.service";
 import { examResultFilterableFields } from "./exam-result.constants";
 import { paginationFields } from "../../constants/pagination";
 import pick from "../../../shared/pick";
-import { ExamResult } from "./exam-result.model";
-import { ExamPayment } from "../exam-payment/exam-payment.model";
-import ApiError from "../../../errors/ApiError";
 
 const createExamResult = catchAsync(async (req: Request, res: Response) => {
-  const user_id = req.user?.user_id;
-
-  const examResult = await ExamResult.find({
-    user_id: user_id,
-    exam_id: req.body.exam_id,
-  });
-  const examPayment = await ExamPayment.find({
-    user_id,
-    exam_id: req.body.exam_id,
-  });
-  if (examResult.length >= examPayment.length) {
-    throw new ApiError(
-      httpStatus.BAD_REQUEST,
-      "Already exam result is created for this user!"
-    );
-  }
-
   const result = await ExamResultService.createExamResult(req.body);
 
   sendResponse(res, {

@@ -17,7 +17,7 @@ router.get("/", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_AD
 // Get All Course Playlists of a Course
 router.get("/course/:course_id", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */, "admin" /* ENUM_USER_ROLE.ADMIN */, "student" /* ENUM_USER_ROLE.STUDENT */), course_playlist_controller_1.CoursePlaylistController.getPlaylistsOfACourse);
 // get single Course Playlist
-router.get("/:id", course_playlist_controller_1.CoursePlaylistController.getSingleCoursePlaylist);
+router.get("/:id", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */, "admin" /* ENUM_USER_ROLE.ADMIN */), course_playlist_controller_1.CoursePlaylistController.getSingleCoursePlaylist);
 // update single CoursePlaylist
 router.patch("/:id", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */, "admin" /* ENUM_USER_ROLE.ADMIN */), (0, validateRequest_1.default)(course_playlist_validation_1.CoursePlaylistValidation.updateCoursePlaylistZodSchema), course_playlist_controller_1.CoursePlaylistController.updateCoursePlaylist);
 // delete CoursePlaylist

@@ -36,7 +36,20 @@ const createExamPayment = (payload) => __awaiter(void 0, void 0, void 0, functio
 });
 // get all Exam Payments
 const getAllExamPayments = () => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield exam_payment_model_1.ExamPayment.find({});
+    const result = yield exam_payment_model_1.ExamPayment.find({})
+        .populate({
+        path: "exam_id",
+        populate: {
+            path: "course_id",
+            populate: {
+                path: "sub_category_id",
+                populate: {
+                    path: "category_id",
+                },
+            },
+        },
+    })
+        .populate("user_id");
     if (!result.length) {
         throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "No exam payment found!");
     }
@@ -46,7 +59,18 @@ const getAllExamPayments = () => __awaiter(void 0, void 0, void 0, function* () 
 const getMyExamPayments = (user_id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield exam_payment_model_1.ExamPayment.find({
         user_id,
-    }).populate("exam_id");
+    }).populate({
+        path: "exam_id",
+        populate: {
+            path: "course_id",
+            populate: {
+                path: "sub_category_id",
+                populate: {
+                    path: "category_id",
+                },
+            },
+        },
+    });
     if (!result.length) {
         throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "No exam payment found!");
     }

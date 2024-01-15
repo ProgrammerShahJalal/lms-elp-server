@@ -29,7 +29,7 @@ router.get(
 router.get(
   "/payment/check",
   BkashMiddlewares.bkashAuth,
-  BkashController.checkPaymentStatus
+  BkashController.getTransactionDetails
 );
 
 // callback
