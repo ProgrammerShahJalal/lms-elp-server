@@ -1,12 +1,9 @@
 import httpStatus from "http-status";
 import ApiError from "../../../errors/ApiError";
-import { Course } from "../course/course.model";
 import { IExamPayment } from "./exam-payment.interface";
 import { User } from "../user/user.model";
 import { Exam } from "../exam/exam.model";
 import { ExamPayment } from "./exam-payment.model";
-import axios from "axios";
-import config from "../../../config";
 
 // create Exam Payment
 const createExamPayment = async (
@@ -31,7 +28,20 @@ const createExamPayment = async (
 
 // get all Exam Payments
 const getAllExamPayments = async (): Promise<IExamPayment[]> => {
-  const result = await ExamPayment.find({});
+  const result = await ExamPayment.find({})
+    .populate({
+      path: "exam_id",
+      populate: {
+        path: "course_id",
+        populate: {
+          path: "sub_category_id",
+          populate: {
+            path: "category_id",
+          },
+        },
+      },
+    })
+    .populate("user_id");
 
   if (!result.length) {
     throw new ApiError(httpStatus.NOT_FOUND, "No exam payment found!");
@@ -43,7 +53,18 @@ const getAllExamPayments = async (): Promise<IExamPayment[]> => {
 const getMyExamPayments = async (user_id: string): Promise<IExamPayment[]> => {
   const result = await ExamPayment.find({
     user_id,
-  }).populate("exam_id");
+  }).populate({
+    path: "exam_id",
+    populate: {
+      path: "course_id",
+      populate: {
+        path: "sub_category_id",
+        populate: {
+          path: "category_id",
+        },
+      },
+    },
+  });
 
   if (!result.length) {
     throw new ApiError(httpStatus.NOT_FOUND, "No exam payment found!");

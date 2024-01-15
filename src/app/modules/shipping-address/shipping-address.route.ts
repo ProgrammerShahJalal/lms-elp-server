@@ -4,7 +4,6 @@ import validateRequest from "../../middlewares/validateRequest";
 import { ShippingAddressValidation } from "./shipping-address.validation";
 import authRole from "../../middlewares/authRole";
 import { ENUM_USER_ROLE } from "../../enums/user";
-import authUserOrRole from "../../middlewares/authUserOrRole";
 
 const router = Router();
 
@@ -64,7 +63,7 @@ router.patch(
 // delete single shipping address
 router.delete(
   "/:id",
-  authUserOrRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
   ShippingAddressController.deleteShippingAddress
 );
 

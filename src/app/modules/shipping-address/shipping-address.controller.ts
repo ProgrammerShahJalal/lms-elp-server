@@ -105,7 +105,6 @@ const updateShippingAddress = catchAsync(
 const deleteShippingAddress = catchAsync(
   async (req: Request, res: Response) => {
     const { id } = req.params;
-    const payload = req.body;
     const result = await ShippingAddressService.deleteShippingAddress(id);
 
     sendResponse(res, {

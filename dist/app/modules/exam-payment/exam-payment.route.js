@@ -15,7 +15,7 @@ router.post("/", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_A
 // get all Exam Payments
 router.get("/", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */, "admin" /* ENUM_USER_ROLE.ADMIN */), exam_payment_controller_1.ExamPaymentController.getAllExamPayments);
 // get my exam payments
-router.get("/my-exam-payments", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */, "admin" /* ENUM_USER_ROLE.ADMIN */, "student" /* ENUM_USER_ROLE.STUDENT */), exam_payment_controller_1.ExamPaymentController.getMyExamPayments);
+router.get("/my-exam-payments", (0, authRole_1.default)("student" /* ENUM_USER_ROLE.STUDENT */), exam_payment_controller_1.ExamPaymentController.getMyExamPayments);
 // get single Exam Payment
 router.get("/:id", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */, "admin" /* ENUM_USER_ROLE.ADMIN */), exam_payment_controller_1.ExamPaymentController.getSingleExamPayment);
 // update single Exam Payment

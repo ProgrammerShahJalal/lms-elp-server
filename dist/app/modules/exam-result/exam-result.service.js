@@ -71,7 +71,7 @@ const giveQuestionMark = (payload) => __awaiter(void 0, void 0, void 0, function
         exam_id: payload.exam_id,
     });
     if (!examResult) {
-        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "Invalid user id or exam id!");
+        throw new ApiError_1.default(http_status_1.default.OK, "Invalid user id or exam id!");
     }
     let totalCorrectAnswer = 0;
     for (const mark of payload.marks) {
@@ -84,6 +84,7 @@ const giveQuestionMark = (payload) => __awaiter(void 0, void 0, void 0, function
             total_wrong_answer: examResult.total_marks - totalCorrectAnswer,
         },
     }, {
+        upsert: true,
         new: true,
     });
     return result;

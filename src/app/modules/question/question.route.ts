@@ -34,7 +34,11 @@ router.get(
 );
 
 // get single question
-router.get("/:id", QuestionController.getSingleQuestion);
+router.get(
+  "/:id",
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  QuestionController.getSingleQuestion
+);
 
 // update single question
 router.patch(

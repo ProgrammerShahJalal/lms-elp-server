@@ -85,7 +85,17 @@ const getAllSubscriptionHistorys = (filters, paginationOptions) => __awaiter(voi
     const result = yield subscription_history_model_1.SubscriptionHistory.find(whereConditions)
         .sort(sortConditions)
         .skip(skip)
-        .limit(limit);
+        .limit(limit)
+        .populate({
+        path: "course_id",
+        populate: {
+            path: "sub_category_id",
+            populate: {
+                path: "category_id",
+            },
+        },
+    })
+        .populate("subscription_id");
     const total = yield subscription_history_model_1.SubscriptionHistory.countDocuments(whereConditions);
     return {
         meta: {
@@ -98,7 +108,15 @@ const getAllSubscriptionHistorys = (filters, paginationOptions) => __awaiter(voi
 });
 // get my subscription-histories
 const getMySubscriptionHistories = (user_id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield subscription_history_model_1.SubscriptionHistory.find({ user_id }).populate("course_id");
+    const result = yield subscription_history_model_1.SubscriptionHistory.find({ user_id }).populate({
+        path: "course_id",
+        populate: {
+            path: "sub_category_id",
+            populate: {
+                path: "category_id",
+            },
+        },
+    });
     if (!result.length) {
         throw new ApiError_1.default(http_status_1.default.OK, "No subscription found!");
     }

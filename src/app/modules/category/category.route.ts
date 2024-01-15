@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { CategoryController } from "./category.controller";
-import validateRequest from "../../middlewares/validateRequest";
 import authRole from "../../middlewares/authRole";
 import { ENUM_USER_ROLE } from "../../enums/user";
 import { CategoryValidation } from "./category.validation";

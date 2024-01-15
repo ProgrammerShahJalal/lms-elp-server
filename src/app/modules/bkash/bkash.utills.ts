@@ -13,7 +13,7 @@ const bkashHeaders = async () => {
 const getTransactionDetails = async (trx_id: string) => {
   console.log(get("id_token"), "id token");
   const { data } = await axios.post(
-    config.bkash.search_transactioin_url as string,
+    config.bkash.search_transaction_url as string,
     {
       trx_id: trx_id,
     },

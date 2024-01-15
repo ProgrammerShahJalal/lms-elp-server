@@ -34,7 +34,11 @@ router.get(
 );
 
 // get single Course Playlist
-router.get("/:id", CoursePlaylistController.getSingleCoursePlaylist);
+router.get(
+  "/:id",
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  CoursePlaylistController.getSingleCoursePlaylist
+);
 
 // update single CoursePlaylist
 router.patch(

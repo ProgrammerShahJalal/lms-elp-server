@@ -4,7 +4,6 @@ import { IPaginationOptions } from "../../../interfaces/pagination";
 import { IGenericResponse } from "../../../interfaces/common";
 import { paginationHelpers } from "../../helpers/paginationHelpers";
 import { SortOrder } from "mongoose";
-import { Course } from "../course/course.model";
 import { SubscriptionHistory } from "./subscription-history.model";
 import { User } from "../user/user.model";
 import { Subscription } from "../subscription/subscription.model";
@@ -95,7 +94,17 @@ const getAllSubscriptionHistorys = async (
   const result = await SubscriptionHistory.find(whereConditions)
     .sort(sortConditions)
     .skip(skip)
-    .limit(limit);
+    .limit(limit)
+    .populate({
+      path: "course_id",
+      populate: {
+        path: "sub_category_id",
+        populate: {
+          path: "category_id",
+        },
+      },
+    })
+    .populate("subscription_id");
   const total = await SubscriptionHistory.countDocuments(whereConditions);
 
   return {
@@ -110,9 +119,15 @@ const getAllSubscriptionHistorys = async (
 
 // get my subscription-histories
 const getMySubscriptionHistories = async (user_id: string) => {
-  const result = await SubscriptionHistory.find({ user_id }).populate(
-    "course_id"
-  );
+  const result = await SubscriptionHistory.find({ user_id }).populate({
+    path: "course_id",
+    populate: {
+      path: "sub_category_id",
+      populate: {
+        path: "category_id",
+      },
+    },
+  });
 
   if (!result.length) {
     throw new ApiError(httpStatus.OK, "No subscription found!");

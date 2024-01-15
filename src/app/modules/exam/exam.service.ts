@@ -8,6 +8,8 @@ import { examSearchableFields } from "./exam.constants";
 import { paginationHelpers } from "../../helpers/paginationHelpers";
 import { IGenericResponse } from "../../../interfaces/common";
 import { SortOrder } from "mongoose";
+import { ExamPayment } from "../exam-payment/exam-payment.model";
+import { ExamResult } from "../exam-result/exam-result.model";
 
 // create exam
 const createExam = async (payload: IExam): Promise<IExam> => {
@@ -81,6 +83,31 @@ const getAllExams = async (
   };
 };
 
+// get all due exams
+const getMyDueExams = async (user_id: string): Promise<string[] | null> => {
+  const dueExamIds: string[] = [];
+
+  const examsPayed = await ExamPayment.find({
+    user_id,
+  });
+  for (const examPayed of examsPayed) {
+    const examResult = await ExamResult.findOne({
+      user_id,
+      exam_id: examPayed?.exam_id,
+    }).select("exam_id answer");
+
+    if (!examResult || !examResult?.answer) {
+      dueExamIds.push(examPayed?.exam_id.toString());
+    }
+  }
+
+  if (!dueExamIds.length) {
+    throw new ApiError(httpStatus.NOT_FOUND, "No exam due for you!");
+  }
+
+  return dueExamIds;
+};
+
 // get single exam
 const getSingleExam = async (id: string): Promise<IExam | null> => {
   const result = await Exam.findById(id).populate("course_id");
@@ -113,6 +140,7 @@ const deleteExam = async (id: string) => {
 export const ExamService = {
   createExam,
   getAllExams,
+  getMyDueExams,
   getSingleExam,
   updateExam,
   deleteExam,

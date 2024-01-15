@@ -15,7 +15,11 @@ router.post(
 );
 
 // get all Order statuses
-router.get("/", OrderStatusController.getAllOrderStatuss);
+router.get(
+  "/",
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  OrderStatusController.getAllOrderStatuss
+);
 
 // get single Order status
 router.get("/:id", OrderStatusController.getSingleOrderStatus);

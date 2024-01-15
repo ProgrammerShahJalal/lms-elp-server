@@ -17,7 +17,7 @@ router.get("/", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_AD
 // get questions of an exam
 router.get("/exam/:exam_id", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */, "admin" /* ENUM_USER_ROLE.ADMIN */, "student" /* ENUM_USER_ROLE.STUDENT */), question_controller_1.QuestionController.getQuestionsOfAnExam);
 // get single question
-router.get("/:id", question_controller_1.QuestionController.getSingleQuestion);
+router.get("/:id", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */, "admin" /* ENUM_USER_ROLE.ADMIN */), question_controller_1.QuestionController.getSingleQuestion);
 // update single question
 router.patch("/:id", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */, "admin" /* ENUM_USER_ROLE.ADMIN */), (0, validateRequest_1.default)(question_validation_1.QuestionValidation.updateQuestionZodSchema), question_controller_1.QuestionController.updateQuestion);
 // delete single question

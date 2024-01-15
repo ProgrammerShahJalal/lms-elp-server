@@ -10,6 +10,7 @@ const router = Router();
 // create Subscription
 router.post(
   "/",
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
   validateRequest(SubscriptionValidation.createSubscriptionSchema),
   SubscriptionController.createSubscription
 );

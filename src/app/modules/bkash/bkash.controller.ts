@@ -107,13 +107,13 @@ const checkPaymentStatus = async (req: Request, res: Response) => {
   }
 };
 
-const getTransactionStatus = async (req: Request, res: Response) => {
-  const { trx_id } = req.body;
+const getTransactionDetails = async (req: Request, res: Response) => {
+  const { trxID } = req.body;
   try {
     const { data } = await axios.post(
-      config.bkash.search_transactioin_url as string,
+      config.bkash.search_transaction_url as string,
       {
-        trx_id,
+        trxID,
       },
       {
         headers: await bkashHeaders(),
@@ -187,5 +187,6 @@ export const BkashController = {
   createPayment,
   callBack,
   refund,
+  getTransactionDetails,
   checkPaymentStatus,
 };

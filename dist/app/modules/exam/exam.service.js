@@ -30,6 +30,8 @@ const course_model_1 = require("../course/course.model");
 const exam_model_1 = require("./exam.model");
 const exam_constants_1 = require("./exam.constants");
 const paginationHelpers_1 = require("../../helpers/paginationHelpers");
+const exam_payment_model_1 = require("../exam-payment/exam-payment.model");
+const exam_result_model_1 = require("../exam-result/exam-result.model");
 // create exam
 const createExam = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     // if the provided course_id have the course or not in db
@@ -85,6 +87,26 @@ const getAllExams = (filters, paginationOptions) => __awaiter(void 0, void 0, vo
         data: result,
     };
 });
+// get all due exams
+const getMyDueExams = (user_id) => __awaiter(void 0, void 0, void 0, function* () {
+    const dueExamIds = [];
+    const examsPayed = yield exam_payment_model_1.ExamPayment.find({
+        user_id,
+    });
+    for (const examPayed of examsPayed) {
+        const examResult = yield exam_result_model_1.ExamResult.findOne({
+            user_id,
+            exam_id: examPayed === null || examPayed === void 0 ? void 0 : examPayed.exam_id,
+        }).select("exam_id answer");
+        if (!examResult || !(examResult === null || examResult === void 0 ? void 0 : examResult.answer)) {
+            dueExamIds.push(examPayed === null || examPayed === void 0 ? void 0 : examPayed.exam_id.toString());
+        }
+    }
+    if (!dueExamIds.length) {
+        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "No exam due for you!");
+    }
+    return dueExamIds;
+});
 // get single exam
 const getSingleExam = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield exam_model_1.Exam.findById(id).populate("course_id");
@@ -108,6 +130,7 @@ const deleteExam = (id) => __awaiter(void 0, void 0, void 0, function* () {
 exports.ExamService = {
     createExam,
     getAllExams,
+    getMyDueExams,
     getSingleExam,
     updateExam,
     deleteExam,

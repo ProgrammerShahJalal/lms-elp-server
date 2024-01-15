@@ -14,6 +14,8 @@ const router = (0, express_1.Router)();
 router.post("/", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */, "admin" /* ENUM_USER_ROLE.ADMIN */), (0, validateRequest_1.default)(exam_validation_1.ExamValidation.createExamZodSchema), exam_controller_1.ExamController.createExam);
 // get all exams
 router.get("/", exam_controller_1.ExamController.getAllExams);
+// get all due exams
+router.get("/my-due-exams", (0, authRole_1.default)("student" /* ENUM_USER_ROLE.STUDENT */), exam_controller_1.ExamController.getMyDueExams);
 // get single exam
 router.get("/:id", exam_controller_1.ExamController.getSingleExam);
 // update single exam

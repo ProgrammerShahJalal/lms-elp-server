@@ -32,6 +32,18 @@ const getAllExams = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getMyDueExams = catchAsync(async (req: Request, res: Response) => {
+  const user_id = req?.user?.userId;
+  const result = await ExamService.getMyDueExams(user_id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Due exams fetched successfully!",
+    data: result,
+  });
+});
+
 const getSingleExam = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const result = await ExamService.getSingleExam(id);
@@ -71,6 +83,7 @@ const deleteExam = catchAsync(async (req: Request, res: Response) => {
 export const ExamController = {
   createExam,
   getAllExams,
+  getMyDueExams,
   getSingleExam,
   updateExam,
   deleteExam,

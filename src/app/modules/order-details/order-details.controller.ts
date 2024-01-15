@@ -49,8 +49,8 @@ const getMyOrderDetails = catchAsync(async (req: Request, res: Response) => {
 const getSingleOrderDetails = catchAsync(
   async (req: Request, res: Response) => {
     const { id } = req.params;
-    console.log(id, req.user);
-    const result = await OrderDetailsService.getSingleOrderDetails(id);
+    const user_id = req?.user?.userId;
+    const result = await OrderDetailsService.getSingleOrderDetails(id, user_id);
 
     sendResponse(res, {
       success: true,
