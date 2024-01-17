@@ -13,7 +13,7 @@ const router = (0, express_1.Router)();
 // create Order status
 router.post("/", (0, validateRequest_1.default)(order_status_validation_1.OrderStatusValidation.createOrderStatusZodSchema), order_status_controller_1.OrderStatusController.createOrderStatus);
 // get all Order statuses
-router.get("/", order_status_controller_1.OrderStatusController.getAllOrderStatuss);
+router.get("/", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */, "admin" /* ENUM_USER_ROLE.ADMIN */), order_status_controller_1.OrderStatusController.getAllOrderStatuss);
 // get single Order status
 router.get("/:id", order_status_controller_1.OrderStatusController.getSingleOrderStatus);
 // update single Order status

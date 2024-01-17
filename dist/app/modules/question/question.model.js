@@ -4,10 +4,7 @@ exports.Question = void 0;
 const mongoose_1 = require("mongoose");
 const questionSchema = new mongoose_1.Schema({
     question: { type: String, required: true },
-    a: { type: String },
-    b: { type: String },
-    c: { type: String },
-    d: { type: String },
+    options: [{ type: Map, of: String }],
     correct_answer: { type: String },
     mark: { type: Number, required: true, default: 1 },
     exam_id: { type: mongoose_1.Schema.Types.ObjectId, ref: "Exam" },

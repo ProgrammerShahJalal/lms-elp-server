@@ -29,6 +29,7 @@ const orderDetailsSchema = new Schema<IOrderDetails>(
     trx_id: {
       type: String,
       required: true,
+      unique: true,
     },
   },
   { timestamps: true, toJSON: { virtuals: true } }

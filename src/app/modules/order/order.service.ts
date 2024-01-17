@@ -14,12 +14,19 @@ import { IOrderDetails } from "../order-details/order-details.interface";
 import { Settings } from "../settings/settings.model";
 import { isJSON } from "../../helpers/common";
 import { OrderStatus } from "../order-status/order-status.model";
+import { Payment } from "../payment/payment.model";
 
 // create Order
 const createOrder = async (
   user_id: string,
   payload: { trx_id: string; shipping_address: string }
 ): Promise<IOrderDetails> => {
+  const validPayment = await Payment.findOne({ trxID: payload?.trx_id });
+
+  if (!validPayment) {
+    throw new ApiError(httpStatus.OK, "Invalid transaction id!");
+  }
+
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -70,6 +77,10 @@ const createOrder = async (
         (Number(book?.price) - Number(book?.discount_price)) *
         Number(cartItem?.quantity);
     });
+
+    if (totalPrice > Number(validPayment?.amount)) {
+      throw new ApiError(httpStatus.OK, "Invalid payment amount!");
+    }
 
     // Wait for all orders to be created
     await Promise.all(orderPromises);

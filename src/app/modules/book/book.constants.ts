@@ -6,6 +6,7 @@ export const bookFilterableFields = [
   "format",
   "pdf_link",
   "course_id",
+  "course_id.sub_category_id",
 ];
 
 export const bookSearchableFields = ["title", "description"];

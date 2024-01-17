@@ -16,8 +16,9 @@ import { OrderRoutes } from "../modules/order/order.route";
 import { OrderStatusRoutes } from "../modules/order-status/order-status.route";
 import { SubscriptionHistoryRoutes } from "../modules/subscription-history/subscription-history.route";
 import { OrderDetailsStatusRoutes } from "../modules/order-details/order-details.route";
-import { BkashRoutes } from "../modules/bkash/bkash.route";
+import { BkashRoutes } from "../modules/payment-bkash/bkash.route";
 import { SettingsRoutes } from "../modules/settings/settings.route";
+import { NagadPaymentRoutes } from "../modules/payment-nagad/nagad.route";
 
 const router = Router();
 
@@ -40,6 +41,7 @@ const moduleRoutes = [
   { path: "/order-details", route: OrderDetailsStatusRoutes },
   { path: "/order-statuses", route: OrderStatusRoutes },
   { path: "/bkash", route: BkashRoutes },
+  { path: "/nagad", route: NagadPaymentRoutes },
   { path: "/settings", route: SettingsRoutes },
 ];
 

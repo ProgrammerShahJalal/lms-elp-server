@@ -82,7 +82,15 @@ const getAllBooks = (filters, paginationOptions) => __awaiter(void 0, void 0, vo
         .sort(sortConditions)
         .skip(skip)
         .limit(limit)
-        .populate("course_id");
+        .populate({
+        path: "course_id",
+        populate: {
+            path: "sub_category_id",
+            populate: {
+                path: "category_id",
+            },
+        },
+    });
     const total = yield book_model_1.Book.countDocuments(whereConditions);
     return {
         meta: {
@@ -92,6 +100,24 @@ const getAllBooks = (filters, paginationOptions) => __awaiter(void 0, void 0, vo
         },
         data: result,
     };
+});
+const getAllBooksOfASubCategory = (sub_category_id) => __awaiter(void 0, void 0, void 0, function* () {
+    const allBooks = yield book_model_1.Book.find({}).populate({
+        path: "course_id",
+        populate: {
+            path: "sub_category_id",
+            populate: {
+                path: "category_id",
+            },
+        },
+    });
+    let result = [];
+    if (allBooks === null || allBooks === void 0 ? void 0 : allBooks.length) {
+        result = allBooks === null || allBooks === void 0 ? void 0 : allBooks.filter((book) => { var _a, _b; 
+        // @ts-ignore
+        return ((_b = (_a = book === null || book === void 0 ? void 0 : book.course_id) === null || _a === void 0 ? void 0 : _a.sub_category_id) === null || _b === void 0 ? void 0 : _b._id.toString()) === sub_category_id; });
+    }
+    return result;
 });
 // get single Book
 const getSingleBook = (id) => __awaiter(void 0, void 0, void 0, function* () {
@@ -145,6 +171,7 @@ const deleteBook = (id) => __awaiter(void 0, void 0, void 0, function* () {
 exports.BookService = {
     addBook,
     getAllBooks,
+    getAllBooksOfASubCategory,
     getSingleBook,
     updateBook,
     deleteBook,

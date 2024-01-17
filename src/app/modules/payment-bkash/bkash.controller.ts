@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import config from "../../../config";
 import { get } from "node-global-storage";
 import ApiError from "../../../errors/ApiError";
+import { Payment } from "../payment/payment.model";
 
 const bkashHeaders = async () => {
   return {
@@ -65,6 +66,12 @@ const callBack = async (req: Request, res: Response) => {
         }
       );
       if (data && data.statusCode === "0000") {
+        await Payment.create({
+          trxID: data?.trxID,
+          paymentID: data?.paymentID,
+          amount: data?.amount,
+          customerMsisdn: data?.customerMsisdn,
+        });
         return res.redirect(
           `${config.frontend_site_url}/bkash/success?trx_id=${data.trxID}`
         );

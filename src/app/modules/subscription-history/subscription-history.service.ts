@@ -11,6 +11,7 @@ import {
   ISubscriptionHistory,
   ISubscriptionHistoryFilters,
 } from "./subscription-history.interface";
+import { Payment } from "../payment/payment.model";
 
 // create Subscription history
 const createSubscriptionHistory = async (
@@ -28,6 +29,16 @@ const createSubscriptionHistory = async (
   );
   if (!subscription) {
     throw new ApiError(httpStatus.NOT_FOUND, "Subscription not found!");
+  }
+
+  const validPayment = await Payment.findOne({ trxID: payload?.trx_id });
+
+  if (!validPayment) {
+    throw new ApiError(httpStatus.OK, "Invalid transaction id!");
+  }
+
+  if (Number(subscription?.cost) > Number(validPayment?.amount)) {
+    throw new ApiError(httpStatus.OK, "Invalid payment amount!");
   }
 
   // check if your subscription day left

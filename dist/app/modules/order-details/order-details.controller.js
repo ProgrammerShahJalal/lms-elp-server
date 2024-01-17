@@ -52,9 +52,10 @@ const getMyOrderDetails = (0, catchAsync_1.default)((req, res) => __awaiter(void
     });
 }));
 const getSingleOrderDetails = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _b;
     const { id } = req.params;
-    console.log(id, req.user);
-    const result = yield order_details_service_1.OrderDetailsService.getSingleOrderDetails(id);
+    const user_id = (_b = req === null || req === void 0 ? void 0 : req.user) === null || _b === void 0 ? void 0 : _b.userId;
+    const result = yield order_details_service_1.OrderDetailsService.getSingleOrderDetails(id, user_id);
     (0, sendResponse_1.default)(res, {
         success: true,
         statusCode: http_status_1.default.OK,

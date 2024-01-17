@@ -17,6 +17,8 @@ router.post("/", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_A
 });
 // get all Books
 router.get("/", book_controller_1.BookController.getAllBooks);
+// get books of a sub category
+router.get("/sub-category/:sub_category_id", book_controller_1.BookController.getAllBooksOfASubCategory);
 // get single Book
 router.get("/:id", book_controller_1.BookController.getSingleBook);
 // update single Book

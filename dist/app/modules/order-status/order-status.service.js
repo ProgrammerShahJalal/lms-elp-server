@@ -37,17 +37,17 @@ const createOrderStatus = (payload) => __awaiter(void 0, void 0, void 0, functio
     // to check if the user is present of the provided user_id
     const user = yield user_model_1.User.findById(user_id);
     if (!user) {
-        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "User not found!");
+        throw new ApiError_1.default(http_status_1.default.OK, "User not found!");
     }
     // to check if the order details is present of the provided order_details_id
     const order_details = yield order_model_1.Order.findById(order_details_id);
     if (!order_details) {
-        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "Order details found!");
+        throw new ApiError_1.default(http_status_1.default.OK, "Order details not found!");
     }
     // to check if the shipping address is present of the provided shipping address id
     const shippingAddress = yield shipping_address_model_1.ShippingAddress.findById(shipping_address_id);
     if (!shippingAddress) {
-        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "Shipping address not found!");
+        throw new ApiError_1.default(http_status_1.default.OK, "Shipping address not found!");
     }
     const result = yield order_status_model_1.OrderStatus.create(payload);
     return result;

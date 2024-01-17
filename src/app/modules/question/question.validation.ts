@@ -5,10 +5,7 @@ const createQuestionZodSchema = z.object({
     question: z.string({
       required_error: "Question is required!",
     }),
-    a: z.string({}).optional(),
-    b: z.string({}).optional(),
-    c: z.string({}).optional(),
-    d: z.string({}).optional(),
+    options: z.array(z.object({})).optional(),
     correct_answer: z.string({}).optional(),
     exam_id: z.string({
       required_error: "Exam id is required",
@@ -23,10 +20,7 @@ const createQuestionZodSchema = z.object({
 const updateQuestionZodSchema = z.object({
   body: z.object({
     question: z.string({}).optional(),
-    a: z.string({}).optional(),
-    b: z.string({}).optional(),
-    c: z.string({}).optional(),
-    d: z.string({}).optional(),
+    options: z.string({}).optional(),
     correct_answer: z.string({}).optional(),
     exam_id: z.string({}).optional(),
     exam_type: z.enum(["0", "1"] as const).optional(),
