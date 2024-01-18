@@ -86,7 +86,6 @@ const updateShippingAddress = (0, catchAsync_1.default)((req, res, next) => __aw
 }));
 const deleteShippingAddress = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const payload = req.body;
     const result = yield shipping_address_service_1.ShippingAddressService.deleteShippingAddress(id);
     (0, sendResponse_1.default)(res, {
         success: true,

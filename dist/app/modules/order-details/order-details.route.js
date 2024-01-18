@@ -14,7 +14,7 @@ const router = (0, express_1.Router)();
 // create OrderDetails
 router.post("/", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */, "admin" /* ENUM_USER_ROLE.ADMIN */, "student" /* ENUM_USER_ROLE.STUDENT */), (0, validateRequest_1.default)(order_details_validation_1.OrderDetailsValidation.createOrderDetailsSchema), order_details_controller_1.OrderDetailsController.createOrderDetails);
 // get all OrderDetails
-router.get("/", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */, "admin" /* ENUM_USER_ROLE.ADMIN */, "student" /* ENUM_USER_ROLE.STUDENT */), order_details_controller_1.OrderDetailsController.getAllOrderDetails);
+router.get("/", (0, authRole_1.default)("super_admin" /* ENUM_USER_ROLE.SUPER_ADMIN */, "admin" /* ENUM_USER_ROLE.ADMIN */), order_details_controller_1.OrderDetailsController.getAllOrderDetails);
 // get all Order Details of an user
 router.get("/my-order-details", (0, authRole_1.default)("student" /* ENUM_USER_ROLE.STUDENT */), order_details_controller_1.OrderDetailsController.getMyOrderDetails);
 // get single OrderDetails

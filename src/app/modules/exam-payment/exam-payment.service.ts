@@ -4,6 +4,7 @@ import { IExamPayment } from "./exam-payment.interface";
 import { User } from "../user/user.model";
 import { Exam } from "../exam/exam.model";
 import { ExamPayment } from "./exam-payment.model";
+import { Payment } from "../payment/payment.model";
 
 // create Exam Payment
 const createExamPayment = async (
@@ -19,6 +20,16 @@ const createExamPayment = async (
   const exam = await Exam.findById(exam_id);
   if (!exam) {
     throw new ApiError(httpStatus.NOT_FOUND, "Exam not found!");
+  }
+
+  const validPayment = await Payment.findOne({ trxID: payload?.trx_id });
+
+  if (!validPayment) {
+    throw new ApiError(httpStatus.OK, "Invalid transaction id!");
+  }
+
+  if (Number(exam?.fee) > Number(validPayment?.amount)) {
+    throw new ApiError(httpStatus.OK, "Invalid payment amount!");
   }
 
   const result = await ExamPayment.create(payload);

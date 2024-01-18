@@ -23,11 +23,7 @@ router.post(
 // get all OrderDetails
 router.get(
   "/",
-  authRole(
-    ENUM_USER_ROLE.SUPER_ADMIN,
-    ENUM_USER_ROLE.ADMIN,
-    ENUM_USER_ROLE.STUDENT
-  ),
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
   OrderDetailsController.getAllOrderDetails
 );
 

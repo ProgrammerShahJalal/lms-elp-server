@@ -22,6 +22,12 @@ router.post(
 // get all Books
 router.get("/", BookController.getAllBooks);
 
+// get books of a sub category
+router.get(
+  "/sub-category/:sub_category_id",
+  BookController.getAllBooksOfASubCategory
+);
+
 // get single Book
 router.get("/:id", BookController.getSingleBook);
 

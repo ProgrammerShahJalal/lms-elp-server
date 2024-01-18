@@ -6,7 +6,7 @@ import { Book } from "./book.model";
 import { IPaginationOptions } from "../../../interfaces/pagination";
 import { bookSearchableFields } from "./book.constants";
 import { paginationHelpers } from "../../helpers/paginationHelpers";
-import { SortOrder } from "mongoose";
+import mongoose, { SortOrder } from "mongoose";
 import { IGenericResponse } from "../../../interfaces/common";
 import { IUploadFile } from "../../../interfaces/file";
 import { Request } from "express";
@@ -79,7 +79,15 @@ const getAllBooks = async (
     .sort(sortConditions)
     .skip(skip)
     .limit(limit)
-    .populate("course_id");
+    .populate({
+      path: "course_id",
+      populate: {
+        path: "sub_category_id",
+        populate: {
+          path: "category_id",
+        },
+      },
+    });
   const total = await Book.countDocuments(whereConditions);
 
   return {
@@ -91,6 +99,60 @@ const getAllBooks = async (
     data: result,
   };
 };
+
+const getAllBooksOfASubCategory = async (
+  sub_category_id: string
+): Promise<IBook[]> => {
+  const allBooks = await Book.find({}).populate({
+    path: "course_id",
+    populate: {
+      path: "sub_category_id",
+      populate: {
+        path: "category_id",
+      },
+    },
+  });
+
+  let result: IBook[] = [];
+  if (allBooks?.length) {
+    result = allBooks?.filter(
+      (book) =>
+        // @ts-ignore
+        book?.course_id?.sub_category_id?._id.toString() === sub_category_id
+    );
+  }
+  return result;
+};
+
+// const getAllBooksOfASubCategory = async (
+//   sub_category_id: string
+// ): Promise<IBook[]> => {
+//   const result = await Book.aggregate([
+//     {
+//       $lookup: {
+//         from: "Course",
+//         localField: "course_id",
+//         foreignField: "_id",
+//         as: "course",
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'SubCategory',
+//         localField: 'course.sub_category_id',
+//         foreignField: '_id',
+//         as: 'sub_category',
+//       },
+//     },
+//     {
+//       $match: {
+//         'sub_category._id': mongoose.Types.ObjectId(sub_category_id),
+//       },
+//     },
+//   ]);
+
+//   return result;
+// };
 
 // get single Book
 const getSingleBook = async (id: string): Promise<IBook | null> => {
@@ -154,6 +216,7 @@ const deleteBook = async (id: string) => {
 export const BookService = {
   addBook,
   getAllBooks,
+  getAllBooksOfASubCategory,
   getSingleBook,
   updateBook,
   deleteBook,

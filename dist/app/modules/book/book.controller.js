@@ -40,6 +40,16 @@ const getAllBooks = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, vo
         data: result,
     });
 }));
+const getAllBooksOfASubCategory = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { sub_category_id } = req.params;
+    const result = yield book_service_1.BookService.getAllBooksOfASubCategory(sub_category_id);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Books fetched successfully!",
+        data: result,
+    });
+}));
 const getSingleBook = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const result = yield book_service_1.BookService.getSingleBook(id);
@@ -72,6 +82,7 @@ const deleteBook = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
 exports.BookController = {
     addBook,
     getAllBooks,
+    getAllBooksOfASubCategory,
     getSingleBook,
     updateBook,
     deleteBook,

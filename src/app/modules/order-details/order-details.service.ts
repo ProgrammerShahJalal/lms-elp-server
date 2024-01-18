@@ -77,6 +77,7 @@ const getAllOrderDetails = async (
   const result = await OrderDetails.find(whereConditions)
     .sort(sortConditions)
     .skip(skip)
+    .populate("user_id")
     .limit(limit);
   const total = await OrderDetails.countDocuments(whereConditions);
 
