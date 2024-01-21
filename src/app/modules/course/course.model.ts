@@ -11,10 +11,11 @@ const courseSchema = new Schema<ICourse>(
       required: true,
       ref: "SubCategory",
     },
-    category_id: { type: String },
+    category_id: { type: Schema.Types.ObjectId, ref: "Category" },
     description: { type: String, required: true },
     banner: { type: String },
     syllabus: { type: String },
+    routine: { type: String },
     study_materials: { type: String },
   },
   { timestamps: true, toJSON: { virtuals: true } }

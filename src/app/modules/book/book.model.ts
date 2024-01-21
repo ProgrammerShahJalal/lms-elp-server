@@ -10,8 +10,9 @@ const bookSchema = new Schema<IBook>(
     description: { type: String },
     cover_page: { type: String },
     format: { type: String, required: true },
+    sample_pdf_link: { type: String },
     pdf_link: { type: String },
-    course_id: { type: Schema.Types.ObjectId, ref: "Course" },
+    course_id: [{ type: Schema.Types.ObjectId, ref: "Course" }],
   },
   { timestamps: true, toJSON: { virtuals: true } }
 );

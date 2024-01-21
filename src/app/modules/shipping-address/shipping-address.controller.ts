@@ -7,16 +7,8 @@ import ApiError from "../../../errors/ApiError";
 
 const createShippingAddress = catchAsync(
   async (req: Request, res: Response) => {
-    const verifiedUser = req?.user;
     const payload = req.body;
-
-    if (
-      verifiedUser?.role !== "super_admin" &&
-      verifiedUser?.role !== "admin" &&
-      payload.user_id !== verifiedUser?.userId
-    ) {
-      throw new ApiError(httpStatus.OK, "Unauthorized! Login to your account.");
-    }
+    payload.user_id = req?.user?.userId;
 
     const result = await ShippingAddressService.createShippingAddress(payload);
 
@@ -76,21 +68,8 @@ const getMyShippingAddress = catchAsync(async (req: Request, res: Response) => {
 
 const updateShippingAddress = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const verifiedUser = req?.user;
     const payload = req.body;
-
-    if (payload.user_id) {
-      if (
-        verifiedUser?.role !== "super_admin" &&
-        verifiedUser?.role !== "admin" &&
-        verifiedUser?.userId !== payload.user_id
-      ) {
-        throw new ApiError(
-          httpStatus.OK,
-          "Unauthorized! Login to your account."
-        );
-      }
-    }
+    payload.user_id = req?.user?.userId;
 
     const result = await ShippingAddressService.updateShippingAddress(payload);
 

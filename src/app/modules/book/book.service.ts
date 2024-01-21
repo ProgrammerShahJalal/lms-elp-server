@@ -19,7 +19,7 @@ const addBook = async (req: Request): Promise<IBook> => {
   if (course_id) {
     const course = await Course.findById(course_id);
     if (!course) {
-      throw new ApiError(httpStatus.NOT_FOUND, "Course not found!");
+      throw new ApiError(httpStatus.OK, "Course not found!");
     }
   }
 
@@ -81,10 +81,13 @@ const getAllBooks = async (
     .limit(limit)
     .populate({
       path: "course_id",
+      select: "title membership_type title",
       populate: {
         path: "sub_category_id",
+        select: "title",
         populate: {
           path: "category_id",
+          select: "title",
         },
       },
     });
@@ -100,66 +103,80 @@ const getAllBooks = async (
   };
 };
 
-const getAllBooksOfASubCategory = async (
-  sub_category_id: string
-): Promise<IBook[]> => {
-  const allBooks = await Book.find({}).populate({
-    path: "course_id",
-    populate: {
-      path: "sub_category_id",
-      populate: {
-        path: "category_id",
-      },
-    },
-  });
-
-  let result: IBook[] = [];
-  if (allBooks?.length) {
-    result = allBooks?.filter(
-      (book) =>
-        // @ts-ignore
-        book?.course_id?.sub_category_id?._id.toString() === sub_category_id
-    );
-  }
-  return result;
-};
-
 // const getAllBooksOfASubCategory = async (
 //   sub_category_id: string
 // ): Promise<IBook[]> => {
-//   const result = await Book.aggregate([
-//     {
-//       $lookup: {
-//         from: "Course",
-//         localField: "course_id",
-//         foreignField: "_id",
-//         as: "course",
+//   const allBooks = await Book.find({}).populate({
+//     path: "course_id",
+//     populate: {
+//       path: "sub_category_id",
+//       populate: {
+//         path: "category_id",
 //       },
 //     },
-//     {
-//       $lookup: {
-//         from: 'SubCategory',
-//         localField: 'course.sub_category_id',
-//         foreignField: '_id',
-//         as: 'sub_category',
-//       },
-//     },
-//     {
-//       $match: {
-//         'sub_category._id': mongoose.Types.ObjectId(sub_category_id),
-//       },
-//     },
-//   ]);
+//   });
 
+//   let result: IBook[] = [];
+//   if (allBooks?.length) {
+//     result = allBooks?.filter(
+//       (book) =>
+//         // @ts-ignore
+//         book?.course_id?.sub_category_id?._id.toString() === sub_category_id
+//     );
+//   }
 //   return result;
 // };
+
+const getAllBooksOfASubCategory = async (
+  sub_category_id: string
+): Promise<IBook[]> => {
+  const result = await Book.aggregate([
+    {
+      $lookup: {
+        from: "courses",
+        localField: "course_id",
+        foreignField: "_id",
+        as: "courses",
+      },
+    },
+    {
+      $unwind: "$courses",
+    },
+    {
+      $match: {
+        "courses.sub_category_id": new mongoose.Types.ObjectId(sub_category_id),
+      },
+    },
+    {
+      $project: {
+        courses: 0, // Exclude the 'courses' field
+      },
+    },
+  ]);
+
+  return result;
+};
+
+// get books of a course
+const getBooksOfACourse = async (course_id: string): Promise<IBook[]> => {
+  const result = await Book.aggregate([
+    {
+      $match: {
+        course_id: {
+          $elemMatch: { $eq: new mongoose.Types.ObjectId(course_id) },
+        },
+      },
+    },
+  ]);
+  return result;
+};
 
 // get single Book
 const getSingleBook = async (id: string): Promise<IBook | null> => {
   const result = await Book.findById(id);
 
   if (!result) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Book not found!");
+    throw new ApiError(httpStatus.OK, "Book not found!");
   }
 
   return result;
@@ -170,7 +187,7 @@ const updateBook = async (req: Request): Promise<IBook | null> => {
   // find book of given id
   const book = await Book.findById(req.params.id);
   if (!book) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Book not found!");
+    throw new ApiError(httpStatus.OK, "Book not found!");
   }
 
   // if image is given, upload new, and delete old one
@@ -200,7 +217,7 @@ const deleteBook = async (id: string) => {
   const book = await Book.findById(id);
 
   if (!book) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Book not found!");
+    throw new ApiError(httpStatus.OK, "Book not found!");
   } else {
     if (book.cover_page) {
       // delete that book cover page from cloudinary
@@ -217,6 +234,7 @@ export const BookService = {
   addBook,
   getAllBooks,
   getAllBooksOfASubCategory,
+  getBooksOfACourse,
   getSingleBook,
   updateBook,
   deleteBook,

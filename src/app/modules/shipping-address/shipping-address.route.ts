@@ -10,11 +10,7 @@ const router = Router();
 // create shipping address
 router.post(
   "/",
-  authRole(
-    ENUM_USER_ROLE.SUPER_ADMIN,
-    ENUM_USER_ROLE.ADMIN,
-    ENUM_USER_ROLE.STUDENT
-  ),
+  authRole(ENUM_USER_ROLE.STUDENT),
   validateRequest(ShippingAddressValidation.createShippingAddressZodSchema),
   ShippingAddressController.createShippingAddress
 );
@@ -29,11 +25,7 @@ router.get(
 // get single shipping address
 router.get(
   "/my-shipping-address",
-  authRole(
-    ENUM_USER_ROLE.SUPER_ADMIN,
-    ENUM_USER_ROLE.ADMIN,
-    ENUM_USER_ROLE.STUDENT
-  ),
+  authRole(ENUM_USER_ROLE.STUDENT),
   ShippingAddressController.getMyShippingAddress
 );
 
@@ -51,11 +43,7 @@ router.get(
 // update single shipping address
 router.patch(
   "/update",
-  authRole(
-    ENUM_USER_ROLE.SUPER_ADMIN,
-    ENUM_USER_ROLE.ADMIN,
-    ENUM_USER_ROLE.STUDENT
-  ),
+  authRole(ENUM_USER_ROLE.STUDENT),
   validateRequest(ShippingAddressValidation.updateShippingAddressZodSchema),
   ShippingAddressController.updateShippingAddress
 );

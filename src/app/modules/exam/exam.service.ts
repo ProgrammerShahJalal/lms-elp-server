@@ -10,6 +10,9 @@ import { IGenericResponse } from "../../../interfaces/common";
 import { SortOrder } from "mongoose";
 import { ExamPayment } from "../exam-payment/exam-payment.model";
 import { ExamResult } from "../exam-result/exam-result.model";
+import { IExamPayment } from "../exam-payment/exam-payment.interface";
+import { User } from "../user/user.model";
+import { Payment } from "../payment/payment.model";
 
 // create exam
 const createExam = async (payload: IExam): Promise<IExam> => {
@@ -18,11 +21,40 @@ const createExam = async (payload: IExam): Promise<IExam> => {
   if (course_id) {
     const course = await Course.findById(course_id);
     if (!course) {
-      throw new ApiError(httpStatus.NOT_FOUND, "Course not found!");
+      throw new ApiError(httpStatus.OK, "Course not found!");
     }
   }
 
   const result = await Exam.create(payload);
+
+  return result;
+};
+
+// Buy an exam
+const BuyAnExam = async (payload: IExamPayment): Promise<IExamPayment> => {
+  // if the provided user_id have the user or not in db
+  const { user_id, exam_id } = payload;
+  const user = await User.findById(user_id);
+  if (!user) {
+    throw new ApiError(httpStatus.OK, "User not found!");
+  }
+  // if the provided exam_id have the exam or not in db
+  const exam = await Exam.findById(exam_id);
+  if (!exam) {
+    throw new ApiError(httpStatus.OK, "Exam not found!");
+  }
+
+  const validPayment = await Payment.findOne({ trxID: payload?.trx_id });
+
+  if (!validPayment) {
+    throw new ApiError(httpStatus.OK, "Invalid transaction id!");
+  }
+
+  if (Number(exam?.fee) > Number(validPayment?.amount)) {
+    throw new ApiError(httpStatus.OK, "Invalid payment amount!");
+  }
+
+  const result = await ExamPayment.create(payload);
 
   return result;
 };
@@ -102,7 +134,7 @@ const getMyDueExams = async (user_id: string): Promise<string[] | null> => {
   }
 
   if (!dueExamIds.length) {
-    throw new ApiError(httpStatus.NOT_FOUND, "No exam due for you!");
+    throw new ApiError(httpStatus.OK, "No exam due for you!");
   }
 
   return dueExamIds;
@@ -113,7 +145,7 @@ const getSingleExam = async (id: string): Promise<IExam | null> => {
   const result = await Exam.findById(id).populate("course_id");
 
   if (!result) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Exam not found!");
+    throw new ApiError(httpStatus.OK, "Exam not found!");
   }
 
   return result;
@@ -139,6 +171,7 @@ const deleteExam = async (id: string) => {
 
 export const ExamService = {
   createExam,
+  BuyAnExam,
   getAllExams,
   getMyDueExams,
   getSingleExam,

@@ -16,7 +16,7 @@ const createQuestion = async (payload: IQuestion): Promise<IQuestion> => {
   if (exam_id) {
     const exam = await Exam.findById(exam_id);
     if (!exam) {
-      throw new ApiError(httpStatus.NOT_FOUND, "Exam not found!");
+      throw new ApiError(httpStatus.OK, "Exam not found!");
     }
 
     // if adding this question to the exam exceeds the total_marks limit for the exam
@@ -30,7 +30,7 @@ const createQuestion = async (payload: IQuestion): Promise<IQuestion> => {
     );
     if (totalMarkQuestionAdded + payload.mark > total_marks) {
       throw new ApiError(
-        httpStatus.BAD_REQUEST,
+        httpStatus.OK,
         `Adding this question exceeds ${total_marks} marks for this exam.`
       );
     }
@@ -107,7 +107,7 @@ const getSingleQuestion = async (id: string): Promise<IQuestion | null> => {
 
   // if question not found, throw error
   if (!result) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Question not found!");
+    throw new ApiError(httpStatus.OK, "Question not found!");
   }
 
   return result;
@@ -123,10 +123,7 @@ const updateQuestion = async (
   });
 
   if (!result) {
-    throw new ApiError(
-      httpStatus.NOT_FOUND,
-      "Couldn't update. Question not found!"
-    );
+    throw new ApiError(httpStatus.OK, "Couldn't update. Question not found!");
   }
   return result;
 };
@@ -136,10 +133,7 @@ const deleteQuestion = async (id: string) => {
   const result = await Question.findByIdAndDelete(id);
 
   if (!result) {
-    throw new ApiError(
-      httpStatus.NOT_FOUND,
-      "Couldn't delete. Question not found!"
-    );
+    throw new ApiError(httpStatus.OK, "Couldn't delete. Question not found!");
   }
   return result;
 };

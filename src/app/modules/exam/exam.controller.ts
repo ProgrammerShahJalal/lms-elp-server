@@ -6,6 +6,7 @@ import { ExamService } from "./exam.service";
 import { examFilterableFields } from "./exam.constants";
 import pick from "../../../shared/pick";
 import { paginationFields } from "../../constants/pagination";
+import { ExamPaymentService } from "../exam-payment/exam-payment.service";
 
 const createExam = catchAsync(async (req: Request, res: Response) => {
   const result = await ExamService.createExam(req.body);
@@ -14,6 +15,17 @@ const createExam = catchAsync(async (req: Request, res: Response) => {
     success: true,
     statusCode: httpStatus.OK,
     message: "Exam added successfully!",
+    data: result,
+  });
+});
+
+const BuyAnExam = catchAsync(async (req: Request, res: Response) => {
+  const result = await ExamPaymentService.createExamPayment(req.body);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Exam fee paid(bought) successfully!",
     data: result,
   });
 });
@@ -82,6 +94,7 @@ const deleteExam = catchAsync(async (req: Request, res: Response) => {
 
 export const ExamController = {
   createExam,
+  BuyAnExam,
   getAllExams,
   getMyDueExams,
   getSingleExam,

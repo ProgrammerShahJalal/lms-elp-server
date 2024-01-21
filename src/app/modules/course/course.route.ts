@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { CourseController } from "./course.controller";
-import validateRequest from "../../middlewares/validateRequest";
 import authRole from "../../middlewares/authRole";
 import { ENUM_USER_ROLE } from "../../enums/user";
 import { CourseValidation } from "./course.validation";
 import { FileUploadHelper } from "../../helpers/fileUploadHelper";
+import validateRequest from "../../middlewares/validateRequest";
+import { SubscriptionHistoryValidation } from "../subscription-history/subscription-history.validation";
 
 const router = Router();
 
@@ -21,8 +22,41 @@ router.post(
   }
 );
 
+router.post(
+  "/buy-a-course",
+  authRole(
+    ENUM_USER_ROLE.SUPER_ADMIN,
+    ENUM_USER_ROLE.ADMIN,
+    ENUM_USER_ROLE.STUDENT
+  ),
+  validateRequest(
+    SubscriptionHistoryValidation.createSubscriptionHistorySchema
+  ),
+  CourseController.BuyACourse
+);
+
+// buy all courses of a sub category
+router.post(
+  "/buy-all-of-a-sub-category",
+  authRole(
+    ENUM_USER_ROLE.SUPER_ADMIN,
+    ENUM_USER_ROLE.ADMIN,
+    ENUM_USER_ROLE.STUDENT
+  ),
+  validateRequest(CourseValidation.buyAllCoursesOfASubCategorySchema),
+  CourseController.BuyAllCoursesOfASubCategory
+);
+
 // get all courses
 router.get("/", CourseController.getAllCourses);
+
+router.get(
+  "/total-cost-of-all-courses-of-a-sub-cat",
+  CourseController.GetTotalCostsOfSubCategory
+);
+
+// get all course routines
+router.get("/routines", CourseController.getAllRoutines);
 
 // get single Course
 router.get("/:id", CourseController.getSingleCourse);

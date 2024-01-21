@@ -76,7 +76,7 @@ const getSingleSettings = async (id: string): Promise<ISettings | null> => {
   const result = await Settings.findById(id);
 
   if (!result) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Settings not found!");
+    throw new ApiError(httpStatus.OK, "Settings not found!");
   }
 
   return result;

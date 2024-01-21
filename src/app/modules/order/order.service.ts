@@ -44,7 +44,6 @@ const createOrder = async (
     let shippingCharge;
     const orders: Partial<IOrder>[] = [];
 
-    // Use map instead of forEach for asynchronous operations
     const orderPromises = cartItems.map(async (cartItem) => {
       const book = await Book.findById(cartItem?.book_id).session(session);
       const order = await Order.create(
@@ -78,7 +77,7 @@ const createOrder = async (
         Number(cartItem?.quantity);
     });
 
-    if (totalPrice > Number(validPayment?.amount)) {
+    if (totalPrice !== Number(validPayment?.amount)) {
       throw new ApiError(httpStatus.OK, "Invalid payment amount!");
     }
 

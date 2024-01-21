@@ -4,6 +4,7 @@ import validateRequest from "../../middlewares/validateRequest";
 import authRole from "../../middlewares/authRole";
 import { ENUM_USER_ROLE } from "../../enums/user";
 import { ExamValidation } from "./exam.validation";
+import { ExamPaymentValidation } from "../exam-payment/exam-payment.validation";
 
 const router = Router();
 
@@ -13,6 +14,18 @@ router.post(
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
   validateRequest(ExamValidation.createExamZodSchema),
   ExamController.createExam
+);
+
+// Buy an exam
+router.post(
+  "/buy-an-exam",
+  authRole(
+    ENUM_USER_ROLE.SUPER_ADMIN,
+    ENUM_USER_ROLE.ADMIN,
+    ENUM_USER_ROLE.STUDENT
+  ),
+  validateRequest(ExamPaymentValidation.createExamPaymentZodSchema),
+  ExamController.BuyAnExam
 );
 
 // get all exams

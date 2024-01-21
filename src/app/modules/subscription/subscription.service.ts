@@ -1,7 +1,6 @@
 import httpStatus from "http-status";
 import ApiError from "../../../errors/ApiError";
 import { ISubscription, ISubscriptionFilters } from "./subscription.interface";
-import { SubCategory } from "../sub-category/sub-category.model";
 import { IPaginationOptions } from "../../../interfaces/pagination";
 import { IGenericResponse } from "../../../interfaces/common";
 import { paginationHelpers } from "../../helpers/paginationHelpers";
@@ -18,7 +17,7 @@ const createSubscription = async (
   const { course_id } = payload;
   const course = await Course.findById(course_id);
   if (!course) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Course not found!");
+    throw new ApiError(httpStatus.OK, "Course not found!");
   }
 
   const result = await Subscription.create(payload);
@@ -89,7 +88,7 @@ const getSingleSubscription = async (
 
   // if the Subscription is not found, throw error
   if (!result) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Subscription not found!");
+    throw new ApiError(httpStatus.OK, "Subscription not found!");
   }
 
   return result;
@@ -108,7 +107,7 @@ const updateSubscription = async (
   // if the Subscription you want to update was not present, i.e. not updated, throw error
   if (!result) {
     throw new ApiError(
-      httpStatus.NOT_FOUND,
+      httpStatus.OK,
       "Couldn't update. Subscription not found!"
     );
   }
@@ -124,7 +123,7 @@ const deleteSubscription = async (id: string) => {
   // if the Subscription you want to delete was not present, i.e. not deleted, throw error
   if (!result) {
     throw new ApiError(
-      httpStatus.NOT_FOUND,
+      httpStatus.OK,
       "Couldn't delete. Subscription not found!"
     );
   }

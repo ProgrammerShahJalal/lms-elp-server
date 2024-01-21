@@ -42,7 +42,7 @@ const getAllSubscriptionHistorys = catchAsync(
 
 const getMySubscriptionHistories = catchAsync(
   async (req: Request, res: Response) => {
-    const user_id = req.user?.userId;
+    const user_id = req?.user?.userId;
     const result = await SubscriptionHistoryService.getMySubscriptionHistories(
       user_id
     );
@@ -50,7 +50,7 @@ const getMySubscriptionHistories = catchAsync(
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
-      message: "Subscription histories fetched successfully!",
+      message: "Subscription histories d fetched successfully!",
       data: result,
     });
   }

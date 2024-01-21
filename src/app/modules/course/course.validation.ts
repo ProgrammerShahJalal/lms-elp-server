@@ -21,7 +21,33 @@ const createCourseSchema = z.object({
   }),
   banner: z.string({}).optional(),
   syllabus: z.string({}).optional(),
+  routine: z.string({}).optional(),
   study_materials: z.string({}).optional(),
+});
+
+const getTotalCostsOfSubCategorySchema = z.object({
+  body: z.object({
+    sub_category_id: z.string({
+      required_error: "Sub category id is required!",
+    }),
+  }),
+});
+
+const buyAllCoursesOfASubCategorySchema = z.object({
+  body: z.object({
+    sub_category_id: z.string({
+      required_error: "Sub category id is required!",
+    }),
+    user_id: z.string({
+      required_error: "Sub category id is required!",
+    }),
+    subscription_duration_in_months: z.number({
+      required_error: "Subscription duration is required!",
+    }),
+    trx_id: z.string({
+      required_error: "Transaction id is required!",
+    }),
+  }),
 });
 
 const updateCourseZodSchema = z.object({
@@ -32,10 +58,13 @@ const updateCourseZodSchema = z.object({
   description: z.string({}).optional(),
   banner: z.string({}).optional(),
   syllabus: z.string({}).optional(),
+  routine: z.string({}).optional(),
   study_materials: z.string({}).optional(),
 });
 
 export const CourseValidation = {
   createCourseSchema,
+  getTotalCostsOfSubCategorySchema,
+  buyAllCoursesOfASubCategorySchema,
   updateCourseZodSchema,
 };

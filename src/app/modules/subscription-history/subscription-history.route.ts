@@ -7,7 +7,7 @@ import { SubscriptionHistoryController } from "./subscription-history.controller
 
 const router = Router();
 
-// create Subscription History
+// create Subscription History(buy a course)
 router.post(
   "/",
   validateRequest(
@@ -15,6 +15,15 @@ router.post(
   ),
   SubscriptionHistoryController.createSubscriptionHistory
 );
+
+// // create Subscription History(buy all course of a sub-category)
+// router.post(
+//   "/",
+//   validateRequest(
+//     SubscriptionHistoryValidation.createSubscriptionHistorySchema
+//   ),
+//   SubscriptionHistoryController.createSubscriptionHistory
+// );
 
 // get all SubscriptionHistorys
 router.get("/", SubscriptionHistoryController.getAllSubscriptionHistorys);
