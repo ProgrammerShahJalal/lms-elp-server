@@ -6,10 +6,6 @@ import { CourseService } from "./course.service";
 import { courseFilterableFields } from "./course.constants";
 import { paginationFields } from "../../constants/pagination";
 import pick from "../../../shared/pick";
-import { SubscriptionHistory } from "../subscription-history/subscription-history.model";
-import ApiError from "../../../errors/ApiError";
-import { jwtHelpers } from "../../helpers/jwtHelpers";
-import config from "../../../config";
 
 const createCourse = catchAsync(async (req: Request, res: Response) => {
   const result = await CourseService.createCourse(req);
@@ -21,6 +17,30 @@ const createCourse = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
+const BuyACourse = catchAsync(async (req: Request, res: Response) => {
+  const result = await CourseService.BuyACourse(req.body);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Course subscribed successfully!",
+    data: result,
+  });
+});
+
+const BuyAllCoursesOfASubCategory = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await CourseService.BuyAllCoursesOfASubCategory(req.body);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "All courses bought successfully!",
+      data: result,
+    });
+  }
+);
 
 const getAllCourses = catchAsync(async (req: Request, res: Response) => {
   const filters = pick(req.query, courseFilterableFields);
@@ -34,6 +54,30 @@ const getAllCourses = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
+const getAllRoutines = catchAsync(async (req: Request, res: Response) => {
+  const result = await CourseService.getAllRoutines();
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Course routines fetched successfully!",
+    data: result,
+  });
+});
+
+const GetTotalCostsOfSubCategory = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await CourseService.GetTotalCostsOfSubCategory(req.body);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Prices fetched successfully!",
+      data: result,
+    });
+  }
+);
 
 const getSingleCourse = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -91,7 +135,11 @@ const deleteCourse = catchAsync(async (req: Request, res: Response) => {
 
 export const CourseController = {
   createCourse,
+  BuyACourse,
+  BuyAllCoursesOfASubCategory,
   getAllCourses,
+  GetTotalCostsOfSubCategory,
+  getAllRoutines,
   getSingleCourse,
   updateCourse,
   deleteCourse,

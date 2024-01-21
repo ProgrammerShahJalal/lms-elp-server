@@ -28,6 +28,9 @@ router.get(
   BookController.getAllBooksOfASubCategory
 );
 
+// get books of a course
+router.get("/course/:course_id", BookController.getAllBooksOfACourse);
+
 // get single Book
 router.get("/:id", BookController.getSingleBook);
 

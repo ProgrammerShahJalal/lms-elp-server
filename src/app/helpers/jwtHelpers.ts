@@ -17,7 +17,7 @@ const verifyToken = (token: string, secret: Secret) => {
     const isVerified = jwt.verify(token, secret) as JwtPayload;
     return isVerified;
   } catch (error) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Invalid token");
+    throw new ApiError(httpStatus.OK, "Invalid token");
   }
 };
 

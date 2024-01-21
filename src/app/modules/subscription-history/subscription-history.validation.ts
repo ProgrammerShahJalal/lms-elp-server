@@ -11,7 +11,6 @@ const createSubscriptionHistorySchema = z.object({
 
 const updateSubscriptionHistoryZodSchema = z.object({
   body: z.object({
-    user_id: z.string({}).optional(),
     course_id: z.string({}).optional(),
     subscription_id: z.string({}).optional(),
     expire_date: z.date({}).optional(),

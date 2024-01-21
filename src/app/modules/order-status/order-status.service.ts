@@ -90,7 +90,7 @@ const getSingleOrderStatus = async (
 
   // if the OrderStatus is not found, throw error
   if (!result) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Order status not found!");
+    throw new ApiError(httpStatus.OK, "Order status not found!");
   }
 
   return result;
@@ -109,7 +109,7 @@ const updateOrderStatus = async (
   // if the OrderStatus you want to update was not present, i.e. not updated, throw error
   if (!result) {
     throw new ApiError(
-      httpStatus.NOT_FOUND,
+      httpStatus.OK,
       "Couldn't update. Order status not found!"
     );
   }
@@ -125,7 +125,7 @@ const deleteOrderStatus = async (id: string) => {
   // if the OrderStatus you want to delete was not present, i.e. not deleted, throw error
   if (!result) {
     throw new ApiError(
-      httpStatus.NOT_FOUND,
+      httpStatus.OK,
       "Couldn't delete. Order status not found!"
     );
   }

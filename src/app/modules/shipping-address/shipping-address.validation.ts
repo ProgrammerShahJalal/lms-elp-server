@@ -2,9 +2,6 @@ import { z } from "zod";
 
 const createShippingAddressZodSchema = z.object({
   body: z.object({
-    user_id: z.string({
-      required_error: "User id is required!",
-    }),
     division: z.string({
       required_error: "Division is required!",
     }),
@@ -31,7 +28,6 @@ const createShippingAddressZodSchema = z.object({
 
 const updateShippingAddressZodSchema = z.object({
   body: z.object({
-    user_id: z.string({}).optional(),
     outside_dhaka: z.boolean({}).optional(),
     division: z.string({}).optional(),
     district: z.string({}).optional(),

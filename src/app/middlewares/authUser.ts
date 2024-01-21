@@ -12,7 +12,7 @@ const authUser =
       //get authorization token
       const token = req.headers.authorization;
       if (!token) {
-        throw new ApiError(httpStatus.UNAUTHORIZED, "You are not authorized");
+        throw new ApiError(httpStatus.OK, "You are not authorized");
       }
       // verify token
       let verifiedUser = null;
@@ -25,13 +25,13 @@ const authUser =
         req.user = verifiedUser; // role  , userId
       } else {
         req.user = null;
-        throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
+        throw new ApiError(httpStatus.OK, "User not found!");
       }
 
       if (verifiedUser.userId === req?.params?.user_id) {
         next();
       } else {
-        throw new ApiError(httpStatus.UNAUTHORIZED, "Permission denied!");
+        throw new ApiError(httpStatus.OK, "Permission denied!");
       }
     } catch (error) {
       next(error);

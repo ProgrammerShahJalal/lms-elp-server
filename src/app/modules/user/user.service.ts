@@ -58,7 +58,7 @@ const login = async (loginInfo: ILoginInfo) => {
   });
 
   if (!requestedUser) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
+    throw new ApiError(httpStatus.OK, "User not found!");
   }
 
   // compare password
@@ -69,7 +69,7 @@ const login = async (loginInfo: ILoginInfo) => {
 
   // if password doesn't match, throw error
   if (!isPasswordMatched) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Invalid credentials!");
+    throw new ApiError(httpStatus.OK, "Invalid credentials!");
   }
 
   const { accessToken, refreshToken } =
@@ -133,7 +133,7 @@ const getAllUsers = async (
   };
 
   if (!result.length) {
-    throw new ApiError(httpStatus.NOT_FOUND, "No user found!");
+    throw new ApiError(httpStatus.OK, "No user found!");
   }
 
   return result;
@@ -146,7 +146,7 @@ const getSingleUser = async (
   const result = await User.findById(user_id);
 
   if (!result) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
+    throw new ApiError(httpStatus.OK, "User not found!");
   }
 
   const { password, ...otherData } = result.toObject();
@@ -161,7 +161,7 @@ const updateUser = async (
   const result = await User.findByIdAndUpdate(user_id, payload, { new: true });
 
   if (!result) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
+    throw new ApiError(httpStatus.OK, "User not found!");
   }
 
   const { password, ...otherData } = result.toObject();
@@ -173,7 +173,7 @@ const deleteUser = async (user_id: string) => {
   const result = await User.findByIdAndDelete(user_id);
 
   if (!result) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
+    throw new ApiError(httpStatus.OK, "User not found!");
   }
 
   return result;

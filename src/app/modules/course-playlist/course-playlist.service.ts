@@ -13,7 +13,7 @@ const createCoursePlaylist = async (
   const { course_id } = payload;
   const course = await Course.findById(course_id);
   if (!course) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Course not found!");
+    throw new ApiError(httpStatus.OK, "Course not found!");
   }
 
   const result = await CoursePlaylist.create(payload);
@@ -26,7 +26,7 @@ const getAllCoursePlaylists = async (): Promise<ICoursePlaylist[]> => {
 
   // if there is no CoursePlaylist, throw error
   if (!result.length) {
-    throw new ApiError(httpStatus.NOT_FOUND, "No course playlist found!");
+    throw new ApiError(httpStatus.OK, "No course playlist found!");
   }
 
   return result;
@@ -60,7 +60,7 @@ const getSingleCoursePlaylist = async (
 
   // if the Course Playlist is not found, throw error
   if (!result) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Course playlist not found!");
+    throw new ApiError(httpStatus.OK, "Course playlist not found!");
   }
 
   return result;
@@ -79,7 +79,7 @@ const updateCoursePlaylist = async (
   // if the CoursePlaylist you want to update was not present, i.e. not updated, throw error
   if (!result) {
     throw new ApiError(
-      httpStatus.NOT_FOUND,
+      httpStatus.OK,
       "Couldn't update. CoursePlaylist not found!"
     );
   }
@@ -95,7 +95,7 @@ const deleteCoursePlaylist = async (id: string) => {
   // if the CoursePlaylist you want to delete was not present, i.e. not deleted, throw error
   if (!result) {
     throw new ApiError(
-      httpStatus.NOT_FOUND,
+      httpStatus.OK,
       "Couldn't delete. CoursePlaylist not found!"
     );
   }

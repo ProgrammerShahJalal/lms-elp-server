@@ -118,7 +118,7 @@ const getSingleOrderDetails = async (
 
   // if the OrderDetails is not found, throw error
   if (!result) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Order details not found!");
+    throw new ApiError(httpStatus.OK, "Order details not found!");
   }
 
   return result;
@@ -137,7 +137,7 @@ const updateOrderDetails = async (
   // if the OrderDetails you want to update was not present, i.e. not updated, throw error
   if (!result) {
     throw new ApiError(
-      httpStatus.NOT_FOUND,
+      httpStatus.OK,
       "Couldn't update. Order status not found!"
     );
   }
@@ -153,7 +153,7 @@ const deleteOrderDetails = async (id: string) => {
   // if the OrderDetails you want to delete was not present, i.e. not deleted, throw error
   if (!result) {
     throw new ApiError(
-      httpStatus.NOT_FOUND,
+      httpStatus.OK,
       "Couldn't delete. Order status not found!"
     );
   }

@@ -17,10 +17,7 @@ const createSubCategory = async (req: Request): Promise<ISubCategory> => {
   // check if the category found of payload category_id
   const category = await Category.findById(req.body.category_id);
   if (!category) {
-    throw new ApiError(
-      httpStatus.NOT_FOUND,
-      "Category not found of your category id"
-    );
+    throw new ApiError(httpStatus.OK, "Category not found of your category id");
   }
 
   if (req.file) {
@@ -109,7 +106,7 @@ const getSingleSubCategory = async (
 
   // if the SubCategory is not found, throw error
   if (!result) {
-    throw new ApiError(httpStatus.NOT_FOUND, "SubCategory not found!");
+    throw new ApiError(httpStatus.OK, "SubCategory not found!");
   }
 
   return result;
@@ -122,7 +119,7 @@ const updateSubCategory = async (
   // find sub-category of given id
   const subCategory = await SubCategory.findById(req.params.id);
   if (!subCategory) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Sub-category not found!");
+    throw new ApiError(httpStatus.OK, "Sub-category not found!");
   }
 
   // if image is given, upload new, and delete old one
@@ -144,7 +141,7 @@ const updateSubCategory = async (
     const category = await Category.findById(req.body.category_id);
     if (!category) {
       throw new ApiError(
-        httpStatus.NOT_FOUND,
+        httpStatus.OK,
         "Category not found on given category_id!"
       );
     }
@@ -167,7 +164,7 @@ const deleteSubCategory = async (id: string) => {
   const subCategory = await SubCategory.findById(id);
 
   if (!subCategory) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Sub-category not found!");
+    throw new ApiError(httpStatus.OK, "Sub-category not found!");
   } else {
     if (subCategory.icon) {
       // delete that sub-category icon from cloudinary

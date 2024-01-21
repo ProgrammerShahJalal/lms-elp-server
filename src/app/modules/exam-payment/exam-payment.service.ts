@@ -14,12 +14,12 @@ const createExamPayment = async (
   const { user_id, exam_id } = payload;
   const user = await User.findById(user_id);
   if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
+    throw new ApiError(httpStatus.OK, "User not found!");
   }
   // if the provided exam_id have the exam or not in db
   const exam = await Exam.findById(exam_id);
   if (!exam) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Exam not found!");
+    throw new ApiError(httpStatus.OK, "Exam not found!");
   }
 
   const validPayment = await Payment.findOne({ trxID: payload?.trx_id });
@@ -28,7 +28,7 @@ const createExamPayment = async (
     throw new ApiError(httpStatus.OK, "Invalid transaction id!");
   }
 
-  if (Number(exam?.fee) > Number(validPayment?.amount)) {
+  if (Number(exam?.fee) !== Number(validPayment?.amount)) {
     throw new ApiError(httpStatus.OK, "Invalid payment amount!");
   }
 
@@ -55,7 +55,7 @@ const getAllExamPayments = async (): Promise<IExamPayment[]> => {
     .populate("user_id");
 
   if (!result.length) {
-    throw new ApiError(httpStatus.NOT_FOUND, "No exam payment found!");
+    throw new ApiError(httpStatus.OK, "No exam payment found!");
   }
   return result;
 };
@@ -78,7 +78,7 @@ const getMyExamPayments = async (user_id: string): Promise<IExamPayment[]> => {
   });
 
   if (!result.length) {
-    throw new ApiError(httpStatus.NOT_FOUND, "No exam payment found!");
+    throw new ApiError(httpStatus.OK, "No exam payment found!");
   }
   return result;
 };
@@ -90,7 +90,7 @@ const getSingleExamPayment = async (
   const result = await ExamPayment.findById(id);
 
   if (!result) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Exam payment not found!");
+    throw new ApiError(httpStatus.OK, "Exam payment not found!");
   }
 
   return result;
@@ -107,7 +107,7 @@ const updateExamPayment = async (
 
   if (!result) {
     throw new ApiError(
-      httpStatus.NOT_FOUND,
+      httpStatus.OK,
       "Couldn't update. Exam payment was not found!"
     );
   }
@@ -121,7 +121,7 @@ const deleteExamPayment = async (id: string) => {
 
   if (!result) {
     throw new ApiError(
-      httpStatus.NOT_FOUND,
+      httpStatus.OK,
       "Couldn't delete. Exam payment wasn't found!"
     );
   }

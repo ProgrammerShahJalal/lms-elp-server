@@ -10,7 +10,10 @@ import { User } from "../user/user.model";
 import { Exam } from "../exam/exam.model";
 import { IGenericResponse } from "../../../interfaces/common";
 import { IPaginationOptions } from "../../../interfaces/pagination";
-import { examResultFilterableFields } from "./exam-result.constants";
+import {
+  examResultFilterableFields,
+  examResultSearchableFields,
+} from "./exam-result.constants";
 import { paginationHelpers } from "../../helpers/paginationHelpers";
 import { SortOrder } from "mongoose";
 
@@ -20,13 +23,13 @@ const createExamResult = async (payload: IExamResult): Promise<IExamResult> => {
   const { user_id, exam_id } = payload;
   const user = await User.findById(user_id);
   if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
+    throw new ApiError(httpStatus.OK, "User not found!");
   }
 
   // if the provided user_id have the user or not in db
   const exam = await Exam.findById(exam_id);
   if (!exam) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Exam not found!");
+    throw new ApiError(httpStatus.OK, "Exam not found!");
   }
 
   let result;
@@ -44,7 +47,7 @@ const createExamResult = async (payload: IExamResult): Promise<IExamResult> => {
     result = await ExamResult.create(payload);
     return result;
   } else {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Invalid exam type!");
+    throw new ApiError(httpStatus.OK, "Invalid exam type!");
   }
 };
 
@@ -91,7 +94,7 @@ const getAllExamResults = async (
 
   if (searchTerm) {
     andConditions.push({
-      $or: examResultFilterableFields.map((field) => ({
+      $or: examResultSearchableFields.map((field) => ({
         [field]: {
           $regex: searchTerm,
           $options: "i",
@@ -123,7 +126,7 @@ const getAllExamResults = async (
     .sort(sortConditions)
     .skip(skip)
     .limit(limit)
-    .populate("course_id");
+    .populate("exam_id");
   const total = await ExamResult.countDocuments(whereConditions);
 
   return {
@@ -141,7 +144,7 @@ const getSingleExamResult = async (id: string): Promise<IExamResult | null> => {
   const result = await ExamResult.findById(id);
 
   if (!result) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Exam result not found!");
+    throw new ApiError(httpStatus.OK, "Exam result not found!");
   }
 
   return result;

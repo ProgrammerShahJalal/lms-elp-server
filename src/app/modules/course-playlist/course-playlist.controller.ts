@@ -43,7 +43,10 @@ const getPlaylistsOfACourse = catchAsync(
     });
 
     if (!subscribed.length) {
-      throw new ApiError(httpStatus.OK, "No subscription found!");
+      throw new ApiError(
+        httpStatus.OK,
+        "No subscription found. You haven't bought this course!"
+      );
     }
 
     const result = await CoursePlaylistService.getPlaylistsOfACourse(course_id);

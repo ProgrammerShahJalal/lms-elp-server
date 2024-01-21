@@ -22,13 +22,13 @@ const createSubscriptionHistory = async (
 
   const user = await User.findById(user_id);
   if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
+    throw new ApiError(httpStatus.OK, "User not found!");
   }
   const subscription = await Subscription.findById(subscription_id).populate(
     "course_id"
   );
   if (!subscription) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Subscription not found!");
+    throw new ApiError(httpStatus.OK, "Subscription not found!");
   }
 
   const validPayment = await Payment.findOne({ trxID: payload?.trx_id });
@@ -37,7 +37,7 @@ const createSubscriptionHistory = async (
     throw new ApiError(httpStatus.OK, "Invalid transaction id!");
   }
 
-  if (Number(subscription?.cost) > Number(validPayment?.amount)) {
+  if (Number(subscription?.cost) !== Number(validPayment?.amount)) {
     throw new ApiError(httpStatus.OK, "Invalid payment amount!");
   }
 
@@ -156,7 +156,7 @@ const getSingleSubscriptionHistory = async (
 
   // if the SubscriptionHistory is not found, throw error
   if (!result) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Subscription history not found!");
+    throw new ApiError(httpStatus.OK, "Subscription history not found!");
   }
 
   return result;
@@ -179,7 +179,7 @@ const updateSubscriptionHistory = async (
   // if the SubscriptionHistory you want to update was not present, i.e. not updated, throw error
   if (!result) {
     throw new ApiError(
-      httpStatus.NOT_FOUND,
+      httpStatus.OK,
       "Couldn't update. Subscription history not found!"
     );
   }
@@ -195,7 +195,7 @@ const deleteSubscriptionHistory = async (id: string) => {
   // if the SubscriptionHistory you want to delete was not present, i.e. not deleted, throw error
   if (!result) {
     throw new ApiError(
-      httpStatus.NOT_FOUND,
+      httpStatus.OK,
       "Couldn't delete. Subscription history not found!"
     );
   }

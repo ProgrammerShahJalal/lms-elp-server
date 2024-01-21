@@ -29,7 +29,7 @@ const getAllCategories = async (): Promise<ICategory[]> => {
 
   // if there is no category, throw error
   if (!result.length) {
-    throw new ApiError(httpStatus.NOT_FOUND, "No category found!");
+    throw new ApiError(httpStatus.OK, "No category found!");
   }
 
   return result;
@@ -41,7 +41,7 @@ const getSingleCategory = async (id: string): Promise<ICategory | null> => {
 
   // if the category is not found, throw error
   if (!result) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Category not found!");
+    throw new ApiError(httpStatus.OK, "Category not found!");
   }
 
   return result;
@@ -52,7 +52,7 @@ const updateCategory = async (req: Request): Promise<ICategory | null> => {
   // find category of given id
   const category = await Category.findById(req.params.id);
   if (!category) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Category not found!");
+    throw new ApiError(httpStatus.OK, "Category not found!");
   }
 
   // if image is given, upload new, and delete old one
@@ -85,7 +85,7 @@ const deleteCategory = async (id: string) => {
   const category = await Category.findById(id);
 
   if (!category) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Category not found!");
+    throw new ApiError(httpStatus.OK, "Category not found!");
   } else {
     if (category.icon) {
       // delete that category icon from cloudinary
