@@ -24,6 +24,7 @@ const createSubscriptionHistory = async (
   if (!user) {
     throw new ApiError(httpStatus.OK, "User not found!");
   }
+
   const subscription = await Subscription.findById(subscription_id).populate(
     "course_id"
   );
@@ -32,11 +33,9 @@ const createSubscriptionHistory = async (
   }
 
   const validPayment = await Payment.findOne({ trxID: payload?.trx_id });
-
   if (!validPayment) {
     throw new ApiError(httpStatus.OK, "Invalid transaction id!");
   }
-
   if (Number(subscription?.cost) !== Number(validPayment?.amount)) {
     throw new ApiError(httpStatus.OK, "Invalid payment amount!");
   }
@@ -49,24 +48,27 @@ const createSubscriptionHistory = async (
       course_id: subscription?.course_id?.id,
       expire_date: { $gt: today },
     });
-  if (alreadyHaveSubscription?.length) {
-    // Calculate the number of days left for the subscription
-    const daysLeft = Math.ceil(
-      (alreadyHaveSubscription[0].expire_date.getTime() - today) /
-        (1000 * 60 * 60 * 24)
-    );
-    throw new ApiError(
-      httpStatus.OK,
-      `You have an active subscription. It will expire in ${daysLeft} days.`
-    );
-  }
+  // finding the subscription that has most number of days
+  const latestSubscription = alreadyHaveSubscription?.sort(
+    (a: ISubscriptionHistory, b: ISubscriptionHistory) =>
+      b.expire_date.getTime() - a.expire_date.getTime()
+  )?.[0];
 
-  payload.course_id = subscription.course_id;
-  payload.amount = subscription.cost;
   let expire_date = new Date();
   expire_date.setMonth(
     expire_date.getMonth() + subscription.subscription_duration_in_months
   );
+  if (alreadyHaveSubscription?.length) {
+    // Calculate the number of days left for the subscription
+    const daysLeft = Math.floor(
+      (latestSubscription.expire_date.getTime() - today) / (1000 * 60 * 60 * 24)
+    );
+    expire_date.setDate(expire_date.getDate() + daysLeft);
+  }
+
+  // setting payload for creating subscription history
+  payload.course_id = subscription.course_id;
+  payload.amount = subscription.cost;
   payload.expire_date = expire_date;
   payload.is_active = payload?.is_active || true;
 
