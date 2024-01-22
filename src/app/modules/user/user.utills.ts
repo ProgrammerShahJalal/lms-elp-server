@@ -27,6 +27,7 @@ const createTokenRefreshTokenForUser = async (
   const payload = {
     userId: user._id,
     role: user.role,
+    permission: user.permission,
   };
 
   // creating access token

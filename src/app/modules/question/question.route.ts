@@ -4,6 +4,7 @@ import authRole from "../../middlewares/authRole";
 import { ENUM_USER_ROLE } from "../../enums/user";
 import { QuestionController } from "./question.controller";
 import { QuestionValidation } from "./question.validation";
+import authPermission from "../../middlewares/authPermission";
 
 const router = Router();
 
@@ -11,6 +12,7 @@ const router = Router();
 router.post(
   "/",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("exam"),
   validateRequest(QuestionValidation.createQuestionZodSchema),
   QuestionController.createQuestion
 );
@@ -19,6 +21,7 @@ router.post(
 router.get(
   "/",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("exam"),
   QuestionController.getAllQuestions
 );
 
@@ -37,6 +40,7 @@ router.get(
 router.get(
   "/:id",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("exam"),
   QuestionController.getSingleQuestion
 );
 
@@ -44,6 +48,7 @@ router.get(
 router.patch(
   "/:id",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("exam"),
   validateRequest(QuestionValidation.updateQuestionZodSchema),
   QuestionController.updateQuestion
 );
@@ -52,6 +57,7 @@ router.patch(
 router.delete(
   "/:id",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("exam"),
   QuestionController.deleteQuestion
 );
 

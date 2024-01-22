@@ -4,6 +4,7 @@ import validateRequest from "../../middlewares/validateRequest";
 import authRole from "../../middlewares/authRole";
 import { ENUM_USER_ROLE } from "../../enums/user";
 import { SubscriptionValidation } from "./subscription.validation";
+import authPermission from "../../middlewares/authPermission";
 
 const router = Router();
 
@@ -11,6 +12,7 @@ const router = Router();
 router.post(
   "/",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("subscription"),
   validateRequest(SubscriptionValidation.createSubscriptionSchema),
   SubscriptionController.createSubscription
 );
@@ -25,6 +27,7 @@ router.get("/:id", SubscriptionController.getSingleSubscription);
 router.patch(
   "/:id",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("subscription"),
   validateRequest(SubscriptionValidation.updateSubscriptionZodSchema),
   SubscriptionController.updateSubscription
 );
@@ -33,6 +36,7 @@ router.patch(
 router.delete(
   "/:id",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("subscription"),
   SubscriptionController.deleteSubscription
 );
 

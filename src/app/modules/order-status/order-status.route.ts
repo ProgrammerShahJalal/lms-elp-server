@@ -4,6 +4,7 @@ import { ENUM_USER_ROLE } from "../../enums/user";
 import { OrderStatusValidation } from "./order-status.validation";
 import authRole from "../../middlewares/authRole";
 import { OrderStatusController } from "./order-status.controller";
+import authPermission from "../../middlewares/authPermission";
 
 const router = Router();
 
@@ -18,6 +19,7 @@ router.post(
 router.get(
   "/",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authRole("order_status"),
   OrderStatusController.getAllOrderStatuss
 );
 
@@ -28,6 +30,7 @@ router.get("/:id", OrderStatusController.getSingleOrderStatus);
 router.patch(
   "/:id",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("order_status"),
   validateRequest(OrderStatusValidation.updateOrderStatusZodSchema),
   OrderStatusController.updateOrderStatus
 );
@@ -36,6 +39,7 @@ router.patch(
 router.delete(
   "/:id",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("order"),
   OrderStatusController.deleteOrderStatus
 );
 

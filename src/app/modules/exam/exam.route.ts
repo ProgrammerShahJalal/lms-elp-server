@@ -5,6 +5,7 @@ import authRole from "../../middlewares/authRole";
 import { ENUM_USER_ROLE } from "../../enums/user";
 import { ExamValidation } from "./exam.validation";
 import { ExamPaymentValidation } from "../exam-payment/exam-payment.validation";
+import authPermission from "../../middlewares/authPermission";
 
 const router = Router();
 
@@ -12,6 +13,7 @@ const router = Router();
 router.post(
   "/",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("exam"),
   validateRequest(ExamValidation.createExamZodSchema),
   ExamController.createExam
 );
@@ -45,6 +47,7 @@ router.get("/:id", ExamController.getSingleExam);
 router.patch(
   "/:id",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("exam"),
   validateRequest(ExamValidation.updateExamZodSchema),
   ExamController.updateExam
 );
@@ -53,6 +56,7 @@ router.patch(
 router.delete(
   "/:id",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("exam"),
   ExamController.deleteExam
 );
 

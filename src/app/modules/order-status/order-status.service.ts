@@ -68,8 +68,7 @@ const getAllOrderStatuss = async (
   const result = await OrderStatus.find(whereConditions)
     .sort(sortConditions)
     .skip(skip)
-    .limit(limit)
-    .populate("course_id");
+    .limit(limit);
   const total = await OrderStatus.countDocuments(whereConditions);
 
   return {

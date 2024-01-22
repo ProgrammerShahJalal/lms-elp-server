@@ -226,15 +226,15 @@ const BuyAllCoursesOfASubCategory = async (payload: {
     },
   ]);
   // if the amount of payment needed is paid ----------------uncoment this section in production
-  // if (
-  //   courseSubscriptions.length &&
-  //   Number(courseSubscriptions[0]?.total_cost) !== Number(validPayment?.amount)
-  // ) {
-  //   throw new ApiError(
-  //     httpStatus.OK,
-  //     `Invalid payment amount! You had to pay ${courseSubscriptions[0]?.total_cost} taka!`
-  //   );
-  // }
+  if (
+    courseSubscriptions.length &&
+    Number(courseSubscriptions[0]?.total_cost) !== Number(validPayment?.amount)
+  ) {
+    throw new ApiError(
+      httpStatus.OK,
+      `Invalid payment amount! You had to pay ${courseSubscriptions[0]?.total_cost} taka!`
+    );
+  }
 
   if (courseSubscriptions.length < 1) {
     throw new ApiError(
@@ -249,13 +249,14 @@ const BuyAllCoursesOfASubCategory = async (payload: {
     courseSubscriptions.length &&
     courseSubscriptions[0].subscriptions.map(
       async (subscription: ISubscription) => {
+        let bundleNo = 1;
         // creating payload to create subscription history
         let subscriptionHistoryPayload: Partial<ISubscriptionHistory> = {
           user_id: new mongoose.Types.ObjectId(user_id),
           subscription_id: subscription?._id,
           course_id: subscription?.course_id,
           amount: subscription?.cost,
-          trx_id: `${trx_id}-bundle-${subscription?.course_id}-${user_id}`,
+          trx_id: `${trx_id}-bundle-${bundleNo++}`,
           is_active: true,
         };
         let expire_date = new Date();
@@ -279,7 +280,7 @@ const BuyAllCoursesOfASubCategory = async (payload: {
 
         if (alreadyHaveSubscription?.length) {
           // Calculate the number of days left for the subscription
-          const daysLeft = Math.ceil(
+          const daysLeft = Math.floor(
             (latestSubscription.expire_date.getTime() - today) /
               (1000 * 60 * 60 * 24)
           );

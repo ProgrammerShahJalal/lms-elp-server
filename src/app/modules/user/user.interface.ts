@@ -7,6 +7,7 @@ export interface IUser {
   email?: string;
   contact_no?: string;
   role: ENUM_USER_ROLE;
+  permission?: string[];
   password: string;
 }
 

@@ -19,7 +19,9 @@ const createCourse = catchAsync(async (req: Request, res: Response) => {
 });
 
 const BuyACourse = catchAsync(async (req: Request, res: Response) => {
-  const result = await CourseService.BuyACourse(req.body);
+  const payload = req.body;
+  payload.user_id = req?.user?.userId;
+  const result = await CourseService.BuyACourse(payload);
 
   sendResponse(res, {
     success: true,
@@ -31,7 +33,9 @@ const BuyACourse = catchAsync(async (req: Request, res: Response) => {
 
 const BuyAllCoursesOfASubCategory = catchAsync(
   async (req: Request, res: Response) => {
-    const result = await CourseService.BuyAllCoursesOfASubCategory(req.body);
+    const payload = req.body;
+    payload.user_id = req?.user?.userId;
+    const result = await CourseService.BuyAllCoursesOfASubCategory(payload);
 
     sendResponse(res, {
       success: true,
