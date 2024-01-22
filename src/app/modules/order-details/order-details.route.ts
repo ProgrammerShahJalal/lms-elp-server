@@ -5,6 +5,7 @@ import authUserOrRole from "../../middlewares/authUserOrRole";
 import { OrderDetailsValidation } from "./order-details.validation";
 import { OrderDetailsController } from "./order-details.controller";
 import authRole from "../../middlewares/authRole";
+import authPermission from "../../middlewares/authPermission";
 
 const router = Router();
 
@@ -24,6 +25,7 @@ router.post(
 router.get(
   "/",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("order"),
   OrderDetailsController.getAllOrderDetails
 );
 
@@ -49,6 +51,7 @@ router.get(
 router.patch(
   "/:id",
   authUserOrRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("order"),
   validateRequest(OrderDetailsValidation.updateOrderDetailsZodSchema),
   OrderDetailsController.updateOrderDetails
 );
@@ -56,7 +59,8 @@ router.patch(
 // delete OrderDetails
 router.delete(
   "/:id",
-  authUserOrRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("order"),
   OrderDetailsController.deleteOrderDetails
 );
 

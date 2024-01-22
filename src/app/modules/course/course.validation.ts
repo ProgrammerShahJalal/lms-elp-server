@@ -38,9 +38,6 @@ const buyAllCoursesOfASubCategorySchema = z.object({
     sub_category_id: z.string({
       required_error: "Sub category id is required!",
     }),
-    user_id: z.string({
-      required_error: "Sub category id is required!",
-    }),
     subscription_duration_in_months: z.number({
       required_error: "Subscription duration is required!",
     }),

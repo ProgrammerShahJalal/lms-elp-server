@@ -10,7 +10,7 @@ const router = Router();
 // create category
 router.post(
   "/",
-  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN),
   FileUploadHelper.upload.single("file"),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = CategoryValidation.createCategorySchema.parse(
@@ -29,7 +29,7 @@ router.get("/:id", CategoryController.getSingleCategory);
 // update single category
 router.patch(
   "/:id",
-  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN),
   FileUploadHelper.upload.single("file"),
   (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -50,7 +50,7 @@ router.patch(
 // delete category
 router.delete(
   "/:id",
-  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN),
   CategoryController.deleteCategory
 );
 

@@ -47,6 +47,37 @@ const createAdmin = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const givePermissionToAdmin = catchAsync(
+  async (req: Request, res: Response) => {
+    const { user_id, permission } = req.body;
+    const result = await UserService.givePermissionToAdmin(user_id, permission);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Permission given to admin successfully!",
+      data: result,
+    });
+  }
+);
+
+const removePermissionFromAdmin = catchAsync(
+  async (req: Request, res: Response) => {
+    const { user_id, permission } = req.body;
+    const result = await UserService.removePermissionFromAdmin(
+      user_id,
+      permission
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Permission removed from successfully!",
+      data: result,
+    });
+  }
+);
+
 const login = catchAsync(async (req: Request, res: Response) => {
   const result = await UserService.login(req.body);
 
@@ -119,6 +150,8 @@ export const UserController = {
   registerUser,
   createSuperAdmin,
   createAdmin,
+  givePermissionToAdmin,
+  removePermissionFromAdmin,
   login,
   getAllUsers,
   getSingleUser,

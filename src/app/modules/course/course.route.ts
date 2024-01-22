@@ -6,6 +6,7 @@ import { CourseValidation } from "./course.validation";
 import { FileUploadHelper } from "../../helpers/fileUploadHelper";
 import validateRequest from "../../middlewares/validateRequest";
 import { SubscriptionHistoryValidation } from "../subscription-history/subscription-history.validation";
+import authPermission from "../../middlewares/authPermission";
 
 const router = Router();
 
@@ -13,6 +14,7 @@ const router = Router();
 router.post(
   "/",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("course"),
   FileUploadHelper.upload.single("file"),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = CourseValidation.createCourseSchema.parse(
@@ -24,11 +26,7 @@ router.post(
 
 router.post(
   "/buy-a-course",
-  authRole(
-    ENUM_USER_ROLE.SUPER_ADMIN,
-    ENUM_USER_ROLE.ADMIN,
-    ENUM_USER_ROLE.STUDENT
-  ),
+  authRole(ENUM_USER_ROLE.STUDENT),
   validateRequest(
     SubscriptionHistoryValidation.createSubscriptionHistorySchema
   ),
@@ -38,11 +36,7 @@ router.post(
 // buy all courses of a sub category
 router.post(
   "/buy-all-of-a-sub-category",
-  authRole(
-    ENUM_USER_ROLE.SUPER_ADMIN,
-    ENUM_USER_ROLE.ADMIN,
-    ENUM_USER_ROLE.STUDENT
-  ),
+  authRole(ENUM_USER_ROLE.STUDENT),
   validateRequest(CourseValidation.buyAllCoursesOfASubCategorySchema),
   CourseController.BuyAllCoursesOfASubCategory
 );
@@ -65,6 +59,7 @@ router.get("/:id", CourseController.getSingleCourse);
 router.patch(
   "/:id",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("course"),
   FileUploadHelper.upload.single("file"),
   (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -86,6 +81,7 @@ router.patch(
 router.delete(
   "/:id",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("course"),
   CourseController.deleteCourse
 );
 

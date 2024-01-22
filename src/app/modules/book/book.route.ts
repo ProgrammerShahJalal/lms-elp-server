@@ -5,6 +5,7 @@ import authRole from "../../middlewares/authRole";
 import { ENUM_USER_ROLE } from "../../enums/user";
 import { BookValidation } from "./book.validation";
 import { FileUploadHelper } from "../../helpers/fileUploadHelper";
+import authPermission from "../../middlewares/authPermission";
 
 const router = Router();
 
@@ -12,6 +13,7 @@ const router = Router();
 router.post(
   "/",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("book"),
   FileUploadHelper.upload.single("file"),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = BookValidation.addBookZodSchema.parse(JSON.parse(req.body.data));
@@ -38,6 +40,7 @@ router.get("/:id", BookController.getSingleBook);
 router.patch(
   "/:id",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("book"),
   FileUploadHelper.upload.single("file"),
   (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -59,6 +62,7 @@ router.patch(
 router.delete(
   "/:id",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("book"),
   BookController.deleteBook
 );
 

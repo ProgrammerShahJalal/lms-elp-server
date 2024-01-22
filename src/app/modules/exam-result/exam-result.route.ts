@@ -4,6 +4,7 @@ import authRole from "../../middlewares/authRole";
 import { ENUM_USER_ROLE } from "../../enums/user";
 import { ExamResultValidation } from "./exam-result.validation";
 import { ExamResultController } from "./exam-result.controller";
+import authPermission from "../../middlewares/authPermission";
 
 const router = Router();
 
@@ -45,6 +46,7 @@ router.get(
 router.patch(
   "/give-mark",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("exam"),
   validateRequest(ExamResultValidation.giveQuestionMarkZodSchema),
   ExamResultController.giveQuestionMark
 );
@@ -53,6 +55,7 @@ router.patch(
 router.patch(
   "/:id",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("exam"),
   validateRequest(ExamResultValidation.updateExamResultZodSchema),
   ExamResultController.updateExamResult
 );
@@ -61,6 +64,7 @@ router.patch(
 router.delete(
   "/:id",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("exam"),
   ExamResultController.deleteExamResult
 );
 

@@ -13,6 +13,7 @@ import { IPaginationOptions } from "../../../interfaces/pagination";
 // registering user/student
 const registerUser = async (userData: IUser) => {
   userData.role = ENUM_USER_ROLE.STUDENT;
+  userData.permission = [];
 
   const createdUser = await UserUtills.createUser(userData);
 
@@ -44,6 +45,41 @@ const createSuperAdmin = async (userData: IUser) => {
     await UserUtills.createTokenRefreshTokenForUser(createdUser);
 
   return { createdUser, accessToken, refreshToken };
+};
+
+// give permission to a user
+const givePermissionToAdmin = async (user_id: string, permission: string) => {
+  const user = await User.findById(user_id);
+  if (!user || user?.role !== "admin") {
+    throw new ApiError(httpStatus.OK, "Enter existing admin only!");
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    user_id,
+    { $addToSet: { permission: permission } },
+    { new: true }
+  ).select("-password");
+
+  return updatedUser;
+};
+
+// remove permission from a user
+const removePermissionFromAdmin = async (
+  user_id: string,
+  permission: string
+) => {
+  const user = await User.findById(user_id);
+  if (!user || user?.role !== "admin") {
+    throw new ApiError(httpStatus.OK, "Enter existing admin only!");
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    user_id,
+    { $pull: { permission: permission } },
+    { new: true }
+  ).select("-password");
+
+  return updatedUser;
 };
 
 // login user
@@ -120,7 +156,8 @@ const getAllUsers = async (
   const result = await User.find(whereConditions)
     .sort(sortConditions)
     .skip(skip)
-    .limit(limit);
+    .limit(limit)
+    .select("-password");
   const total = await User.countDocuments(whereConditions);
 
   return {
@@ -131,26 +168,18 @@ const getAllUsers = async (
     },
     data: result,
   };
-
-  if (!result.length) {
-    throw new ApiError(httpStatus.OK, "No user found!");
-  }
-
-  return result;
 };
 
 // get single user
 const getSingleUser = async (
   user_id: string
 ): Promise<Omit<IUser, "password">> => {
-  const result = await User.findById(user_id);
+  const result = await User.findById(user_id).select("-password");
 
   if (!result) {
     throw new ApiError(httpStatus.OK, "User not found!");
   }
-
-  const { password, ...otherData } = result.toObject();
-  return otherData;
+  return result;
 };
 
 // update user
@@ -158,6 +187,7 @@ const updateUser = async (
   user_id: string,
   payload: Partial<IUser>
 ): Promise<Omit<IUser, "password">> => {
+  payload.permission = [];
   const result = await User.findByIdAndUpdate(user_id, payload, { new: true });
 
   if (!result) {
@@ -183,6 +213,8 @@ export const UserService = {
   registerUser,
   createSuperAdmin,
   createAdmin,
+  givePermissionToAdmin,
+  removePermissionFromAdmin,
   login,
   getAllUsers,
   getSingleUser,

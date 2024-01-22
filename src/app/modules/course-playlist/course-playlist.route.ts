@@ -4,6 +4,7 @@ import authRole from "../../middlewares/authRole";
 import { ENUM_USER_ROLE } from "../../enums/user";
 import { CoursePlaylistValidation } from "./course-playlist.validation";
 import { CoursePlaylistController } from "./course-playlist.controller";
+import authPermission from "../../middlewares/authPermission";
 
 const router = Router();
 
@@ -11,6 +12,7 @@ const router = Router();
 router.post(
   "/",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("course_video"),
   validateRequest(CoursePlaylistValidation.createCoursePlaylistSchema),
   CoursePlaylistController.createCoursePlaylist
 );
@@ -19,6 +21,7 @@ router.post(
 router.get(
   "/",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("course_video"),
   CoursePlaylistController.getAllCoursePlaylists
 );
 
@@ -44,6 +47,7 @@ router.get(
 router.patch(
   "/:id",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("course_video"),
   validateRequest(CoursePlaylistValidation.updateCoursePlaylistZodSchema),
   CoursePlaylistController.updateCoursePlaylist
 );
@@ -52,6 +56,7 @@ router.patch(
 router.delete(
   "/:id",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("course_video"),
   CoursePlaylistController.deleteCoursePlaylist
 );
 
