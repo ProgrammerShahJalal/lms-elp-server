@@ -1,6 +1,7 @@
 export const orderStatusFilterableFields = [
   "searchTerm",
   "user_id",
-  "order_id",
-  "shipping",
+  "status",
+  "order_details_id",
+  "shipping_address_id",
 ];

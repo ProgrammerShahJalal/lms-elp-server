@@ -25,22 +25,12 @@ router.get(
 // get shipping charge inside dhaka
 router.get(
   "/shipping-charge-inside-dhaka",
-  authRole(
-    ENUM_USER_ROLE.SUPER_ADMIN,
-    ENUM_USER_ROLE.ADMIN,
-    ENUM_USER_ROLE.STUDENT
-  ),
   SettingsController.getShippingChargeInsideDhaka
 );
 
 // get shipping charge outside dhaka
 router.get(
   "/shipping-charge-outside-dhaka",
-  authRole(
-    ENUM_USER_ROLE.SUPER_ADMIN,
-    ENUM_USER_ROLE.ADMIN,
-    ENUM_USER_ROLE.STUDENT
-  ),
   SettingsController.getShippingChargeOutsideDhaka
 );
 

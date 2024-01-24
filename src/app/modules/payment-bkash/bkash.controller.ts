@@ -66,14 +66,14 @@ const callBack = async (req: Request, res: Response) => {
         }
       );
       if (data && data.statusCode === "0000") {
-        await Payment.create({
+        const payment = await Payment.create({
           trxID: data?.trxID,
           paymentID: data?.paymentID,
           amount: data?.amount,
           customerMsisdn: data?.customerMsisdn,
         });
         return res.redirect(
-          `${config.frontend_site_url}/bkash/success?trx_id=${data.trxID}`
+          `${config.frontend_site_url}/bkash/success?trx_id=${data.trxID}&paymentID=${payment?._id}`
         );
       } else {
         return res.redirect(

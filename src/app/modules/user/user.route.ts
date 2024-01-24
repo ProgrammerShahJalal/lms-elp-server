@@ -62,6 +62,13 @@ router.get(
   UserController.getAllUsers
 );
 
+// check permission of  admin
+router.get(
+  "/check-permission/:user_id/:permission",
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  UserController.checkPermissionOfAdmin
+);
+
 // get single user
 router.get(
   "/:user_id",

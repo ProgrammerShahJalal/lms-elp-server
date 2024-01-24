@@ -4,10 +4,9 @@ import { IPaginationOptions } from "../../../interfaces/pagination";
 import { IGenericResponse } from "../../../interfaces/common";
 import { paginationHelpers } from "../../helpers/paginationHelpers";
 import mongoose, { SortOrder } from "mongoose";
-import { IOrder, IOrderFilters } from "./order.interface";
+import { IOrder, IOrderCreatePayload, IOrderFilters } from "./order.interface";
 import { Order } from "./order.model";
 import { Book } from "../book/book.model";
-import { Cart } from "../cart/cart.model";
 import { ShippingAddress } from "../shipping-address/shipping-address.model";
 import { OrderDetails } from "../order-details/order-details.model";
 import { IOrderDetails } from "../order-details/order-details.interface";
@@ -19,9 +18,14 @@ import { Payment } from "../payment/payment.model";
 // create Order
 const createOrder = async (
   user_id: string,
-  payload: { trx_id: string; shipping_address: string }
+  payload: IOrderCreatePayload
 ): Promise<IOrderDetails> => {
-  const validPayment = await Payment.findOne({ trxID: payload?.trx_id });
+  const { trx_id, paymentID, books, shipping_address } = payload;
+
+  const validPayment = await Payment.findOne({
+    trxID: trx_id,
+    _id: paymentID,
+  });
 
   if (!validPayment) {
     throw new ApiError(httpStatus.OK, "Invalid transaction id!");
@@ -31,137 +35,113 @@ const createOrder = async (
   session.startTransaction();
 
   try {
-    // Fetch cart items
-    const cartItems = await Cart.find({ user_id }).session(session);
-    if (!cartItems?.length) {
-      throw new ApiError(httpStatus.OK, "No item in the cart!");
-    }
-
-    // Initialize variables
-    let totalPrice: number = 0;
-    let discountPrice: number = 0;
-    let needShippingCharge: boolean = false;
-    let shippingCharge;
+    let totalPrice = 0;
+    let discountPrice = 0;
+    let needShippingCharge = false;
+    let shippingCharge = 0;
     const orders: Partial<IOrder>[] = [];
 
-    const orderPromises = cartItems.map(async (cartItem) => {
-      const book = await Book.findById(cartItem?.book_id).session(session);
-      const order = await Order.create(
-        [
-          {
-            user_id,
-            book_id: book?._id,
-            book_quantity: cartItem?.quantity,
-            unit_price: book?.discount_price,
-          },
-        ],
-        {
-          session,
+    await Promise.all(
+      books.map(async (cartItem: { book_id: string; quantity: number }) => {
+        const book = await Book.findById(cartItem?.book_id).session(session);
+        const order = await Order.create(
+          [
+            {
+              user_id,
+              book_id: book?._id,
+              book_quantity: cartItem?.quantity,
+              unit_price: book?.discount_price,
+            },
+          ],
+          { session }
+        );
+
+        const orderToPush = {
+          book_id: order[0]?.book_id,
+          book_quantity: order[0]?.book_quantity,
+          unit_price: order[0]?.unit_price,
+        };
+
+        orders.push(orderToPush);
+
+        if (book?.format === "hard copy") {
+          needShippingCharge = true;
         }
-      );
 
-      const orderToPush = {
-        book_id: order[0]?.book_id,
-        book_quantity: order[0]?.book_quantity,
-        unit_price: order[0]?.unit_price,
-      };
-      orders.push(orderToPush);
+        totalPrice += Number(cartItem?.quantity) * Number(book?.discount_price);
+        discountPrice +=
+          (Number(book?.price) - Number(book?.discount_price)) *
+          Number(cartItem?.quantity);
+      })
+    );
 
-      if (book?.format === "hard copy") {
-        needShippingCharge = true;
-      }
-
-      totalPrice += Number(cartItem?.quantity) * Number(book?.discount_price);
-      discountPrice +=
-        (Number(book?.price) - Number(book?.discount_price)) *
-        Number(cartItem?.quantity);
-    });
-
-    if (totalPrice !== Number(validPayment?.amount)) {
-      throw new ApiError(httpStatus.OK, "Invalid payment amount!");
-    }
-
-    // Wait for all orders to be created
-    await Promise.all(orderPromises);
-
-    // if shipping address is given in payload, but in invalid format
-    if (payload.shipping_address && !isJSON(payload.shipping_address)) {
+    if (shipping_address && !isJSON(shipping_address)) {
       throw new ApiError(httpStatus.OK, "Invalid shipping address format!");
     }
 
-    // Fetch shipping information
     const shipping = await ShippingAddress.findOne({ user_id }).session(
       session
     );
+
     if (needShippingCharge && !shipping) {
       throw new ApiError(httpStatus.OK, "No shipping address found!");
     }
 
-    // fetch and calculate shipping charge
     if (needShippingCharge) {
-      if (shipping?.outside_dhaka) {
-        shippingCharge = await Settings.findOne({
-          key: "shipping_charge_inside_dhaka",
-        }).session(session);
-      } else {
-        shippingCharge = await Settings.findOne({
-          key: "shipping_charge_outside_dhaka",
-        }).session(session);
-      }
+      shippingCharge =
+        (shipping?.outside_dhaka
+          ? await Settings.findOne({
+              key: "shipping_charge_outside_dhaka",
+            })
+          : await Settings.findOne({
+              key: "shipping_charge_inside_dhaka",
+            })
+        )?.value || 0;
     }
-    shippingCharge = needShippingCharge ? Number(shippingCharge?.value) : 0;
+
+    if (
+      Number(totalPrice) + Number(shippingCharge) !==
+      Number(validPayment?.amount)
+    ) {
+      throw new ApiError(httpStatus.OK, "Invalid payment amount!");
+    }
 
     const shippingAddress = needShippingCharge
-      ? payload.shipping_address || JSON.stringify(shipping)
+      ? shipping_address || JSON.stringify(shipping)
       : "";
 
-    // Create order details
-    const result = await OrderDetails.create(
+    const orderDetails = await OrderDetails.create(
       [
         {
           user_id,
-          total_price: totalPrice + shippingCharge,
+          total_price: totalPrice + Number(shippingCharge),
           discounts: discountPrice,
-          shipping_charge: shippingCharge,
+          shipping_charge: Number(shippingCharge),
           shipping_address_id: shipping?._id,
           orders: JSON.stringify(orders),
-          trx_id: payload.trx_id,
+          trx_id,
           shipping_address: shippingAddress,
         },
       ],
-      {
-        session,
-      }
-    );
-    // on successfull order, clear carts of that user
-    await Cart.deleteMany(
-      {
-        user_id,
-      },
-      {
-        session,
-      }
+      { session }
     );
 
-    // create order status
     if (needShippingCharge) {
       await OrderStatus.create(
         [
           {
             user_id,
-            order_details_id: result[0]?._id,
+            order_details_id: orderDetails[0]?._id,
             status: "Pending Approval",
             shipping_address_id: shipping?.id,
           },
         ],
-        {
-          session,
-        }
+        { session }
       );
     }
 
     await session.commitTransaction();
-    return result[0];
+    return orderDetails[0];
   } catch (error: any) {
     await session.abortTransaction();
     throw new ApiError(

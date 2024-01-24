@@ -8,6 +8,7 @@ import pick from "../../../shared/pick";
 import { bookFilterableFields } from "../book/book.constants";
 import { paginationFields } from "../../constants/pagination";
 import { userFilterableFields } from "./user.constants";
+import ApiError from "../../../errors/ApiError";
 
 const registerUser = catchAsync(async (req: Request, res: Response) => {
   const result = await UserService.registerUser(req.body);
@@ -110,6 +111,26 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const checkPermissionOfAdmin = catchAsync(
+  async (req: Request, res: Response) => {
+    const { user_id, permission } = req.params;
+
+    const result = await UserService.checkPermissionOfAdmin(
+      user_id,
+      permission
+    );
+
+    console.log(result);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Permission checked successfully!",
+      data: result ? true : false,
+    });
+  }
+);
+
 const getSingleUser = catchAsync(async (req: Request, res: Response) => {
   const { user_id } = req.params;
   const result = await UserService.getSingleUser(user_id);
@@ -152,6 +173,7 @@ export const UserController = {
   createAdmin,
   givePermissionToAdmin,
   removePermissionFromAdmin,
+  checkPermissionOfAdmin,
   login,
   getAllUsers,
   getSingleUser,
