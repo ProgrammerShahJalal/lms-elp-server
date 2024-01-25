@@ -43,6 +43,7 @@ const getAllOrderStatuss = async (
   paginationOptions: IPaginationOptions
 ): Promise<IGenericResponse<IOrderStatus[]>> => {
   const { searchTerm, ...filtersData } = filters;
+  console.log(filtersData);
 
   const andConditions = [];
 

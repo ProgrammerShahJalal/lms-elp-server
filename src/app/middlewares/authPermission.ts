@@ -9,13 +9,10 @@ const authPermission =
     try {
       const verifiedUser = await User.findById(req?.user?.userId);
 
-      if (verifiedUser?.role === "super_admin") {
-        next();
-      }
-
       if (
-        verifiedUser?.permission &&
-        verifiedUser?.permission.includes(requiredPermission)
+        verifiedUser?.role === "super_admin" ||
+        (verifiedUser?.permission &&
+          verifiedUser?.permission.includes(requiredPermission))
       ) {
         next();
       } else {

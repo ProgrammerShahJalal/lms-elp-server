@@ -117,11 +117,7 @@ const BuyACourse = async (
 };
 
 // get total price/cost of a sub category
-const GetTotalCostsOfSubCategory = async (payload: {
-  sub_category_id: string;
-}) => {
-  const { sub_category_id } = payload;
-
+const GetTotalCostsOfSubCategory = async (sub_category_id: string) => {
   const sub_category = await SubCategory.findById(sub_category_id);
   if (!sub_category) {
     throw new ApiError(httpStatus.OK, "Sub category not found!");
@@ -148,19 +144,27 @@ const GetTotalCostsOfSubCategory = async (payload: {
       $project: {
         "subscription.subscription_duration_in_months": 1,
         "subscription.cost": 1,
+        "subscription.course_id": 1,
       },
     },
     {
       $group: {
         _id: "$subscription.subscription_duration_in_months",
         total_cost: { $sum: "$subscription.cost" },
+        subscriptions: { $push: "$subscription" },
       },
     },
     {
       $project: {
         subscription_duration_in_months: "$_id",
         total_cost: 1,
+        subscriptions: 1,
         _id: 0,
+      },
+    },
+    {
+      $sort: {
+        subscription_duration_in_months: 1,
       },
     },
   ]);
@@ -249,14 +253,13 @@ const BuyAllCoursesOfASubCategory = async (payload: {
     courseSubscriptions.length &&
     courseSubscriptions[0].subscriptions.map(
       async (subscription: ISubscription) => {
-        let bundleNo = 1;
         // creating payload to create subscription history
         let subscriptionHistoryPayload: Partial<ISubscriptionHistory> = {
           user_id: new mongoose.Types.ObjectId(user_id),
           subscription_id: subscription?._id,
           course_id: subscription?.course_id,
           amount: subscription?.cost,
-          trx_id: `${trx_id}-bundle-${bundleNo++}`,
+          trx_id: `${trx_id}-bundle-${today}`,
           is_active: true,
         };
         let expire_date = new Date();

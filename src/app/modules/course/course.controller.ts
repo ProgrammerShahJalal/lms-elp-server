@@ -72,7 +72,10 @@ const getAllRoutines = catchAsync(async (req: Request, res: Response) => {
 
 const GetTotalCostsOfSubCategory = catchAsync(
   async (req: Request, res: Response) => {
-    const result = await CourseService.GetTotalCostsOfSubCategory(req.body);
+    const { sub_category_id } = req.query;
+    const result = await CourseService.GetTotalCostsOfSubCategory(
+      sub_category_id as string
+    );
 
     sendResponse(res, {
       success: true,

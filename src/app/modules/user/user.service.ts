@@ -170,6 +170,23 @@ const getAllUsers = async (
   };
 };
 
+// check permission of a user
+const checkPermissionOfAdmin = async (user_id: string, permission: string) => {
+  const user = await User.findById(user_id);
+  if (!user || user?.role !== "admin") {
+    throw new ApiError(httpStatus.OK, "Enter existing admin only!");
+  }
+
+  if (!user?.permission?.length) {
+    return false;
+  }
+
+  const hasPermission = user?.permission?.includes(permission);
+
+  if (hasPermission) return true;
+  else return false;
+};
+
 // get single user
 const getSingleUser = async (
   user_id: string
@@ -215,6 +232,7 @@ export const UserService = {
   createAdmin,
   givePermissionToAdmin,
   removePermissionFromAdmin,
+  checkPermissionOfAdmin,
   login,
   getAllUsers,
   getSingleUser,

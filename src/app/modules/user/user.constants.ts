@@ -15,6 +15,7 @@ export const userFilterableFields = [
   "name",
   "email",
   "contact_no",
+  "role",
 ];
 
 export const userSearchableFields = ["name", "email", "contact_no"];
