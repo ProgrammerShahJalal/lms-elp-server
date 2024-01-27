@@ -82,9 +82,6 @@ const createOrder = async (
 
     if (needShippingCharge) {
       const shippingAddress = JSON.parse(shipping_address as string);
-      if (user_id !== shippingAddress?.user_id) {
-        throw new ApiError(httpStatus.OK, "Invalid order!");
-      }
       shippingCharge =
         (shippingAddress?.outside_dhaka
           ? await Settings.findOne({
