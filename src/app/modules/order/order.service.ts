@@ -40,7 +40,6 @@ const createOrder = async (
     let needShippingCharge = false;
     let shippingCharge = 0;
     const orders: Partial<IOrder>[] = [];
-
     await Promise.all(
       books.map(async (cartItem: { book_id: string; quantity: number }) => {
         const book = await Book.findById(cartItem?.book_id).session(session);
@@ -64,10 +63,11 @@ const createOrder = async (
 
         orders.push(orderToPush);
 
+        //////////////////////// 'lost here' ///////////////
+
         if (book?.format === "hard copy") {
           needShippingCharge = true;
         }
-
         totalPrice += Number(cartItem?.quantity) * Number(book?.discount_price);
         discountPrice +=
           (Number(book?.price) - Number(book?.discount_price)) *
@@ -75,21 +75,20 @@ const createOrder = async (
       })
     );
 
-    if (shipping_address && !isJSON(shipping_address)) {
+    if (
+      (needShippingCharge && !shipping_address) ||
+      (needShippingCharge && !isJSON(shipping_address))
+    ) {
       throw new ApiError(httpStatus.OK, "Invalid shipping address format!");
     }
 
-    const shipping = await ShippingAddress.findOne({ user_id }).session(
-      session
-    );
-
-    if (needShippingCharge && !shipping) {
-      throw new ApiError(httpStatus.OK, "No shipping address found!");
-    }
-
     if (needShippingCharge) {
+      const shippingAddress = JSON.parse(shipping_address as string);
+      if (user_id !== shippingAddress?.user_id) {
+        throw new ApiError(httpStatus.OK, "Invalid order!");
+      }
       shippingCharge =
-        (shipping?.outside_dhaka
+        (shippingAddress?.outside_dhaka
           ? await Settings.findOne({
               key: "shipping_charge_outside_dhaka",
             })
@@ -106,9 +105,9 @@ const createOrder = async (
       throw new ApiError(httpStatus.OK, "Invalid payment amount!");
     }
 
-    const shippingAddress = needShippingCharge
-      ? shipping_address || JSON.stringify(shipping)
-      : "";
+    const existingShippingAddress = await ShippingAddress.findOne({
+      user_id,
+    }).session(session);
 
     const orderDetails = await OrderDetails.create(
       [
@@ -117,10 +116,10 @@ const createOrder = async (
           total_price: totalPrice + Number(shippingCharge),
           discounts: discountPrice,
           shipping_charge: Number(shippingCharge),
-          shipping_address_id: shipping?._id,
+          shipping_address_id: existingShippingAddress?._id,
           orders: JSON.stringify(orders),
           trx_id,
-          shipping_address: shippingAddress,
+          shipping_address: shipping_address,
         },
       ],
       { session }
@@ -131,9 +130,9 @@ const createOrder = async (
         [
           {
             user_id,
+            shipping_address_id: existingShippingAddress?._id,
             order_details_id: orderDetails[0]?._id,
             status: "Pending Approval",
-            shipping_address_id: shipping?.id,
           },
         ],
         { session }
