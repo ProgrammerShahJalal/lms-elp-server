@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 
 export interface IShippingAddress {
+  _id: Types.ObjectId;
   user_id: Types.ObjectId;
   outside_dhaka: boolean;
   division: string;

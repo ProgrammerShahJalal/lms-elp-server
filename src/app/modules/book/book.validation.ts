@@ -18,7 +18,7 @@ const addBookZodSchema = z.object({
   ),
   sample_pdf_link: z.string({}).optional(),
   pdf_link: z.string({}).optional(),
-  course_id: z.string({}).optional(),
+  course_id: z.array(z.string({})).optional(),
 });
 
 const updateBookZodSchema = z.object({
