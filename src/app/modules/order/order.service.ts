@@ -63,8 +63,6 @@ const createOrder = async (
 
         orders.push(orderToPush);
 
-        //////////////////////// 'lost here' ///////////////
-
         if (book?.format === "hard copy") {
           needShippingCharge = true;
         }
@@ -119,7 +117,7 @@ const createOrder = async (
           shipping_address_id: existingShippingAddress?._id,
           orders: JSON.stringify(orders),
           trx_id,
-          shipping_address: shipping_address,
+          shipping_address: needShippingCharge ? shipping_address : "",
         },
       ],
       { session }
