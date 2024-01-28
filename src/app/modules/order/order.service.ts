@@ -63,8 +63,6 @@ const createOrder = async (
 
         orders.push(orderToPush);
 
-        //////////////////////// 'lost here' ///////////////
-
         if (book?.format === "hard copy") {
           needShippingCharge = true;
         }
@@ -84,9 +82,6 @@ const createOrder = async (
 
     if (needShippingCharge) {
       const shippingAddress = JSON.parse(shipping_address as string);
-      if (user_id !== shippingAddress?.user_id) {
-        throw new ApiError(httpStatus.OK, "Invalid order!");
-      }
       shippingCharge =
         (shippingAddress?.outside_dhaka
           ? await Settings.findOne({
@@ -119,7 +114,7 @@ const createOrder = async (
           shipping_address_id: existingShippingAddress?._id,
           orders: JSON.stringify(orders),
           trx_id,
-          shipping_address: shipping_address,
+          shipping_address: needShippingCharge ? shipping_address : "",
         },
       ],
       { session }

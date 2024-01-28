@@ -39,9 +39,11 @@ const questionMarkSchema = z.object({
 });
 
 export const giveQuestionMarkZodSchema = z.object({
-  exam_id: z.string(),
-  user_id: z.string(),
-  marks: z.array(questionMarkSchema),
+  body: z.object({
+    exam_id: z.string(),
+    user_id: z.string(),
+    marks: z.array(questionMarkSchema),
+  }),
 });
 
 export const ExamResultValidation = {

@@ -120,8 +120,6 @@ const checkPermissionOfAdmin = catchAsync(
       permission
     );
 
-    console.log(result);
-
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
