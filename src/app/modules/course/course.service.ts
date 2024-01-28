@@ -229,7 +229,7 @@ const BuyAllCoursesOfASubCategory = async (payload: {
       },
     },
   ]);
-  // if the amount of payment needed is paid ----------------uncoment this section in production
+  // if the amount of payment needed is paid
   if (
     courseSubscriptions.length &&
     Number(courseSubscriptions[0]?.total_cost) !== Number(validPayment?.amount)
@@ -364,16 +364,68 @@ const getAllCourses = async (
 };
 
 const getAllRoutines = async () => {
-  const result = await Course.find({})
-    .populate({
-      path: "sub_category_id",
-      select: "title",
-      populate: {
-        path: "category_id",
-        select: "title",
+  const result = await Course.aggregate([
+    {
+      $project: {
+        routine: 1,
+        sub_category_id: 1,
+        category_id: 1,
+        title: 1,
       },
-    })
-    .select("routine title");
+    },
+    {
+      $group: {
+        _id: "$sub_category_id",
+        course: {
+          $push: "$$ROOT",
+        },
+      },
+    },
+
+    {
+      $lookup: {
+        from: "subcategories",
+        localField: "_id",
+        foreignField: "_id",
+        as: "sub_category",
+      },
+    },
+    {
+      $unwind: "$sub_category",
+    },
+
+    {
+      $lookup: {
+        from: "categories",
+        localField: "course.category_id",
+        foreignField: "_id",
+        as: "category",
+      },
+    },
+    {
+      $unwind: "$category",
+    },
+    {
+      $project: {
+        sub_category_id: "$sub_category._id",
+        sub_category_title: "$sub_category.title",
+        category_id: "$category._id",
+        category_title: "$category.title",
+        course: {
+          $map: {
+            input: "$course",
+            as: "course",
+            in: {
+              _id: "$$course._id",
+              title: "$$course.title",
+              routine: "$$course.routine",
+            },
+          },
+        },
+      },
+    },
+  ]);
+
   return result;
 };
 
