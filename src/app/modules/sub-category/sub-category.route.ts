@@ -11,7 +11,7 @@ const router = Router();
 // create SubCategory
 router.post(
   "/",
-  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN),
   FileUploadHelper.upload.single("file"),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = SubCategoryValidation.createSubCategorySchema.parse(
@@ -30,7 +30,7 @@ router.get("/:id", SubCategoryController.getSingleSubCategory);
 // update single SubCategory
 router.patch(
   "/:id",
-  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN),
   FileUploadHelper.upload.single("file"),
   (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -51,7 +51,7 @@ router.patch(
 // delete SubCategory
 router.delete(
   "/:id",
-  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN),
   SubCategoryController.deleteSubCategory
 );
 

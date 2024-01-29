@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { adminPermissions } from "./user.constants";
 
 const registerUserZodSchema = z
   .object({
@@ -8,7 +9,7 @@ const registerUserZodSchema = z
           required_error: "Name is required!",
         })
         .trim(),
-      contact_no: z.string({}).trim().optional(),
+      contact_no: z.string({}).trim(),
       email: z.string({}).trim().optional(),
       password: z.string({ required_error: "Password is required!" }),
     }),
@@ -19,6 +20,19 @@ const registerUserZodSchema = z
     }
     return true;
   });
+
+type AdminPermission = (typeof adminPermissions)[number];
+const giveOrRemovePermissionOfAdmin = z.object({
+  body: z.object({
+    user_id: z.string({ required_error: "User id of the admin is required!" }),
+    permission: z.string().refine(
+      (value): value is AdminPermission => {
+        return adminPermissions.includes(value as AdminPermission);
+      },
+      { message: "Invalid permission" }
+    ),
+  }),
+});
 
 const loginUserZodSchema = z.object({
   body: z.object({
@@ -37,6 +51,7 @@ const updateUserZodSchema = z.object({
 
 export const UserValidation = {
   registerUserZodSchema,
+  giveOrRemovePermissionOfAdmin,
   loginUserZodSchema,
   updateUserZodSchema,
 };

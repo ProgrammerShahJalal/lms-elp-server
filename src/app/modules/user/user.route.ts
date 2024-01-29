@@ -5,6 +5,7 @@ import { UserValidation } from "./user.validation";
 import authRole from "../../middlewares/authRole";
 import { ENUM_USER_ROLE } from "../../enums/user";
 import authUserOrRole from "../../middlewares/authUserOrRole";
+import authPermission from "../../middlewares/authPermission";
 
 const router = Router();
 
@@ -30,6 +31,22 @@ router.post(
   UserController.createAdmin
 );
 
+// give permission to admin
+router.post(
+  "/give-permission",
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN),
+  validateRequest(UserValidation.giveOrRemovePermissionOfAdmin),
+  UserController.givePermissionToAdmin
+);
+
+// remove permission from admin
+router.post(
+  "/remove-permission",
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN),
+  validateRequest(UserValidation.giveOrRemovePermissionOfAdmin),
+  UserController.removePermissionFromAdmin
+);
+
 // login user
 router.post(
   "/login",
@@ -41,7 +58,15 @@ router.post(
 router.get(
   "/",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("user"),
   UserController.getAllUsers
+);
+
+// check permission of  admin
+router.get(
+  "/check-permission/:user_id/:permission",
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  UserController.checkPermissionOfAdmin
 );
 
 // get single user
@@ -63,6 +88,8 @@ router.patch(
 router.delete(
   "/:user_id",
   authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  authPermission("user"),
+
   UserController.deleteUser
 );
 

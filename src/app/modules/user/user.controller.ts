@@ -8,6 +8,7 @@ import pick from "../../../shared/pick";
 import { bookFilterableFields } from "../book/book.constants";
 import { paginationFields } from "../../constants/pagination";
 import { userFilterableFields } from "./user.constants";
+import ApiError from "../../../errors/ApiError";
 
 const registerUser = catchAsync(async (req: Request, res: Response) => {
   const result = await UserService.registerUser(req.body);
@@ -47,6 +48,37 @@ const createAdmin = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const givePermissionToAdmin = catchAsync(
+  async (req: Request, res: Response) => {
+    const { user_id, permission } = req.body;
+    const result = await UserService.givePermissionToAdmin(user_id, permission);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Permission given to admin successfully!",
+      data: result,
+    });
+  }
+);
+
+const removePermissionFromAdmin = catchAsync(
+  async (req: Request, res: Response) => {
+    const { user_id, permission } = req.body;
+    const result = await UserService.removePermissionFromAdmin(
+      user_id,
+      permission
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Permission removed from successfully!",
+      data: result,
+    });
+  }
+);
+
 const login = catchAsync(async (req: Request, res: Response) => {
   const result = await UserService.login(req.body);
 
@@ -78,6 +110,24 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
+const checkPermissionOfAdmin = catchAsync(
+  async (req: Request, res: Response) => {
+    const { user_id, permission } = req.params;
+
+    const result = await UserService.checkPermissionOfAdmin(
+      user_id,
+      permission
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Permission checked successfully!",
+      data: result ? true : false,
+    });
+  }
+);
 
 const getSingleUser = catchAsync(async (req: Request, res: Response) => {
   const { user_id } = req.params;
@@ -119,6 +169,9 @@ export const UserController = {
   registerUser,
   createSuperAdmin,
   createAdmin,
+  givePermissionToAdmin,
+  removePermissionFromAdmin,
+  checkPermissionOfAdmin,
   login,
   getAllUsers,
   getSingleUser,

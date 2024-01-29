@@ -19,7 +19,9 @@ const createCourse = catchAsync(async (req: Request, res: Response) => {
 });
 
 const BuyACourse = catchAsync(async (req: Request, res: Response) => {
-  const result = await CourseService.BuyACourse(req.body);
+  const payload = req.body;
+  payload.user_id = req?.user?.userId;
+  const result = await CourseService.BuyACourse(payload);
 
   sendResponse(res, {
     success: true,
@@ -31,7 +33,9 @@ const BuyACourse = catchAsync(async (req: Request, res: Response) => {
 
 const BuyAllCoursesOfASubCategory = catchAsync(
   async (req: Request, res: Response) => {
-    const result = await CourseService.BuyAllCoursesOfASubCategory(req.body);
+    const payload = req.body;
+    payload.user_id = req?.user?.userId;
+    const result = await CourseService.BuyAllCoursesOfASubCategory(payload);
 
     sendResponse(res, {
       success: true,
@@ -68,7 +72,10 @@ const getAllRoutines = catchAsync(async (req: Request, res: Response) => {
 
 const GetTotalCostsOfSubCategory = catchAsync(
   async (req: Request, res: Response) => {
-    const result = await CourseService.GetTotalCostsOfSubCategory(req.body);
+    const { sub_category_id } = req.query;
+    const result = await CourseService.GetTotalCostsOfSubCategory(
+      sub_category_id as string
+    );
 
     sendResponse(res, {
       success: true,

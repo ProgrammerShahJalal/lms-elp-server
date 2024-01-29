@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 
 export interface ISubscription {
+  _id: Types.ObjectId;
   subscription_duration_in_months: number;
   cost: number;
   name?: string;

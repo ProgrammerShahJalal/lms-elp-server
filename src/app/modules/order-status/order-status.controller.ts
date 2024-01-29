@@ -57,6 +57,7 @@ const updateOrderStatus = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
 const deleteOrderStatus = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const result = await OrderStatusService.deleteOrderStatus(id);

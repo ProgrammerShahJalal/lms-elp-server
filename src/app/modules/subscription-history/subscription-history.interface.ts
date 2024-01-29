@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 
 export interface ISubscriptionHistory {
+  _id: Types.ObjectId;
   user_id: Types.ObjectId;
   course_id: Types.ObjectId;
   subscription_id: Types.ObjectId;

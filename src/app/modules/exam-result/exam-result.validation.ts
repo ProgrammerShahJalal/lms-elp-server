@@ -19,10 +19,12 @@ const updateExamResultZodSchema = z.object({
     exam_id: z.string({}).optional(),
     answer: z.string({}).optional(),
     question_mark: z
-      .object({
-        question_id: z.string().optional(),
-        mark_obtained: z.number().optional(),
-      })
+      .array(
+        z.object({
+          question_id: z.string().optional(),
+          mark_obtained: z.number().optional(),
+        })
+      )
       .optional(),
     total_marks: z.number().optional(),
     total_correct_answer: z.number().optional(),
@@ -37,9 +39,11 @@ const questionMarkSchema = z.object({
 });
 
 export const giveQuestionMarkZodSchema = z.object({
-  exam_id: z.string(),
-  user_id: z.string(),
-  marks: z.array(questionMarkSchema),
+  body: z.object({
+    exam_id: z.string(),
+    user_id: z.string(),
+    marks: z.array(questionMarkSchema),
+  }),
 });
 
 export const ExamResultValidation = {

@@ -7,7 +7,7 @@ import { IPaginationOptions } from "../../../interfaces/pagination";
 import { IGenericResponse } from "../../../interfaces/common";
 import { courseSearchableFields } from "./course.constants";
 import { paginationHelpers } from "../../helpers/paginationHelpers";
-import { SortOrder } from "mongoose";
+import mongoose, { SortOrder } from "mongoose";
 import { Request } from "express";
 import { IUploadFile } from "../../../interfaces/file";
 import { FileUploadHelper } from "../../helpers/fileUploadHelper";
@@ -88,24 +88,27 @@ const BuyACourse = async (
       course_id: subscription?.course_id?.id,
       expire_date: { $gt: today },
     });
-  if (alreadyHaveSubscription?.length) {
-    // Calculate the number of days left for the subscription
-    const daysLeft = Math.ceil(
-      (alreadyHaveSubscription[0].expire_date.getTime() - today) /
-        (1000 * 60 * 60 * 24)
-    );
-    throw new ApiError(
-      httpStatus.OK,
-      `You have an active subscription. It will expire in ${daysLeft} days.`
-    );
-  }
+  // finding the subscription that has most number of days
+  const latestSubscription = alreadyHaveSubscription?.sort(
+    (a: ISubscriptionHistory, b: ISubscriptionHistory) =>
+      b.expire_date.getTime() - a.expire_date.getTime()
+  )?.[0];
 
-  payload.course_id = subscription.course_id;
-  payload.amount = subscription.cost;
   let expire_date = new Date();
   expire_date.setMonth(
     expire_date.getMonth() + subscription.subscription_duration_in_months
   );
+  if (alreadyHaveSubscription?.length) {
+    // Calculate the number of days left for the subscription
+    const daysLeft = Math.floor(
+      (latestSubscription.expire_date.getTime() - today) / (1000 * 60 * 60 * 24)
+    );
+    expire_date.setDate(expire_date.getDate() + daysLeft);
+  }
+
+  // setting payload for creating subscription history
+  payload.course_id = subscription.course_id;
+  payload.amount = subscription.cost;
   payload.expire_date = expire_date;
   payload.is_active = payload?.is_active || true;
 
@@ -114,11 +117,7 @@ const BuyACourse = async (
 };
 
 // get total price/cost of a sub category
-const GetTotalCostsOfSubCategory = async (payload: {
-  sub_category_id: string;
-}) => {
-  const { sub_category_id } = payload;
-
+const GetTotalCostsOfSubCategory = async (sub_category_id: string) => {
   const sub_category = await SubCategory.findById(sub_category_id);
   if (!sub_category) {
     throw new ApiError(httpStatus.OK, "Sub category not found!");
@@ -145,19 +144,27 @@ const GetTotalCostsOfSubCategory = async (payload: {
       $project: {
         "subscription.subscription_duration_in_months": 1,
         "subscription.cost": 1,
+        "subscription.course_id": 1,
       },
     },
     {
       $group: {
         _id: "$subscription.subscription_duration_in_months",
         total_cost: { $sum: "$subscription.cost" },
+        subscriptions: { $push: "$subscription" },
       },
     },
     {
       $project: {
         subscription_duration_in_months: "$_id",
         total_cost: 1,
+        subscriptions: 1,
         _id: 0,
+      },
+    },
+    {
+      $sort: {
+        subscription_duration_in_months: 1,
       },
     },
   ]);
@@ -184,25 +191,11 @@ const BuyAllCoursesOfASubCategory = async (payload: {
     throw new ApiError(httpStatus.OK, "Sub category not found!");
   }
 
-  const costFromDB = (
-    await GetTotalCostsOfSubCategory({ sub_category_id })
-  ).find(
-    (price) =>
-      price.subscription_duration_in_months === subscription_duration_in_months
-  ).total_cost;
-
   // checking validity of transaction id
   const validPayment = await Payment.findOne({ trxID: trx_id });
   if (!validPayment) {
     throw new ApiError(httpStatus.OK, "Invalid transaction id!");
   }
-  // if the amount of payment needed is paid
-  // if (costFromDB !== validPayment?.amount) {
-  //   throw new ApiError(
-  //     httpStatus.OK,
-  //     `Invalid payment amount! You had to pay ${costFromDB} taka!`
-  //   );
-  // }
 
   // using aggregation pipeline, merge subscriptions and course and group
   const courseSubscriptions = await Course.aggregate([
@@ -236,6 +229,16 @@ const BuyAllCoursesOfASubCategory = async (payload: {
       },
     },
   ]);
+  // if the amount of payment needed is paid
+  if (
+    courseSubscriptions.length &&
+    Number(courseSubscriptions[0]?.total_cost) !== Number(validPayment?.amount)
+  ) {
+    throw new ApiError(
+      httpStatus.OK,
+      `Invalid payment amount! You had to pay ${courseSubscriptions[0]?.total_cost} taka!`
+    );
+  }
 
   if (courseSubscriptions.length < 1) {
     throw new ApiError(
@@ -245,88 +248,55 @@ const BuyAllCoursesOfASubCategory = async (payload: {
   }
 
   // mapping subscriptions and creating subscriptions histories
+  let today: number = new Date().getTime();
   const subscriptionPromises =
     courseSubscriptions.length &&
     courseSubscriptions[0].subscriptions.map(
       async (subscription: ISubscription) => {
+        // creating payload to create subscription history
         let subscriptionHistoryPayload: Partial<ISubscriptionHistory> = {
+          user_id: new mongoose.Types.ObjectId(user_id),
+          subscription_id: subscription?._id,
           course_id: subscription?.course_id,
           amount: subscription?.cost,
+          trx_id: `${trx_id}-bundle-${today}`,
+          is_active: true,
         };
         let expire_date = new Date();
         expire_date.setMonth(
           expire_date.getMonth() + subscription.subscription_duration_in_months
         );
-        subscriptionHistoryPayload.expire_date = expire_date;
-        subscriptionHistoryPayload.is_active =
-          subscriptionHistoryPayload?.is_active || true;
+
         // check if your subscription day left
-        const today: number = new Date().getTime();
         const alreadyHaveSubscription: ISubscriptionHistory[] | null =
           await SubscriptionHistory.find({
             user_id,
             course_id: subscription?.course_id,
             expire_date: { $gt: today },
           });
+
+        // finding the subscription that has most number of days
+        const latestSubscription = alreadyHaveSubscription?.sort(
+          (a: ISubscriptionHistory, b: ISubscriptionHistory) =>
+            b.expire_date.getTime() - a.expire_date.getTime()
+        )?.[0];
+
         if (alreadyHaveSubscription?.length) {
           // Calculate the number of days left for the subscription
-          const daysLeft = Math.ceil(
-            (alreadyHaveSubscription[0].expire_date.getTime() - today) /
+          const daysLeft = Math.floor(
+            (latestSubscription.expire_date.getTime() - today) /
               (1000 * 60 * 60 * 24)
           );
-          throw new ApiError(
-            httpStatus.OK,
-            `You have an active subscription. It will expire in ${daysLeft} days.`
-          );
+          expire_date.setDate(expire_date.getDate() + daysLeft);
         }
+        subscriptionHistoryPayload.expire_date = expire_date;
+
+        await SubscriptionHistory.create(subscriptionHistoryPayload);
       }
     );
+  await Promise.all(subscriptionPromises);
 
-  // if (courseSubscriptions[0].total_cost > Number(validPayment?.amount)) {
-  //   throw new ApiError(
-  //     httpStatus.OK,
-  //     `Invalid amount payed. You must pay ${courseSubscriptions[0].total_cost} taka.`
-  //   );
-  // }
-
-  // const result = await Course.aggregate([
-  //   {
-  //     $match: {
-  //       sub_category_id: new Types.ObjectId(sub_category_id),
-  //     },
-  //   },
-  //   {
-  //     $lookup: {
-  //       from: "subscriptions", // name of the Subscription collection in MongoDB
-  //       localField: "_id",
-  //       foreignField: "course_id",
-  //       as: "subscription",
-  //     },
-  //   },
-  //   {
-  //     $unwind: "$subscription",
-  //   },
-  //   {
-  //     $project: {
-  //       "subscription.subscription_duration_in_months": 1,
-  //       "subscription.cost": 1,
-  //     },
-  //   },
-  //   {
-  //     $match: {
-  //       "subscription.subscription_duration_in_months":
-  //         subscription_duration_in_months,
-  //     },
-  //   },
-  //   {
-  //     $group: {
-  //       _id: "$subscription.subscription_duration_in_months",
-  //       total_cost: { $sum: "$subscription.cost" },
-  //     },
-  //   },
-  // ]);
-
-  return courseSubscriptions;
+  return courseSubscriptions[0];
 };
 
 // get all courses
@@ -394,16 +364,68 @@ const getAllCourses = async (
 };
 
 const getAllRoutines = async () => {
-  const result = await Course.find({})
-    .populate({
-      path: "sub_category_id",
-      select: "title",
-      populate: {
-        path: "category_id",
-        select: "title",
+  const result = await Course.aggregate([
+    {
+      $project: {
+        routine: 1,
+        sub_category_id: 1,
+        category_id: 1,
+        title: 1,
       },
-    })
-    .select("routine");
+    },
+    {
+      $group: {
+        _id: "$sub_category_id",
+        course: {
+          $push: "$$ROOT",
+        },
+      },
+    },
+
+    {
+      $lookup: {
+        from: "subcategories",
+        localField: "_id",
+        foreignField: "_id",
+        as: "sub_category",
+      },
+    },
+    {
+      $unwind: "$sub_category",
+    },
+
+    {
+      $lookup: {
+        from: "categories",
+        localField: "course.category_id",
+        foreignField: "_id",
+        as: "category",
+      },
+    },
+    {
+      $unwind: "$category",
+    },
+    {
+      $project: {
+        sub_category_id: "$sub_category._id",
+        sub_category_title: "$sub_category.title",
+        category_id: "$category._id",
+        category_title: "$category.title",
+        course: {
+          $map: {
+            input: "$course",
+            as: "course",
+            in: {
+              _id: "$$course._id",
+              title: "$$course.title",
+              routine: "$$course.routine",
+            },
+          },
+        },
+      },
+    },
+  ]);
+
   return result;
 };
 

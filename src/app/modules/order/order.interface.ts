@@ -7,6 +7,17 @@ export interface IOrder {
   unit_price: number;
 }
 
+export interface IOrderCreatePayload {
+  trx_id: string;
+  paymentID: string;
+  shipping_address?: string;
+  shipping_address_id?: string;
+  books: {
+    book_id: string;
+    quantity: number;
+  }[];
+}
+
 export interface IOrderFilters {
   searchTerm?: string;
   user_id?: Types.ObjectId;
