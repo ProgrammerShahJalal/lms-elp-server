@@ -1,10 +1,15 @@
 import httpStatus from "http-status";
 import ApiError from "../../../errors/ApiError";
-import { IExamPayment } from "./exam-payment.interface";
+import { IExamPayment, IExamPaymentFilters } from "./exam-payment.interface";
 import { User } from "../user/user.model";
 import { Exam } from "../exam/exam.model";
 import { ExamPayment } from "./exam-payment.model";
 import { Payment } from "../payment/payment.model";
+import { IPaginationOptions } from "../../../interfaces/pagination";
+import { IGenericResponse } from "../../../interfaces/common";
+import { examPaymentSearchableFields } from "./exam-payment.constants";
+import { paginationHelpers } from "../../helpers/paginationHelpers";
+import { SortOrder } from "mongoose";
 
 // create Exam Payment
 const createExamPayment = async (
@@ -38,8 +43,48 @@ const createExamPayment = async (
 };
 
 // get all Exam Payments
-const getAllExamPayments = async (): Promise<IExamPayment[]> => {
-  const result = await ExamPayment.find({})
+const getAllExamPayments = async (
+  filters: IExamPaymentFilters,
+  paginationOptions: IPaginationOptions
+): Promise<IGenericResponse<IExamPayment[]>> => {
+  const { searchTerm, ...filtersData } = filters;
+
+  const andConditions = [];
+
+  if (searchTerm) {
+    andConditions.push({
+      $or: examPaymentSearchableFields.map((field) => ({
+        [field]: {
+          $regex: searchTerm,
+          $options: "i",
+        },
+      })),
+    });
+  }
+
+  if (Object.keys(filtersData).length) {
+    andConditions.push({
+      $and: Object.entries(filtersData).map(([field, value]) => ({
+        [field]: value,
+      })),
+    });
+  }
+
+  const { page, limit, skip, sortBy, sortOrder } =
+    paginationHelpers.calculatePagination(paginationOptions);
+
+  const sortConditions: { [key: string]: SortOrder } = {};
+  if (sortBy && sortOrder) {
+    sortConditions[sortBy] = sortOrder;
+  }
+
+  const whereConditions =
+    andConditions.length > 0 ? { $and: andConditions } : {};
+
+  const result = await ExamPayment.find(whereConditions)
+    .sort(sortConditions)
+    .skip(skip)
+    .limit(limit)
     .populate({
       path: "exam_id",
       populate: {
@@ -53,11 +98,16 @@ const getAllExamPayments = async (): Promise<IExamPayment[]> => {
       },
     })
     .populate("user_id");
+  const total = await ExamPayment.countDocuments(whereConditions);
 
-  if (!result.length) {
-    throw new ApiError(httpStatus.OK, "No exam payment found!");
-  }
-  return result;
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
 };
 
 // get all Exam Payments

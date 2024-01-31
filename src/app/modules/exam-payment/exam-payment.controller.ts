@@ -3,6 +3,9 @@ import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
 import { ExamPaymentService } from "./exam-payment.service";
+import pick from "../../../shared/pick";
+import { examPaymentFilterableFields } from "./exam-payment.constants";
+import { paginationFields } from "../../constants/pagination";
 
 const createExamPayment = catchAsync(async (req: Request, res: Response) => {
   const result = await ExamPaymentService.createExamPayment(req.body);
@@ -16,7 +19,12 @@ const createExamPayment = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllExamPayments = catchAsync(async (req: Request, res: Response) => {
-  const result = await ExamPaymentService.getAllExamPayments();
+  const filters = pick(req.query, examPaymentFilterableFields);
+  const paginationOptions = pick(req.query, paginationFields);
+  const result = await ExamPaymentService.getAllExamPayments(
+    filters,
+    paginationOptions
+  );
 
   sendResponse(res, {
     success: true,
