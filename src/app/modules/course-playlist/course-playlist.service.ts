@@ -4,6 +4,12 @@ import { SubCategory } from "../sub-category/sub-category.model";
 import { ICoursePlaylist } from "./course-playlist.interface";
 import { CoursePlaylist } from "./course-playlist.model";
 import { Course } from "../course/course.model";
+import { IPaginationOptions } from "../../../interfaces/pagination";
+import { IGenericResponse } from "../../../interfaces/common";
+import { coursePlaylistSearchableFields } from "./course-playlist.constants";
+import { paginationHelpers } from "../../helpers/paginationHelpers";
+import { SortOrder } from "mongoose";
+import { ICourseFilters } from "../course/course.interface";
 
 // create CoursePlaylist
 const createCoursePlaylist = async (
@@ -21,15 +27,70 @@ const createCoursePlaylist = async (
 };
 
 // get all CoursePlaylists
-const getAllCoursePlaylists = async (): Promise<ICoursePlaylist[]> => {
-  const result = await CoursePlaylist.find({}).populate("course_id");
+const getAllCoursePlaylists = async (
+  filters: ICourseFilters,
+  paginationOptions: IPaginationOptions
+): Promise<IGenericResponse<ICoursePlaylist[]>> => {
+  const { searchTerm, ...filtersData } = filters;
 
-  // if there is no CoursePlaylist, throw error
-  if (!result.length) {
-    throw new ApiError(httpStatus.OK, "No course playlist found!");
+  const andConditions = [];
+
+  if (searchTerm) {
+    andConditions.push({
+      $or: coursePlaylistSearchableFields.map((field) => ({
+        [field]: {
+          $regex: searchTerm,
+          $options: "i",
+        },
+      })),
+    });
   }
 
-  return result;
+  if (Object.keys(filtersData).length) {
+    andConditions.push({
+      $and: Object.entries(filtersData).map(([field, value]) => ({
+        [field]: value,
+      })),
+    });
+  }
+
+  const { page, limit, skip, sortBy, sortOrder } =
+    paginationHelpers.calculatePagination(paginationOptions);
+
+  const sortConditions: { [key: string]: SortOrder } = {};
+  if (sortBy && sortOrder) {
+    sortConditions[sortBy] = sortOrder;
+  }
+
+  const whereConditions =
+    andConditions.length > 0 ? { $and: andConditions } : {};
+
+  let result = await CoursePlaylist.find(whereConditions)
+    .sort(sortConditions)
+    .skip(skip)
+    .limit(limit)
+    .populate({
+      path: "course_id",
+      select: "title author routine _id",
+      populate: {
+        path: "sub_category_id",
+        select: "title _id",
+        populate: {
+          path: "category_id",
+          select: "title _id",
+        },
+      },
+    });
+  const total = await CoursePlaylist.countDocuments(whereConditions);
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
 };
 
 // get playlists of a course
