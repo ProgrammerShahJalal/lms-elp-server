@@ -29,7 +29,7 @@ const createPayment = async (req: Request, res: Response) => {
         amount: amount,
         currency: "BDT",
         intent: "sale",
-        merchantInvoiceNumber: "Inv-" + uuidv4().substring(0, 6),
+        merchantInvoiceNumber: "Inv" + uuidv4().substring(0, 6),
       },
       {
         headers: await bkashHeaders(),
@@ -52,7 +52,7 @@ const callBack = async (req: Request, res: Response) => {
 
   if (status === "cancel" || status === "failure") {
     return res.redirect(
-      `${config.frontend_site_url}/bkash/error?message=${status}`
+      `${config.frontend_site_url}/payment/error?message=${status}`
     );
   }
 

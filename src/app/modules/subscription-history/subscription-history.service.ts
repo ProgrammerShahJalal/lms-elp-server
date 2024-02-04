@@ -12,13 +12,15 @@ import {
   ISubscriptionHistoryFilters,
 } from "./subscription-history.interface";
 import { Payment } from "../payment/payment.model";
+import axios from "axios";
+import config from "../../../config";
 
 // create Subscription history
 const createSubscriptionHistory = async (
   payload: ISubscriptionHistory
 ): Promise<ISubscriptionHistory> => {
   // to check if the course is present of the provided course-id
-  const { user_id, subscription_id } = payload;
+  const { user_id, subscription_id, trx_id, payment_ref_id } = payload;
 
   const user = await User.findById(user_id);
   if (!user) {
@@ -32,10 +34,29 @@ const createSubscriptionHistory = async (
     throw new ApiError(httpStatus.OK, "Subscription not found!");
   }
 
-  const validPayment = await Payment.findOne({ trxID: payload?.trx_id });
-  if (!validPayment) {
-    throw new ApiError(httpStatus.OK, "Invalid transaction id!");
+  let validPayment;
+  if (trx_id) {
+    validPayment = await Payment.findOne({ trxID: trx_id });
+    if (!validPayment) {
+      throw new ApiError(httpStatus.OK, "Invalid transaction id!");
+    }
+  } else if (payment_ref_id) {
+    const { data: payment } = await axios.get(
+      `${config.this_site_url}/api/v1/nagad/payment/verify/${payment_ref_id}`
+    );
+    await Payment.create({
+      payment_ref_id,
+      amount: payment?.data?.amount,
+      customerMsisdn: payment?.data?.clientMobileNo,
+    });
+    validPayment = payment?.data;
+  } else {
+    throw new ApiError(
+      httpStatus.OK,
+      "Transaction id or Payment ref id must be given!"
+    );
   }
+
   if (Number(subscription?.cost) !== Number(validPayment?.amount)) {
     throw new ApiError(httpStatus.OK, "Invalid payment amount!");
   }
@@ -60,7 +81,7 @@ const createSubscriptionHistory = async (
   );
   if (alreadyHaveSubscription?.length) {
     // Calculate the number of days left for the subscription
-    const daysLeft = Math.floor(
+    const daysLeft = Math.ceil(
       (latestSubscription.expire_date.getTime() - today) / (1000 * 60 * 60 * 24)
     );
     expire_date.setDate(expire_date.getDate() + daysLeft);

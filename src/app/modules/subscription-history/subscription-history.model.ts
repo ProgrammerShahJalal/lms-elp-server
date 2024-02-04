@@ -20,7 +20,8 @@ const subscriptionHistorySchema = new Schema<ISubscriptionHistory>(
     },
     expire_date: { type: Date, required: true },
     amount: { type: Number, required: true },
-    trx_id: { type: String },
+    trx_id: { type: String, sparse: true },
+    payment_ref_id: { type: String, sparse: true },
     is_active: { type: Boolean },
   },
   { timestamps: true, toJSON: { virtuals: true } }
