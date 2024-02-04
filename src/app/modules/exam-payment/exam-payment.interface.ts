@@ -7,6 +7,7 @@ export interface IExamPayment {
   exam_id: Types.ObjectId | IExam;
   trx_id?: string;
   paymentRefId?: string;
+  payment_ref_id?: string;
 }
 
 export type IExamPaymentFilters = {

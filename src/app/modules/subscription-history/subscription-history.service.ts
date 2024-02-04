@@ -14,6 +14,7 @@ import {
 import { Payment } from "../payment/payment.model";
 import axios from "axios";
 import config from "../../../config";
+import { PaymentUtills } from "../payment/payment.utills";
 
 // create Subscription history
 const createSubscriptionHistory = async (
@@ -34,28 +35,10 @@ const createSubscriptionHistory = async (
     throw new ApiError(httpStatus.OK, "Subscription not found!");
   }
 
-  let validPayment;
-  if (trx_id) {
-    validPayment = await Payment.findOne({ trxID: trx_id });
-    if (!validPayment) {
-      throw new ApiError(httpStatus.OK, "Invalid transaction id!");
-    }
-  } else if (payment_ref_id) {
-    const { data: payment } = await axios.get(
-      `${config.this_site_url}/api/v1/nagad/payment/verify/${payment_ref_id}`
-    );
-    await Payment.create({
-      payment_ref_id,
-      amount: payment?.data?.amount,
-      customerMsisdn: payment?.data?.clientMobileNo,
-    });
-    validPayment = payment?.data;
-  } else {
-    throw new ApiError(
-      httpStatus.OK,
-      "Transaction id or Payment ref id must be given!"
-    );
-  }
+  const validPayment = await PaymentUtills.validPayment({
+    trx_id,
+    payment_ref_id,
+  });
 
   if (Number(subscription?.cost) !== Number(validPayment?.amount)) {
     throw new ApiError(httpStatus.OK, "Invalid payment amount!");

@@ -10,13 +10,14 @@ import { IGenericResponse } from "../../../interfaces/common";
 import { examPaymentSearchableFields } from "./exam-payment.constants";
 import { paginationHelpers } from "../../helpers/paginationHelpers";
 import { SortOrder } from "mongoose";
+import { PaymentUtills } from "../payment/payment.utills";
 
 // create Exam Payment
 const createExamPayment = async (
   payload: IExamPayment
 ): Promise<IExamPayment> => {
   // if the provided user_id have the user or not in db
-  const { user_id, exam_id } = payload;
+  const { user_id, exam_id, trx_id, payment_ref_id } = payload;
   const user = await User.findById(user_id);
   if (!user) {
     throw new ApiError(httpStatus.OK, "User not found!");
@@ -27,11 +28,10 @@ const createExamPayment = async (
     throw new ApiError(httpStatus.OK, "Exam not found!");
   }
 
-  const validPayment = await Payment.findOne({ trxID: payload?.trx_id });
-
-  if (!validPayment) {
-    throw new ApiError(httpStatus.OK, "Invalid transaction id!");
-  }
+  const validPayment = await PaymentUtills.validPayment({
+    trx_id,
+    payment_ref_id,
+  });
 
   if (Number(exam?.fee) !== Number(validPayment?.amount)) {
     throw new ApiError(httpStatus.OK, "Invalid payment amount!");

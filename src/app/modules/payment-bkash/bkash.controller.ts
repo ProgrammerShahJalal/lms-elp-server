@@ -52,7 +52,7 @@ const callBack = async (req: Request, res: Response) => {
 
   if (status === "cancel" || status === "failure") {
     return res.redirect(
-      `${config.frontend_site_url}/payment/error?message=${status}`
+      `${config.frontend_site_url}/bkash/error?message=${status}`
     );
   }
 
