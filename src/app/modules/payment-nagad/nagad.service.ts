@@ -1,4 +1,3 @@
-import axios from "axios";
 import config from "../../../config";
 import {
   IClientType,
@@ -8,9 +7,10 @@ import {
   INagadCreatePaymentDecryptedResponse,
   INagadCreatePaymentResponse,
   INagadPaymentURL,
+  INagadPaymentVerificationResponse,
   INagadSensitiveData,
 } from "./nagad.interface";
-import { nagadPost } from "./nagad.request";
+import { nagadGet, nagadPost } from "./nagad.request";
 import { NagadUtills, genKeys } from "./nagad.utills";
 
 async function confirmPayment(
@@ -24,6 +24,7 @@ async function confirmPayment(
     config.nagad.public_key as string,
     false
   );
+
   const sensitiveData = {
     merchantId: config.nagad.merchant_id as string,
     orderId,
@@ -31,15 +32,17 @@ async function confirmPayment(
     currencyCode: "050",
     challenge,
   };
+
   const payload = {
     paymentRefId: paymentReferenceId,
     sensitiveData: NagadUtills.encrypt(sensitiveData, publicKey),
     signature: NagadUtills.sign(sensitiveData, privateKey),
-    merchantCallbackURL: "https://www.google.com",
+    merchantCallbackURL: `${config.frontend_site_url}/nagad`,
     additionalMerchantInfo: {
       ...productDetails,
     },
   };
+
   const newIP = ip === "::1" || ip === "127.0.0.1" ? "103.100.102.100" : ip;
   return await nagadPost<INagadPaymentURL>(
     `${config.nagad.base_url}/api/dfs/check-out/complete/${paymentReferenceId}`,
@@ -96,6 +99,7 @@ const createPayment = async (
     sensitiveData,
     privateKey
   );
+
   const { paymentReferenceId, challenge } = decrypted;
   const confirmArgs: IConfirmPaymentArgs = {
     paymentReferenceId,
@@ -110,6 +114,23 @@ const createPayment = async (
   return callBackUrl;
 };
 
+const verifyPayment = async (payload: {
+  ip: string;
+  clientType: IClientType;
+  paymentRefId: string;
+}): Promise<INagadPaymentVerificationResponse> => {
+  const { ip, clientType, paymentRefId } = payload;
+  return await nagadGet<INagadPaymentVerificationResponse>(
+    `${config.nagad.base_url}/api/dfs/verify/payment/${paymentRefId}`,
+    {
+      "X-KM-Api-Version": "v-0.2.0",
+      "X-KM-IP-V4": ip,
+      "X-KM-Client-Type": clientType,
+    }
+  );
+};
+
 export const NagadService = {
   createPayment,
+  verifyPayment,
 };

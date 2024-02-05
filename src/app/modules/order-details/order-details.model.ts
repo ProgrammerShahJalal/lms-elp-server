@@ -26,9 +26,12 @@ const orderDetailsSchema = new Schema<IOrderDetails>(
       type: String,
       required: true,
     },
+    payment_ref_id: {
+      type: String,
+      unique: true,
+    },
     trx_id: {
       type: String,
-      required: true,
       unique: true,
     },
   },

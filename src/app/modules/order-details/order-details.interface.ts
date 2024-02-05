@@ -8,7 +8,8 @@ export interface IOrderDetails {
   total_price: number;
   discounts: number;
   orders: string; // json of orders
-  trx_id: string;
+  trx_id?: string;
+  payment_ref_id?: string;
 }
 
 export interface IOrderDetailsFilters {
@@ -18,5 +19,6 @@ export interface IOrderDetailsFilters {
   shipping_charge?: number;
   total_price?: number;
   trx_id?: number;
+  paymentMethod?: "bkash" | "nagad";
   discounts?: number;
 }

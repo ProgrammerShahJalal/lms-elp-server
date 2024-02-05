@@ -20,15 +20,20 @@ const createOrder = async (
   user_id: string,
   payload: IOrderCreatePayload
 ): Promise<IOrderDetails> => {
-  const { trx_id, paymentID, books, shipping_address } = payload;
+  const { paymentMethod, trx_id, paymentID, books, shipping_address } = payload;
 
-  const validPayment = await Payment.findOne({
-    trxID: trx_id,
-    _id: paymentID,
-  });
+  let validPayment;
 
-  if (!validPayment) {
-    throw new ApiError(httpStatus.OK, "Invalid transaction id!");
+  if (paymentMethod === "bkash") {
+    validPayment = await Payment.findOne({
+      trxID: trx_id,
+      _id: paymentID,
+    });
+
+    if (!validPayment) {
+      throw new ApiError(httpStatus.OK, "Invalid transaction id!");
+    }
+  } else if (paymentMethod === "nagad") {
   }
 
   const session = await mongoose.startSession();

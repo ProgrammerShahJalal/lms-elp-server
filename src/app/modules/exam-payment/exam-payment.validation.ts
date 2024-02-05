@@ -10,6 +10,7 @@ const createExamPaymentZodSchema = z.object({
     }),
     invalid_date: z.date({}).optional(),
     trx_id: z.string({}).optional(),
+    payment_ref_id: z.string({}).optional(),
   }),
 });
 
@@ -19,6 +20,7 @@ const updateExamPaymentZodSchema = z.object({
     exam_id: z.string({}).optional(),
     invalid_date: z.date({}).optional(),
     trx_id: z.string({}).optional(),
+    payment_ref_id: z.string({}).optional(),
   }),
 });
 
