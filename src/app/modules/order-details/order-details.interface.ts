@@ -19,6 +19,6 @@ export interface IOrderDetailsFilters {
   shipping_charge?: number;
   total_price?: number;
   trx_id?: number;
-  paymentMethod?: "bkash" | "nagad";
+  payment_ref_id?: string;
   discounts?: number;
 }

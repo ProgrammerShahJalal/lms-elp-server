@@ -29,19 +29,28 @@ const orderDetailsSchema = new Schema<IOrderDetails>(
     payment_ref_id: {
       type: String,
       unique: true,
+      sparse: true,
     },
     trx_id: {
       type: String,
       unique: true,
+      sparse: true,
     },
   },
   { timestamps: true, toJSON: { virtuals: true } }
 );
 
-orderDetailsSchema.index(
-  { user_id: 1, trx_id: 1, shipping_address_id: 1 },
-  { unique: true }
-);
+if (orderDetailsSchema.paths.trx_id) {
+  orderDetailsSchema.index(
+    { user_id: 1, trx_id: 1, shipping_address_id: 1 },
+    { unique: true }
+  );
+} else if (orderDetailsSchema.paths.payment_ref_id) {
+  orderDetailsSchema.index(
+    { user_id: 1, payment_ref_id: 1, shipping_address_id: 1 },
+    { unique: true }
+  );
+}
 
 export const OrderDetails = model<IOrderDetails>(
   "OrderDetails",
