@@ -16,18 +16,10 @@ router.post(
 );
 
 // get all Notices
-router.get(
-  "/",
-  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
-  NoticeController.getAllNotice
-);
+router.get("/", NoticeController.getAllNotice);
 
 // get single Notice
-router.get(
-  "/:id",
-  authRole(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
-  NoticeController.getSingleNotice
-);
+router.get("/:id", NoticeController.getSingleNotice);
 
 // update single Notice
 router.patch(
