@@ -34,6 +34,13 @@ const giveOrRemovePermissionOfAdmin = z.object({
   }),
 });
 
+const changeRoleOfAUser = z.object({
+  body: z.object({
+    user_id: z.string({ required_error: "User id is required!" }),
+    role: z.string({ required_error: "Mention your role" }),
+  }),
+});
+
 const loginUserZodSchema = z.object({
   body: z.object({
     email_or_contact: z.string({}).trim().optional(),
@@ -54,4 +61,5 @@ export const UserValidation = {
   giveOrRemovePermissionOfAdmin,
   loginUserZodSchema,
   updateUserZodSchema,
+  changeRoleOfAUser,
 };
