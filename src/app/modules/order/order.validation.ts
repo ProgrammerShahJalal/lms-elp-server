@@ -2,17 +2,9 @@ import { z } from "zod";
 
 const createOrderZodSchema = z.object({
   body: z.object({
-    paymentMethod: z.string({ required_error: "Payment method is required!" }),
-    trx_id: z
-      .string({
-        required_error: "Transaction id is required!",
-      })
-      .optional(),
-    paymentID: z
-      .string({
-        required_error: "Payment id is required!",
-      })
-      .optional(),
+    trx_id: z.string({}).optional(),
+    paymentID: z.string({}).optional(),
+    payment_ref_id: z.string({}).optional(),
     shipping_address: z.string({}).optional(),
     books: z.array(
       z.object({
