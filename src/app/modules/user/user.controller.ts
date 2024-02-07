@@ -5,10 +5,8 @@ import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
 import config from "../../../config";
 import pick from "../../../shared/pick";
-import { bookFilterableFields } from "../book/book.constants";
 import { paginationFields } from "../../constants/pagination";
 import { userFilterableFields } from "./user.constants";
-import ApiError from "../../../errors/ApiError";
 
 const registerUser = catchAsync(async (req: Request, res: Response) => {
   const result = await UserService.registerUser(req.body);
@@ -156,7 +154,6 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
 
 const changeRoleOfAUser = catchAsync(async (req: Request, res: Response) => {
   const payload = req.body;
-  console.log("hit cont");
   const result = await UserService.changeRoleOfAUser(payload);
 
   sendResponse(res, {
