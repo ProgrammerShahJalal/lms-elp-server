@@ -14,22 +14,20 @@ import { Settings } from "../settings/settings.model";
 import { isJSON } from "../../helpers/common";
 import { OrderStatus } from "../order-status/order-status.model";
 import { Payment } from "../payment/payment.model";
+import { PaymentUtills } from "../payment/payment.utills";
 
 // create Order
 const createOrder = async (
   user_id: string,
   payload: IOrderCreatePayload
 ): Promise<IOrderDetails> => {
-  const { trx_id, paymentID, books, shipping_address } = payload;
+  const { trx_id, paymentID, payment_ref_id, books, shipping_address } =
+    payload;
 
-  const validPayment = await Payment.findOne({
-    trxID: trx_id,
-    _id: paymentID,
+  const validPayment = await PaymentUtills.validPayment({
+    trx_id,
+    payment_ref_id,
   });
-
-  if (!validPayment) {
-    throw new ApiError(httpStatus.OK, "Invalid transaction id!");
-  }
 
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -83,7 +81,7 @@ const createOrder = async (
     if (needShippingCharge) {
       const shippingAddress = JSON.parse(shipping_address as string);
       shippingCharge =
-        (shippingAddress?.outside_dhaka
+        (shippingAddress?.division !== "Dhaka"
           ? await Settings.findOne({
               key: "shipping_charge_outside_dhaka",
             })
@@ -114,6 +112,7 @@ const createOrder = async (
           shipping_address_id: existingShippingAddress?._id,
           orders: JSON.stringify(orders),
           trx_id,
+          payment_ref_id,
           shipping_address: needShippingCharge ? shipping_address : "",
         },
       ],

@@ -3,6 +3,8 @@ import { z } from "zod";
 const createSubscriptionHistorySchema = z.object({
   body: z.object({
     user_id: z.string({ required_error: "User id is required!" }),
+    payment_ref_id: z.string().optional(),
+    trx_id: z.string().optional(),
     subscription_id: z.string({
       required_error: "Subscription id is required!",
     }),

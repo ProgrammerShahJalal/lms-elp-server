@@ -19,12 +19,14 @@ import { OrderDetailsStatusRoutes } from "../modules/order-details/order-details
 import { BkashRoutes } from "../modules/payment-bkash/bkash.route";
 import { SettingsRoutes } from "../modules/settings/settings.route";
 import { NagadPaymentRoutes } from "../modules/payment-nagad/nagad.route";
+import { NoticeRoutes } from "../modules/notice/notice.route";
 
 const router = Router();
 
 const moduleRoutes = [
   { path: "/users", route: UserRoutes },
   { path: "/shipping-addresses", route: ShippingAddressRoutes },
+  { path: "/notices", route: NoticeRoutes },
   { path: "/categories", route: CategoryRoutes },
   { path: "/sub-categories", route: SubCategoryRoutes },
   { path: "/courses", route: CourseRoutes },

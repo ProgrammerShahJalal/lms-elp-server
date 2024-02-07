@@ -8,8 +8,9 @@ export interface IOrder {
 }
 
 export interface IOrderCreatePayload {
-  trx_id: string;
-  paymentID: string;
+  trx_id?: string;
+  paymentID?: string;
+  payment_ref_id?: string;
   shipping_address?: string;
   shipping_address_id?: string;
   books: {

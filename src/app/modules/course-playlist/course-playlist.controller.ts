@@ -5,6 +5,9 @@ import httpStatus from "http-status";
 import { CoursePlaylistService } from "./course-playlist.service";
 import { SubscriptionHistory } from "../subscription-history/subscription-history.model";
 import ApiError from "../../../errors/ApiError";
+import pick from "../../../shared/pick";
+import { coursePlaylistFilterableFields } from "./course-playlist.constants";
+import { paginationFields } from "../../constants/pagination";
 
 const createCoursePlaylist = catchAsync(async (req: Request, res: Response) => {
   const result = await CoursePlaylistService.createCoursePlaylist(req.body);
@@ -19,7 +22,12 @@ const createCoursePlaylist = catchAsync(async (req: Request, res: Response) => {
 
 const getAllCoursePlaylists = catchAsync(
   async (req: Request, res: Response) => {
-    const result = await CoursePlaylistService.getAllCoursePlaylists();
+    const filters = pick(req.query, coursePlaylistFilterableFields);
+    const paginationOptions = pick(req.query, paginationFields);
+    const result = await CoursePlaylistService.getAllCoursePlaylists(
+      filters,
+      paginationOptions
+    );
 
     sendResponse(res, {
       success: true,

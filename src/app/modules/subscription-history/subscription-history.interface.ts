@@ -7,7 +7,8 @@ export interface ISubscriptionHistory {
   subscription_id: Types.ObjectId;
   expire_date: Date;
   amount: number;
-  trx_id: string;
+  payment_ref_id?: string;
+  trx_id?: string;
   is_active: boolean;
 }
 

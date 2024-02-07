@@ -29,7 +29,7 @@ const createPayment = async (req: Request, res: Response) => {
         amount: amount,
         currency: "BDT",
         intent: "sale",
-        merchantInvoiceNumber: "Inv-" + uuidv4().substring(0, 6),
+        merchantInvoiceNumber: "Inv" + uuidv4().substring(0, 6),
       },
       {
         headers: await bkashHeaders(),

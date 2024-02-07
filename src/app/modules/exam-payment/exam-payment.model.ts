@@ -5,7 +5,12 @@ const examPaymentSchema = new Schema<IExamPayment>(
   {
     user_id: { type: Schema.Types.ObjectId, required: true, ref: "User" },
     exam_id: { type: Schema.Types.ObjectId, required: true, ref: "Exam" },
-    trx_id: { type: String, required: true, unique: true },
+    trx_id: { type: String, unique: true, sparse: true },
+    payment_ref_id: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
   },
   { timestamps: true, toJSON: { virtuals: true } }
 );

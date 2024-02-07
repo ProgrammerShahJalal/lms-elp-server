@@ -41,9 +41,8 @@ const buyAllCoursesOfASubCategorySchema = z.object({
     subscription_duration_in_months: z.number({
       required_error: "Subscription duration is required!",
     }),
-    trx_id: z.string({
-      required_error: "Transaction id is required!",
-    }),
+    trx_id: z.string({}).optional(),
+    payment_ref_id: z.string({}).optional(),
   }),
 });
 

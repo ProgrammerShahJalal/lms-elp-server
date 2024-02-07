@@ -153,6 +153,20 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
+const changeRoleOfAUser = catchAsync(async (req: Request, res: Response) => {
+  const payload = req.body;
+  console.log("hit cont");
+  const result = await UserService.changeRoleOfAUser(payload);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "User role updated successfully!",
+    data: result,
+  });
+});
+
 const deleteUser = catchAsync(async (req: Request, res: Response) => {
   const { user_id } = req.params;
   const result = await UserService.deleteUser(user_id);
@@ -175,6 +189,7 @@ export const UserController = {
   login,
   getAllUsers,
   getSingleUser,
+  changeRoleOfAUser,
   updateUser,
   deleteUser,
 };

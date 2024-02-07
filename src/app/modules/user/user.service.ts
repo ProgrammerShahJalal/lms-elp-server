@@ -26,6 +26,7 @@ const registerUser = async (userData: IUser) => {
 // create admin
 const createAdmin = async (userData: IUser) => {
   userData.role = ENUM_USER_ROLE.ADMIN;
+  userData.permission = [];
 
   const createdUser = await UserUtills.createUser(userData);
 
@@ -205,7 +206,26 @@ const updateUser = async (
   payload: Partial<IUser>
 ): Promise<Omit<IUser, "password">> => {
   payload.permission = [];
-  const result = await User.findByIdAndUpdate(user_id, payload, { new: true });
+  const { role, ...updatingPayload } = payload;
+  const result = await User.findByIdAndUpdate(user_id, updatingPayload, {
+    new: true,
+  });
+
+  if (!result) {
+    throw new ApiError(httpStatus.OK, "User not found!");
+  }
+
+  const { password, ...otherData } = result.toObject();
+  return otherData;
+};
+
+// change role of a user
+const changeRoleOfAUser = async (payload: {
+  user_id: string;
+  role: "admin" | "student";
+}): Promise<Omit<IUser, "password">> => {
+  const { user_id, role } = payload;
+  const result = await User.findByIdAndUpdate(user_id, { role }, { new: true });
 
   if (!result) {
     throw new ApiError(httpStatus.OK, "User not found!");
@@ -236,6 +256,7 @@ export const UserService = {
   login,
   getAllUsers,
   getSingleUser,
+  changeRoleOfAUser,
   updateUser,
   deleteUser,
 };

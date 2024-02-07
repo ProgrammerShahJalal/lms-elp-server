@@ -10,7 +10,6 @@ const shippingAddressSchema = new Schema<IShippingAddress>(
       immutable: true,
       ref: "User",
     },
-    outside_dhaka: { type: Boolean, required: true },
     division: { type: String, required: true },
     district: { type: String, required: true },
     upazilla: { type: String, required: true },

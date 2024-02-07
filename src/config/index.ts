@@ -35,4 +35,11 @@ export default {
     search_transaction_url: process.env.BKASH_SEARCH_TRAN_URL,
     query_payment_url: process.env.BKASH_QUERY_PAYMENT_URL,
   },
+  nagad: {
+    merchant_id: process.env.NAGAD_MERCHANT_ID,
+    merchant_number: process.env.NAGAD_MERCHANT_NUMBER,
+    public_key: process.env.NAGAD_PUBLIC_KEY,
+    private_key: process.env.NAGAD_PRIVATE_KEY,
+    base_url: process.env.NAGAD_BASE_URL,
+  },
 };
