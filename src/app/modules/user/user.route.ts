@@ -76,6 +76,14 @@ router.get(
   UserController.getSingleUser
 );
 
+// update role of an user
+router.patch(
+  "/change-role",
+  authRole(ENUM_USER_ROLE.SUPER_ADMIN),
+  validateRequest(UserValidation.changeRoleOfAUser),
+  UserController.changeRoleOfAUser
+);
+
 // update user
 router.patch(
   "/:user_id",

@@ -18,6 +18,7 @@ import { Payment } from "../payment/payment.model";
 import { SubscriptionHistory } from "../subscription-history/subscription-history.model";
 import { Types } from "mongoose";
 import { ISubscription } from "../subscription/subscription.interface";
+import { PaymentUtills } from "../payment/payment.utills";
 
 // create Course
 const createCourse = async (req: Request): Promise<ICourse> => {
@@ -176,10 +177,16 @@ const BuyAllCoursesOfASubCategory = async (payload: {
   user_id: string;
   sub_category_id: string;
   subscription_duration_in_months: string;
-  trx_id: string;
+  trx_id?: string;
+  payment_ref_id?: string;
 }) => {
-  const { user_id, sub_category_id, subscription_duration_in_months, trx_id } =
-    payload;
+  const {
+    user_id,
+    sub_category_id,
+    subscription_duration_in_months,
+    trx_id,
+    payment_ref_id,
+  } = payload;
 
   const user = await User.findById(user_id);
   if (!user) {
@@ -192,10 +199,10 @@ const BuyAllCoursesOfASubCategory = async (payload: {
   }
 
   // checking validity of transaction id
-  const validPayment = await Payment.findOne({ trxID: trx_id });
-  if (!validPayment) {
-    throw new ApiError(httpStatus.OK, "Invalid transaction id!");
-  }
+  const validPayment = await PaymentUtills.validPayment({
+    trx_id,
+    payment_ref_id,
+  });
 
   // using aggregation pipeline, merge subscriptions and course and group
   const courseSubscriptions = await Course.aggregate([
@@ -259,7 +266,10 @@ const BuyAllCoursesOfASubCategory = async (payload: {
           subscription_id: subscription?._id,
           course_id: subscription?.course_id,
           amount: subscription?.cost,
-          trx_id: `${trx_id}-bundle-${today}`,
+          trx_id: trx_id ? `${trx_id}-bundle-${today}` : "",
+          payment_ref_id: payment_ref_id
+            ? `${payment_ref_id}-bundle-${today}`
+            : "",
           is_active: true,
         };
         let expire_date = new Date();
