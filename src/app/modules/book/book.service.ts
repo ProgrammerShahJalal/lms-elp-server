@@ -173,7 +173,18 @@ const getBooksOfACourse = async (course_id: string): Promise<IBook[]> => {
 
 // get single Book
 const getSingleBook = async (id: string): Promise<IBook | null> => {
-  const result = await Book.findById(id);
+  const result = await Book.findById(id).populate({
+    path: "course_id",
+    select: "title membership_type title",
+    populate: {
+      path: "sub_category_id",
+      select: "title",
+      populate: {
+        path: "category_id",
+        select: "title",
+      },
+    },
+  });
 
   if (!result) {
     throw new ApiError(httpStatus.OK, "Book not found!");

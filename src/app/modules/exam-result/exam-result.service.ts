@@ -10,10 +10,7 @@ import { User } from "../user/user.model";
 import { Exam } from "../exam/exam.model";
 import { IGenericResponse } from "../../../interfaces/common";
 import { IPaginationOptions } from "../../../interfaces/pagination";
-import {
-  examResultFilterableFields,
-  examResultSearchableFields,
-} from "./exam-result.constants";
+import { examResultSearchableFields } from "./exam-result.constants";
 import { paginationHelpers } from "../../helpers/paginationHelpers";
 import { SortOrder } from "mongoose";
 
@@ -126,7 +123,14 @@ const getAllExamResults = async (
     .sort(sortConditions)
     .skip(skip)
     .limit(limit)
-    .populate("exam_id");
+    .populate({
+      path: "exam_id",
+      select: "title",
+    })
+    .populate({
+      path: "user_id",
+      select: "name",
+    });
   const total = await ExamResult.countDocuments(whereConditions);
 
   return {

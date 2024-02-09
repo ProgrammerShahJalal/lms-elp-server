@@ -2,6 +2,7 @@ import httpStatus from "http-status";
 import ApiError from "../../../errors/ApiError";
 import { ICourse, ICourseFilters } from "./course.interface";
 import { Course } from "./course.model";
+import { v4 as uuidv4 } from "uuid";
 import { SubCategory } from "../sub-category/sub-category.model";
 import { IPaginationOptions } from "../../../interfaces/pagination";
 import { IGenericResponse } from "../../../interfaces/common";
@@ -266,9 +267,9 @@ const BuyAllCoursesOfASubCategory = async (payload: {
           subscription_id: subscription?._id,
           course_id: subscription?.course_id,
           amount: subscription?.cost,
-          trx_id: trx_id ? `${trx_id}-bundle-${today}` : "",
+          trx_id: trx_id ? `${trx_id}-bundle-${uuidv4().substring(0, 5)}` : "",
           payment_ref_id: payment_ref_id
-            ? `${payment_ref_id}-bundle-${today}`
+            ? `${payment_ref_id}-bundle-${uuidv4().substring(0, 5)}`
             : "",
           is_active: true,
         };
