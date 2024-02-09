@@ -29,13 +29,13 @@ const validPayment = async (payload: {
     } else {
       throw new ApiError(
         httpStatus.OK,
-        "Transaction id or Payment ref id must be given!"
+        "Transaction id or Payment ref id must be valid!"
       );
     }
 
     return validPayment;
   } catch (error) {
-    throw new ApiError(httpStatus.OK, "Payment not verified!");
+    throw new ApiError(httpStatus.OK, `Payment not verified! ${error}`);
   }
 };
 
