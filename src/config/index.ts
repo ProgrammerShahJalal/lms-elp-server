@@ -11,6 +11,10 @@ export default {
   mongodb: {
     url: process.env.MONGODB_URL,
   },
+  link_security: {
+    key: process.env.LINK_SECURITY_KEY,
+    iv: process.env.LINK_SECURITY_IV,
+  },
   jwt: {
     secret: process.env.JWT_SECRET,
     bcrypt_salt_rounds: process.env.BCRYPT_SALT_ROUNDS,
