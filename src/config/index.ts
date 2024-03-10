@@ -46,4 +46,5 @@ export default {
     private_key: process.env.NAGAD_PRIVATE_KEY,
     base_url: process.env.NAGAD_BASE_URL,
   },
+  firebase_messaging_key: process.env.FIREBASE_MESSAGING_KEY,
 };
