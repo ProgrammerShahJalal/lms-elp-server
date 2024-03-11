@@ -33,6 +33,12 @@ router.post(
 // get all exams
 router.get("/", ExamController.getAllExams);
 
+// get exams of a sub category
+router.get(
+  "/sub-category/:sub_category_id",
+  ExamController.getSubCategoryExams
+);
+
 // get all due exams
 router.get(
   "/my-due-exams",
