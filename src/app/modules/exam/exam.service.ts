@@ -153,6 +153,40 @@ const getSubCategoryExams = async (sub_category_id: string) => {
   return exams;
 };
 
+const getCategoryExams = async (category_id: string) => {
+  const exams = await Exam.aggregate([
+    {
+      $lookup: {
+        from: "courses",
+        localField: "course_id",
+        foreignField: "_id",
+        as: "course",
+      },
+    },
+    {
+      $unwind: "$course",
+    },
+    {
+      $match: {
+        "course.category_id": new mongoose.Types.ObjectId(category_id),
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        title: 1,
+        total_marks: 1,
+        duration_in_minutes: 1,
+        fee: 1,
+        is_active: 1,
+        exam_type: 1,
+      },
+    },
+  ]);
+
+  return exams;
+};
+
 // get all due exams
 const getMyDueExams = async (user_id: string): Promise<string[] | null> => {
   const dueExamIds: string[] = [];
@@ -212,6 +246,7 @@ export const ExamService = {
   BuyAnExam,
   getAllExams,
   getSubCategoryExams,
+  getCategoryExams,
   getMyDueExams,
   getSingleExam,
   updateExam,

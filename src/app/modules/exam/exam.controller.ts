@@ -57,6 +57,19 @@ const getSubCategoryExams = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getCategoryExams = catchAsync(async (req: Request, res: Response) => {
+  const { category_id } = req.params;
+
+  const result = await ExamService.getCategoryExams(category_id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Exams of the category fetched successfully!",
+    data: result,
+  });
+});
+
 const getMyDueExams = catchAsync(async (req: Request, res: Response) => {
   const user_id = req?.user?.userId;
   const result = await ExamService.getMyDueExams(user_id);
@@ -110,6 +123,7 @@ export const ExamController = {
   BuyAnExam,
   getAllExams,
   getSubCategoryExams,
+  getCategoryExams,
   getMyDueExams,
   getSingleExam,
   updateExam,
