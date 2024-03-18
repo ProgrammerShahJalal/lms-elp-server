@@ -39,6 +39,9 @@ router.get(
   ExamController.getSubCategoryExams
 );
 
+// get exams of a category
+router.get("/category/:category_id", ExamController.getCategoryExams);
+
 // get all due exams
 router.get(
   "/my-due-exams",
