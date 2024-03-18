@@ -64,6 +64,7 @@ const createCourse = async (req: Request): Promise<ICourse> => {
       },
     });
   } else {
+    delete req.body.sub_category_id;
     result = (await Course.create(req.body)).populate({
       path: "category_id",
       select: "title _id",
@@ -511,6 +512,9 @@ const updateCourse = async (req: Request): Promise<ICourse | null> => {
       FileUploadHelper.deleteFromCloudinary(course?.banner as string);
     }
   }
+
+  if (req.body.category_id && !req.body.sub_category_id)
+    delete req.body.sub_category_id;
 
   // updating course
   const result = await Course.findOneAndUpdate(
