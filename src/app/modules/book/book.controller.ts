@@ -32,17 +32,48 @@ const getAllBooks = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getAllBooksOfACategory = catchAsync(
+const getAllBooksOfASubject = catchAsync(
   async (req: Request, res: Response) => {
-    const { category_id } = req.params;
+    const { subject_id } = req.params;
 
-    const result = await BookService.getBooksOfACategory(category_id);
+    const filters = pick(req.query, bookFilterableFields);
+    const paginationOptions = pick(req.query, paginationFields);
+
+    const result = await BookService.getBooksOfASubject(
+      subject_id,
+      filters,
+      paginationOptions
+    );
 
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
       message: "Books fetched successfully!",
-      data: result,
+      data: result.data,
+      meta: result.meta,
+    });
+  }
+);
+
+const getAllBooksOfACategory = catchAsync(
+  async (req: Request, res: Response) => {
+    const { category_id } = req.params;
+
+    const filters = pick(req.query, bookFilterableFields);
+    const paginationOptions = pick(req.query, paginationFields);
+
+    const result = await BookService.getBooksOfACategory(
+      category_id,
+      filters,
+      paginationOptions
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Books fetched successfully!",
+      data: result.data,
+      meta: result.meta,
     });
   }
 );
@@ -51,13 +82,21 @@ const getAllBooksOfASubCategory = catchAsync(
   async (req: Request, res: Response) => {
     const { sub_category_id } = req.params;
 
-    const result = await BookService.getAllBooksOfASubCategory(sub_category_id);
+    const filters = pick(req.query, bookFilterableFields);
+    const paginationOptions = pick(req.query, paginationFields);
+
+    const result = await BookService.getBooksOfASubCategory(
+      sub_category_id,
+      filters,
+      paginationOptions
+    );
 
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
       message: "Books fetched successfully!",
-      data: result,
+      data: result.data,
+      meta: result.meta,
     });
   }
 );
@@ -65,13 +104,42 @@ const getAllBooksOfASubCategory = catchAsync(
 const getAllBooksOfACourse = catchAsync(async (req: Request, res: Response) => {
   const { course_id } = req.params;
 
-  const result = await BookService.getBooksOfACourse(course_id);
+  const filters = pick(req.query, bookFilterableFields);
+  const paginationOptions = pick(req.query, paginationFields);
+
+  const result = await BookService.getBooksOfACourse(
+    course_id,
+    filters,
+    paginationOptions
+  );
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
     message: "Books fetched successfully!",
-    data: result,
+    data: result.data,
+    meta: result.meta,
+  });
+});
+
+const getBooksOfAProstuti = catchAsync(async (req: Request, res: Response) => {
+  const { prostuti_title } = req.params;
+
+  const filters = pick(req.query, bookFilterableFields);
+  const paginationOptions = pick(req.query, paginationFields);
+
+  const result = await BookService.getBooksOfAProstuti(
+    prostuti_title,
+    filters,
+    paginationOptions
+  );
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Books fetched successfully!",
+    data: result.data,
+    meta: result.meta,
   });
 });
 
@@ -114,7 +182,9 @@ export const BookController = {
   getAllBooks,
   getAllBooksOfACategory,
   getAllBooksOfASubCategory,
+  getAllBooksOfASubject,
   getAllBooksOfACourse,
+  getBooksOfAProstuti,
   getSingleBook,
   updateBook,
   deleteBook,

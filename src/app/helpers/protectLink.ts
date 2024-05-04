@@ -11,8 +11,10 @@ function encryptLink(originalLink: string) {
     Buffer.from(key, "hex"),
     Buffer.from(iv, "hex")
   );
-  let encryptedLink = cipher.update(originalLink, "utf-8", "hex");
+
+  let encryptedLink = cipher.update(originalLink, "utf8", "hex");
   encryptedLink += cipher.final("hex");
+
   return encryptedLink;
 }
 

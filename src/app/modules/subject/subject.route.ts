@@ -15,12 +15,8 @@ router.post(
   SubjectController.addSubject
 );
 
-// get all Subject
-router.get(
-  "/",
-  authRole(ENUM_USER_ROLE.SUPER_ADMIN),
-  SubjectController.getAllSubject
-);
+// get all Subjects
+router.get("/", SubjectController.getAllSubjects);
 
 // get single Subject
 router.get(
