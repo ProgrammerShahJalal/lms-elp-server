@@ -10,8 +10,8 @@ import { IGenericResponse } from "../../../interfaces/common";
 import { IUploadFile } from "../../../interfaces/file";
 import { Request } from "express";
 import { FileUploadHelper } from "../../helpers/fileUploadHelper";
-import encryptLink from "../../helpers/protectLink";
 import { BookUtills } from "./book.utills";
+import { LinkProtectionHelpers } from "../../helpers/protectLink";
 
 // create Book
 const addBook = async (req: Request): Promise<IBook> => {
@@ -26,7 +26,7 @@ const addBook = async (req: Request): Promise<IBook> => {
 
   const { pdf_link, ...others } = req.body;
   if (pdf_link) {
-    const encryptedPdfLink = encryptLink(pdf_link);
+    const encryptedPdfLink = LinkProtectionHelpers.encrypt(pdf_link);
     req.body = {
       pdf_link: encryptedPdfLink,
       ...others,
@@ -272,7 +272,10 @@ const getBooksOfAProstuti = async (
 };
 
 // get single Book
-const getSingleBook = async (id: string): Promise<IBook | null> => {
+const getSingleBook = async (
+  id: string,
+  verifiedMobile: boolean
+): Promise<IBook | null> => {
   const result = await Book.findById(id).populate({
     path: "course_id",
     select: "title membership_type title",
@@ -290,7 +293,15 @@ const getSingleBook = async (id: string): Promise<IBook | null> => {
     throw new ApiError(httpStatus.OK, "Book not found!");
   }
 
-  return result;
+  const booksData = JSON.parse(JSON.stringify(result));
+
+  if (verifiedMobile && result?.pdf_link) {
+    booksData.pdf_link = LinkProtectionHelpers.decrypt(
+      result?.pdf_link as string
+    );
+  }
+
+  return booksData;
 };
 
 // update Book
@@ -319,7 +330,7 @@ const updateBook = async (req: Request): Promise<IBook | null> => {
 
   if (req.body.pdf_link) {
     const { pdf_link, ...others } = payload;
-    const encryptedPdfLink = encryptLink(pdf_link);
+    const encryptedPdfLink = LinkProtectionHelpers.encrypt(pdf_link);
     payload = {
       pdf_link: encryptedPdfLink,
       ...others,

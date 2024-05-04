@@ -6,6 +6,8 @@ import { BookService } from "./book.service";
 import pick from "../../../shared/pick";
 import { bookFilterableFields } from "./book.constants";
 import { paginationFields } from "../../constants/pagination";
+import config from "../../../config";
+import { isVerfiedMobileApp } from "../../helpers/common";
 
 const addBook = catchAsync(async (req: Request, res: Response) => {
   const result = await BookService.addBook(req);
@@ -145,7 +147,10 @@ const getBooksOfAProstuti = catchAsync(async (req: Request, res: Response) => {
 
 const getSingleBook = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await BookService.getSingleBook(id);
+
+  let verifiedMobile = isVerfiedMobileApp(req);
+
+  const result = await BookService.getSingleBook(id, verifiedMobile);
 
   sendResponse(res, {
     success: true,
