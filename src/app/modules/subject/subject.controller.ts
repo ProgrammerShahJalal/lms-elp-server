@@ -18,11 +18,14 @@ const addSubject = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getAllSubject = catchAsync(async (req: Request, res: Response) => {
+const getAllSubjects = catchAsync(async (req: Request, res: Response) => {
   const filters = pick(req.query, subjectFilterableFields);
   const paginationOptions = pick(req.query, paginationFields);
 
-  const result = await SubjectService.getAllSubject(filters, paginationOptions);
+  const result = await SubjectService.getAllSubjects(
+    filters,
+    paginationOptions
+  );
 
   sendResponse(res, {
     success: true,
@@ -71,7 +74,7 @@ const deleteSubject = catchAsync(async (req: Request, res: Response) => {
 
 export const SubjectController = {
   addSubject,
-  getAllSubject,
+  getAllSubjects,
   getSingleSubject,
   updateSubject,
   deleteSubject,

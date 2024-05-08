@@ -22,6 +22,7 @@ import { NagadPaymentRoutes } from "../modules/payment-nagad/nagad.route";
 import { NoticeRoutes } from "../modules/notice/notice.route";
 import { MobileAppRoutes } from "../modules/mobile-app/mobile-app.route";
 import { SubjectRoutes } from "../modules/subject/subject.route";
+import { PaymentRoutes } from "../modules/payment/payment.route";
 
 const router = Router();
 
@@ -45,6 +46,7 @@ const moduleRoutes = [
   { path: "/orders", route: OrderRoutes },
   { path: "/order-details", route: OrderDetailsStatusRoutes },
   { path: "/order-statuses", route: OrderStatusRoutes },
+  { path: "/payments", route: PaymentRoutes },
   { path: "/bkash", route: BkashRoutes },
   { path: "/nagad", route: NagadPaymentRoutes },
   { path: "/settings", route: SettingsRoutes },
