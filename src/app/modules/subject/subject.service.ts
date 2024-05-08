@@ -16,8 +16,8 @@ const addSubject = async (payload: ISubject): Promise<ISubject> => {
   return result;
 };
 
-// get all Subject
-const getAllSubject = async (
+// get all Subject(custom sort)
+const getAllSubjects = async (
   filters: ISubjectFilters,
   paginationOptions: IPaginationOptions
 ): Promise<IGenericResponse<ISubject[]>> => {
@@ -44,6 +44,7 @@ const getAllSubject = async (
     });
   }
 
+  if (!paginationOptions?.limit) paginationOptions.limit = 15;
   const { page, limit, skip, sortBy, sortOrder } =
     paginationHelpers.calculatePagination(paginationOptions);
 
@@ -58,8 +59,33 @@ const getAllSubject = async (
   const result = await Subject.find(whereConditions)
     .sort(sortConditions)
     .skip(skip)
-    .limit(limit);
+    .limit(limit)
+    .select("-createdAt -updatedAt -__v");
   const total = await Subject.countDocuments(whereConditions);
+
+  let predefinedSubjects = [
+    "বাংলা",
+    "ইংরেজি",
+    "গণিত",
+    "সাধারণ জ্ঞাণ",
+    "আইসিটি",
+    "অন্যান্য",
+  ];
+
+  let sortedSubjects = result.sort((a, b) => {
+    let indexA = predefinedSubjects.indexOf(a.title);
+    let indexB = predefinedSubjects.indexOf(b.title);
+
+    // If not found in predefinedCategories, push to the end
+    if (indexA === -1) indexA = predefinedSubjects.length;
+    if (indexB === -1) indexB = predefinedSubjects.length;
+
+    // Special handling for "অন্যান্য"
+    if (a.title === "অন্যান্য") return 1;
+    if (b.title === "অন্যান্য") return -1;
+
+    return indexA - indexB;
+  });
 
   return {
     meta: {
@@ -67,7 +93,7 @@ const getAllSubject = async (
       limit,
       total,
     },
-    data: result,
+    data: sortedSubjects,
   };
 };
 
@@ -102,7 +128,7 @@ const deleteSubject = async (id: string) => {
 
 export const SubjectService = {
   addSubject,
-  getAllSubject,
+  getAllSubjects,
   getSingleSubject,
   updateSubject,
   deleteSubject,
