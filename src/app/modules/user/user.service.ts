@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 import { ILoginInfo, IUser, IUserFilters } from "./user.interface";
 import { User } from "./user.model";
 import { ENUM_USER_ROLE } from "../../enums/user";
@@ -7,7 +8,7 @@ import httpStatus from "http-status";
 import { UserUtills } from "./user.utills";
 import { userSearchableFields } from "./user.constants";
 import { paginationHelpers } from "../../helpers/paginationHelpers";
-import { SortOrder } from "mongoose";
+import { SortOrder, trusted } from "mongoose";
 import { IPaginationOptions } from "../../../interfaces/pagination";
 
 // registering user/student
@@ -98,6 +99,17 @@ const login = async (loginInfo: ILoginInfo) => {
     throw new ApiError(httpStatus.OK, "User not found!");
   }
 
+  // assigning sessionID
+  const userWithSessionID = await User.findByIdAndUpdate(
+    requestedUser?._id,
+    {
+      sessionID: crypto.randomUUID().toString().slice(0, 16),
+    },
+    {
+      new: true,
+    }
+  );
+
   // compare password
   const isPasswordMatched = bcrypt.compareSync(
     password,
@@ -110,7 +122,8 @@ const login = async (loginInfo: ILoginInfo) => {
   }
 
   const { accessToken, refreshToken } =
-    await UserUtills.createTokenRefreshTokenForUser(requestedUser);
+    // @ts-ignore
+    await UserUtills.createTokenRefreshTokenForUser(userWithSessionID);
 
   return { isPasswordMatched, accessToken, refreshToken };
 };
@@ -206,7 +219,7 @@ const updateUser = async (
   payload: Partial<IUser>
 ): Promise<Omit<IUser, "password">> => {
   payload.permission = [];
-  const { role, ...updatingPayload } = payload;
+  const { role, email, contact_no, ...updatingPayload } = payload;
   const result = await User.findByIdAndUpdate(user_id, updatingPayload, {
     new: true,
   });
