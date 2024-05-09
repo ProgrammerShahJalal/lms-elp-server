@@ -1,6 +1,5 @@
 import httpStatus from "http-status";
 import ApiError from "../../../errors/ApiError";
-import { SubCategory } from "../sub-category/sub-category.model";
 import { ICoursePlaylist } from "./course-playlist.interface";
 import { CoursePlaylist } from "./course-playlist.model";
 import { Course } from "../course/course.model";
