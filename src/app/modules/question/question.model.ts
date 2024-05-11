@@ -4,7 +4,7 @@ import { IQuestion } from "./question.interface";
 const questionSchema = new Schema<IQuestion>(
   {
     question: { type: String, required: true },
-    options: [{ type: Map, of: String }],
+    options: [{ type: Map, of: String, unique: true }],
     correct_answer: { type: String },
     mark: { type: Number, required: true, default: 1 },
     exam_id: { type: Schema.Types.ObjectId, ref: "Exam" },
