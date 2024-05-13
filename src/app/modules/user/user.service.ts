@@ -18,8 +18,20 @@ const registerUser = async (userData: IUser) => {
 
   const createdUser = await UserUtills.createUser(userData);
 
+  // assigning sessionID
+  const userWithSessionID = await User.findByIdAndUpdate(
+    createdUser?._id,
+    {
+      sessionID: crypto.randomUUID().toString().slice(0, 16),
+    },
+    {
+      new: true,
+    }
+  );
+
   const { accessToken, refreshToken } =
-    await UserUtills.createTokenRefreshTokenForUser(createdUser);
+    // @ts-ignore
+    await UserUtills.createTokenRefreshTokenForUser(userWithSessionID);
 
   return { createdUser, accessToken, refreshToken };
 };
@@ -31,8 +43,20 @@ const createAdmin = async (userData: IUser) => {
 
   const createdUser = await UserUtills.createUser(userData);
 
+  // assigning sessionID
+  const userWithSessionID = await User.findByIdAndUpdate(
+    createdUser?._id,
+    {
+      sessionID: crypto.randomUUID().toString().slice(0, 16),
+    },
+    {
+      new: true,
+    }
+  );
+
   const { accessToken, refreshToken } =
-    await UserUtills.createTokenRefreshTokenForUser(createdUser);
+    // @ts-ignore
+    await UserUtills.createTokenRefreshTokenForUser(userWithSessionID);
 
   return { createdUser, accessToken, refreshToken };
 };
@@ -43,8 +67,20 @@ const createSuperAdmin = async (userData: IUser) => {
 
   const createdUser = await UserUtills.createUser(userData);
 
+  // assigning sessionID
+  const userWithSessionID = await User.findByIdAndUpdate(
+    createdUser?._id,
+    {
+      sessionID: crypto.randomUUID().toString().slice(0, 16),
+    },
+    {
+      new: true,
+    }
+  );
+
   const { accessToken, refreshToken } =
-    await UserUtills.createTokenRefreshTokenForUser(createdUser);
+    // @ts-ignore
+    await UserUtills.createTokenRefreshTokenForUser(userWithSessionID);
 
   return { createdUser, accessToken, refreshToken };
 };
